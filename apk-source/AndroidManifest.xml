@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="34" android:compileSdkVersionCodename="14" package="com.cicp.jwxt" platformBuildVersionCode="34" platformBuildVersionName="14">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application android:debuggable="true" android:extractNativeLibs="false" android:icon="@android:drawable/ic_menu_agenda" android:label="司警教务查询" android:usesCleartextTraffic="true" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity android:configChanges="orientation|screenSize" android:exported="true" android:name="com.cicp.jwxt.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

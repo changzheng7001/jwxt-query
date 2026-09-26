@@ -12,27 +12,80 @@
 - 全校教师/班级/教室浏览
 - 本地缓存，无网也能查看
 
-## 技术栈
+## 技术架构
 
-- 前端：单文件 HTML + CSS + JS
-- 包装：Android WebView
-- 接口：直接调用教务系统 HTTP 接口
+```
+┌─────────────────────────┐
+│   Android WebView       │
+│  ┌───────────────────┐  │
+│  │   index.html      │  │
+│  │   (前端 UI/逻辑)   │  │
+│  └───────────────────┘  │
+│           ↓ 调用         │
+│  ┌───────────────────┐  │
+│  │ Android.httpRequest│ │
+│  │ (Java 原生发请求)   │  │
+│  └───────────────────┘  │
+│           ↓             │
+│    教务系统 HTTP API     │
+└─────────────────────────┘
+```
 
-## 使用
-
-1. 下载最新 APK 安装
-2. 打开 App，默认缓存模式，无网也能看之前查过的数据
-3. 需要更新数据时点右上角"登录"，输入学号密码
-4. 点"查询"看缓存，点"刷新"拉新数据
+- **前端**：单文件 HTML + CSS + JS（`apk-source/assets/index.html`）
+- **Android 壳**：反编译的 smali 代码（`apk-source/smali/`）
+- **接口**：直接调用教务系统 HTTP 接口
 
 ## 目录结构
 
 ```
-├── jwxt-webapp/       # 前端代码
-│   └── index.html     # 单文件前端
-├── jwxt-deploy/       # 部署相关
+├── apk-source/           # 完整反编译源码
+│   ├── AndroidManifest.xml
+│   ├── apktool.yml
+│   ├── assets/
+│   │   └── index.html    # 前端代码（主要改这里）
+│   ├── smali/            # Android 原生代码
+│   ├── res/              # 资源文件
+│   └── original/
+├── jwxt-webapp/
+│   └── index.html        # 前端源文件（和 apk-source/assets/ 同步）
 └── README.md
 ```
+
+## 如何修改和打包
+
+### 1. 修改前端代码
+
+编辑 `jwxt-webapp/index.html`，改完后复制到 `apk-source/assets/index.html`。
+
+### 2. 打包 APK
+
+需要安装 apktool：
+```bash
+# 下载 apktool
+wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O apktool.jar
+
+# 打包
+java -jar apktool.jar b apk-source -o 司警教务查询_new.apk
+```
+
+### 3. 签名
+
+需要安装 uber-apk-signer：
+```bash
+wget https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar -O uber-apk-signer.jar
+
+# 用 debug keystore 签名
+java -jar uber-apk-signer.jar -a 司警教务查询_new.apk --out signed
+```
+
+签名后的 APK 可以直接安装。
+
+## 使用
+
+1. 安装 APK
+2. 打开 App，默认缓存模式，无网也能看之前查过的数据
+3. 需要更新数据时点右上角"登录"，输入学号密码
+4. 点"查询"看缓存，点"刷新"拉新数据
 
 ## 版本
 

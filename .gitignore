@@ -27,3 +27,6 @@ __pycache__/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# apktool 构建目录
+apk-source/build/

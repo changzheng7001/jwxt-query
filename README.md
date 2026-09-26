@@ -1,6 +1,6 @@
-# 司警教务查询 APP
+# CICP 教务查询 APP
 
-中央司法警官学院教务系统查询工具，WebView 包装的 Android APK。
+CICP 教务系统查询工具，WebView 包装的 Android APK。
 
 ## 功能
 
@@ -65,7 +65,7 @@
 wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O apktool.jar
 
 # 打包
-java -jar apktool.jar b apk-source -o 司警教务查询_new.apk
+java -jar apktool.jar b apk-source -o cicp-jwxt_new.apk
 ```
 
 ### 3. 签名
@@ -75,7 +75,7 @@ java -jar apktool.jar b apk-source -o 司警教务查询_new.apk
 wget https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar -O uber-apk-signer.jar
 
 # 用 debug keystore 签名
-java -jar uber-apk-signer.jar -a 司警教务查询_new.apk --out signed
+java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
 ```
 
 签名后的 APK 可以直接安装。

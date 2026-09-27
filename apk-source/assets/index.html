@@ -97,11 +97,39 @@ body { background: transparent; color: var(--ink); font-family: var(--font); fon
 }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
 .topbar-title { font-size: 20px; color: var(--green); font-weight: 600; }
+.menu-btn { background: none; border: none; color: var(--green); padding: 4px; cursor: pointer; display: flex; align-items: center; line-height: 0; border-radius: 8px; }
+.menu-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .back-btn { background: none; border: none; color: var(--green); font-size: 20px; padding: 0 8px; cursor: pointer; display: none; line-height: 1; }
 .back-btn.show { display: block; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #8b949e; display: inline-block; }
 .status-dot.ok { background: var(--green); }
 .status-dot.cached { background: var(--pink); }
+
+/* ==== 左侧查询工作台侧边栏（≡ 抽屉） ==== */
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(10,14,20,0.36); z-index: 145; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+body.sidebar-open .sidebar-overlay { opacity: 1; pointer-events: auto; }
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 300px; max-width: 84vw;
+  margin: 0; padding: 0 0 24px; overflow-y: auto; z-index: 150; box-sizing: border-box;
+  background: var(--sheet-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+  border-right: 1px solid var(--glass-border);
+  transform: translateX(-104%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+  overscroll-behavior: contain;
+}
+body.sidebar-open .sidebar { transform: translateX(0); box-shadow: 0 0 48px rgba(0,0,0,0.18); }
+.sidebar-head { display: flex; align-items: center; justify-content: space-between; padding: 62px 16px 10px; }
+.sidebar-close { background: none; border: none; color: var(--ink-light); font-size: 16px; cursor: pointer; padding: 4px; }
+#querySection { margin: 0; padding: 0 14px; }
+#browseNav { margin: 0; padding: 0 14px; }
+#querySection .card, #browseNav .card { box-shadow: none; margin-bottom: 14px; }
+html[data-style="classic"] .sidebar { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* 宽屏：侧边栏常驻 */
+@media (min-width: 960px) {
+  .sidebar { transform: none; width: 320px; }
+  .sidebar-overlay { display: none; }
+  main { margin-left: 320px; }
+}
 
 main { max-width: 600px; margin: 0 auto; padding: 12px; }
 
@@ -371,9 +399,12 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 
 <header class="topbar">
   <div class="topbar-left">
+    <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="菜单" title="查询工作台">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="16" x2="21" y2="16"/></svg>
+    </button>
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.6</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.7</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -385,37 +416,13 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
   </div>
 </header>
 
-<main id="main">
-
-  <!-- 登录面板（默认隐藏，点顶栏登录按钮展开） -->
-  <section id="loginSection" style="display:none;">
-    <div class="card card-green">
-      <div class="card-header">
-        <span class="mono">登录 · 获取最新数据</span>
-        <span class="mono" id="loginHint" style="font-size:8px; color:var(--ink-light);">离线缓存中</span>
-      </div>
-      <div class="login-body">
-        <input type="text" id="account" placeholder="学号" autocomplete="off" />
-        <input type="password" id="password" placeholder="密码" autocomplete="off" />
-        <div style="display:flex; gap:8px;">
-          <button class="small" onclick="doLoginNow()">登录并刷新</button>
-          <button class="small" style="border-color:var(--ink-light); color:var(--ink-light);" onclick="hideLogin()">取消</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 查询表单 -->
-  <!-- 今日课程（滚动） -->
-  <section id="todaySection" class="hidden">
-    <div class="card card-green">
-      <div class="card-header">
-        <span class="mono">今日课程</span>
-        <span class="mono" id="todayCount" style="font-size:9px; color:var(--ink-light);"></span>
-      </div>
-      <div id="todayCourses"></div>
-    </div>
-  </section>
+<!-- 左侧查询工作台侧边栏（≡ 展开） -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-head">
+    <span class="mono" style="color:var(--green); font-weight:600;">查询工作台</span>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
 
   <section id="querySection">
     <div class="card card-pink">
@@ -454,6 +461,39 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
         <button class="btn-chip" onclick="openBrowse('class')">全校班级</button>
         <button class="btn-chip" onclick="openBrowse('classroom')">全校教室</button>
       </div>
+    </div>
+  </section>
+</aside>
+
+<main id="main">
+
+  <!-- 登录面板（默认隐藏，点顶栏登录按钮展开） -->
+  <section id="loginSection" style="display:none;">
+    <div class="card card-green">
+      <div class="card-header">
+        <span class="mono">登录 · 获取最新数据</span>
+        <span class="mono" id="loginHint" style="font-size:8px; color:var(--ink-light);">离线缓存中</span>
+      </div>
+      <div class="login-body">
+        <input type="text" id="account" placeholder="学号" autocomplete="off" />
+        <input type="password" id="password" placeholder="密码" autocomplete="off" />
+        <div style="display:flex; gap:8px;">
+          <button class="small" onclick="doLoginNow()">登录并刷新</button>
+          <button class="small" style="border-color:var(--ink-light); color:var(--ink-light);" onclick="hideLogin()">取消</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 查询表单 -->
+  <!-- 今日课程（滚动） -->
+  <section id="todaySection" class="hidden">
+    <div class="card card-green">
+      <div class="card-header">
+        <span class="mono">今日课程</span>
+        <span class="mono" id="todayCount" style="font-size:9px; color:var(--ink-light);"></span>
+      </div>
+      <div id="todayCourses"></div>
     </div>
   </section>
 
@@ -526,7 +566,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 设置面板 -->
 <section id="settingsSection" class="hidden settings-panel">
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.6</span></div>
+    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.7</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -550,7 +590,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.6（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.7（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>
@@ -1183,10 +1223,9 @@ function setCache(k, v) {
 function showView(v, pushHistory) {
   var prevView = S.view;
   S.view = v;
-  document.getElementById('querySection').style.display = v === 'main' ? '' : 'none';
-  document.getElementById('browseNav').style.display = v === 'main' ? '' : 'none';
   document.getElementById('resultSection').classList.toggle('hidden', v !== 'result');
   document.getElementById('backBtn').classList.toggle('show', v !== 'main');
+  if (v === 'result') closeSidebar(); // 出结果时收起查询侧边栏
   window.scrollTo(0, 0);
   // 记录历史：从主页面进入结果页时 push
   if (pushHistory !== false && v !== prevView && v === 'result') {
@@ -1202,6 +1241,13 @@ function showView(v, pushHistory) {
 function closeBrowse() {
   document.getElementById('browseSection').classList.add('hidden');
   document.getElementById('browseOverlay').style.display = 'none';
+}
+// 查询工作台侧边栏（≡ 抽屉）
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-open');
+}
+function closeSidebar() {
+  document.body.classList.remove('sidebar-open');
 }
 function goBack() {
   // 如果弹窗开着，先关弹窗

@@ -91,7 +91,16 @@ java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
 
 当前版本：v0.9（测试版）
 
+## 开发说明
+
+本项目由 [豆包工作（Doubao Work）](https://www.doubao.com) 协助开发完成。豆包办公 Agent 参与了项目的需求梳理、前端界面与逻辑实现、接口对接、APK 打包签名、调试迭代以及代码托管等环节。
+
+- 前端代码、交互设计与调试：豆包办公 Agent 编写与维护
+- APK 打包、签名与版本管理：豆包办公 Agent 完成
+- 功能迭代（深色主题、日视图、缓存、弹窗等）：与豆包办公 Agent 多轮协作打磨
+
 ## 说明
 
 - 本项目仅供学习交流使用
 - 数据来自学校教务系统，如有问题请联系学校
+- 本项目遵循 MIT 许可证，详见 [LICENSE](LICENSE)

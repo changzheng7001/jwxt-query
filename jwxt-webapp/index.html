@@ -332,43 +332,40 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
   min-width: 64px;
 }
 .bottomnav .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.bottomnav .nav-item.active { color: var(--green); transform: translateY(-1px); }
-html[data-theme="dark"] .bottomnav .nav-item.active { color: #cfe3a0; }
+.bottomnav .nav-item.active { color: var(--green); transform: translateY(-3px) scale(1.38); z-index: 3; }
+.bottomnav .nav-item.active svg { filter: drop-shadow(0 3px 9px rgba(46,74,42,0.45)); }
+html[data-theme="dark"] .bottomnav .nav-item.active { color: #eaf5c8; }
+html[data-theme="dark"] .bottomnav .nav-item.active svg { filter: drop-shadow(0 3px 9px rgba(190,220,140,0.55)); }
 html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav::before { display: none; }
-html[data-style="classic"] .bottomnav .nav-item.active { background: var(--cream-2); }
-/* 底部导航：液态玻璃折射透镜（盖在图标上，图标透过透镜放大折射） */
+html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); transform: translateY(-3px) scale(1.38); z-index: 3; background: none; }
+/* 底部导航：液态玻璃——光泽透镜作折射层，选中的图标在透镜上放大突出 */
 .bottomnav .glass-slide {
-  position: absolute; top: 6px; bottom: 6px; left: 7px; width: 66px;
-  background: rgba(255,255,255,0.32);
-  -webkit-backdrop-filter: blur(3px) saturate(200%) brightness(1.18);
-  backdrop-filter: blur(3px) saturate(200%) brightness(1.18);
+  position: absolute; top: 5px; bottom: 5px; left: 7px; width: 68px;
+  /* 折射色渐变光泽（白→蓝紫→粉），模拟光透过玻璃的色散 */
+  background: linear-gradient(140deg, rgba(255,255,255,0.62), rgba(190,215,255,0.32) 48%, rgba(255,205,235,0.36) 100%);
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.65);
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -3px 8px rgba(255,255,255,0.35), 0 3px 16px rgba(0,0,0,0.16);
-  z-index: 2; pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.78);
+  box-shadow: 0 4px 22px rgba(0,0,0,0.16), inset 0 1px 3px rgba(255,255,255,0.95), inset 0 -4px 10px rgba(255,255,255,0.45);
+  z-index: 1; pointer-events: none;
   filter: url(#liquidGlassFilter);
   transition: left .3s cubic-bezier(.34,1.56,.64,1);
 }
-/* 透镜折射 rim：顶部高光 + 边缘色差（prism fringe） */
+/* 透镜顶部折射高光 */
 .bottomnav .glass-slide::before {
   content: ''; position: absolute; top: 2px; left: 8px; right: 8px; height: 55%;
   border-radius: 16px 16px 8px 8px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0) 82%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0) 82%);
   pointer-events: none;
 }
-.bottomnav .glass-slide::after {
-  content: ''; position: absolute; inset: 0; border-radius: 22px;
-  box-shadow: inset 2.5px 0 5px -2px rgba(255,60,80,0.75), inset -2.5px 0 5px -2px rgba(60,160,255,0.75);
-  pointer-events: none;
-}
-.bottomnav .nav-item { position: relative; z-index: 1; }
-.bottomnav .nav-item.refract { transform: translateY(-1px) scale(1.2); color: var(--green); }
-.bottomnav .nav-item.refract svg { filter: drop-shadow(0 2px 6px rgba(46,74,42,0.4)); }
-html[data-theme="dark"] .bottomnav .nav-item.refract { color: #cfe3a0; }
-html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: drop-shadow(0 2px 6px rgba(180,210,130,0.5)); }
-html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.94); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }
+.bottomnav .nav-item { position: relative; z-index: 2; }
+.bottomnav .nav-item.refract { transform: translateY(-4px) scale(1.46); color: var(--green); z-index: 3; }
+.bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 12px rgba(46,74,42,0.5)); }
+html[data-theme="dark"] .bottomnav .nav-item.refract { color: #eaf5c8; }
+html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 12px rgba(190,220,140,0.6)); }
+html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.95); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }
 html[data-style="classic"] .bottomnav .glass-slide::before, html[data-style="classic"] .bottomnav .glass-slide::after { display: none; }
+html[data-style="classic"] .bottomnav .nav-item.refract { color: var(--green); }
 main { padding-bottom: 86px; }
 
 /* ==== 设置面板 ==== */

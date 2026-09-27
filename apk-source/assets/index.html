@@ -142,7 +142,8 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
 /* 课表网格表格 */
-.sched-grid { display: grid; gap: 3px; font-size: 10px; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sched-grid { display: grid; gap: 3px; font-size: 10px; min-width: 640px; }
 .sched-grid.week { grid-template-columns: 46px repeat(7, minmax(0,1fr)); }
 .sched-grid.today { grid-template-columns: 46px minmax(0,1fr); }
 .sched-head { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--green); font-weight: 600;
@@ -294,7 +295,7 @@ tr:nth-child(even) td { background: var(--row); }
   <div class="topbar-left">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.3</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.4</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -471,6 +472,7 @@ let S = {
   browseFiltered: null,
   view: 'main',
   scheduleView: 'week',  // 'week' | 'today'
+  scheduleForm: 'table', // 'table' | 'list'
 };
 
 function toggleTheme() {
@@ -1287,7 +1289,7 @@ function renderResult(type, data) {
     function buildTable(daySet) {
       // daySet: 若为 null 表示周视图(7列)；否则 [dayIdx] 表示仅今天
       const single = daySet && daySet.length === 1;
-      let h = '<div class="sched-grid '+(single?'today':'week')+'">';
+      let h = '<div class="table-scroll"><div class="sched-grid '+(single?'today':'week')+'">';
       // 表头
       h += '<div class="sched-head">节次</div>';
       if (single) h += '<div class="sched-head">'+esc(WEEKDAYS[daySet[0]-1])+' · 今天</div>';
@@ -1305,28 +1307,61 @@ function renderResult(type, data) {
           }
         }
       });
-      h += '</div>';
+      h += '</div></div>';
       return h;
     }
-    // 视图切换条
-    let h = '<div style="display:flex; gap:6px; margin-bottom:12px;">';
+    // 列表形式：按天分组，每门课一行
+    function buildList(daySet) {
+      const single = daySet && daySet.length === 1;
+      const days = single ? daySet : [1,2,3,4,5,6,7];
+      let h = '';
+      days.forEach(d => {
+        const list = courses.filter(c => c.weekday === d).sort((a,b)=>(a.period||'').localeCompare(b.period||''));
+        h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+esc(WEEKDAYS[d-1])+(single?' · 今天':'')+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+list.length+'节</span></div>';
+        if (!list.length) h += '<p class="empty-day">'+(single?'今天无课':'无课')+'</p>';
+        else list.forEach((c, ci) => { h += courseCard(courses.indexOf(c), ci%2===0?'green':'pink'); });
+        h += '</div>';
+      });
+      return h;
+    }
+    // 视图切换条 + 形式切换条
+    let h = '<div style="display:flex; gap:6px; margin-bottom:8px;">';
     h += '<button class="small" style="flex:1;'+(S.scheduleView==='week'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'week\')">本周</button>';
     h += '<button class="small" style="flex:1;'+(S.scheduleView==='today'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'today\')">今天</button>';
     h += '</div>';
+    h += '<div style="display:flex; gap:6px; margin-bottom:12px;">';
+    h += '<button class="small" style="flex:1;'+(S.scheduleForm==='table'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'table\')">表格</button>';
+    h += '<button class="small" style="flex:1;'+(S.scheduleForm==='list'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'list\')">列表</button>';
+    h += '</div>';
+    let dayArg = null;
     if (S.scheduleView === 'today') {
       const now = new Date();
       const today = now.getDay();
-      const dayIdx = today === 0 ? 7 : today;
-      h += buildTable([dayIdx]);
-    } else {
-      h += buildTable(null);
+      dayArg = [today === 0 ? 7 : today];
     }
+    h += (S.scheduleForm === 'list') ? buildList(dayArg) : buildTable(dayArg);
     el.innerHTML = h;
   }
 }
 
 function setScheduleView(v) {
   S.scheduleView = v;
+  const type = S.queryType;
+  const params = {};
+  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
+  if (NEEDS_WEEK.indexOf(type) >= 0) {
+    params.week = document.getElementById('queryWeek').value.trim();
+    params.weekday = document.getElementById('queryWeekday').value;
+  }
+  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+  const ck = cacheKey(type, params);
+  const cached = getCache(ck) || getCache(type);
+  if (cached) renderResult(type, cached.data);
+  else alert('无缓存数据，请先查询');
+}
+
+function setScheduleForm(v) {
+  S.scheduleForm = v;
   const type = S.queryType;
   const params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
@@ -1510,6 +1545,7 @@ async function openBrowse(type, forceRefresh) {
 }
 
 function renderBrowse() {
+  try {
   var data = S.browseFiltered;
   if (!data) return;
   // 清空字母导航栏
@@ -1594,6 +1630,9 @@ function renderBrowse() {
       h += '</div></div></div>';
     });
     el.innerHTML = h;
+  }
+  } catch(e) {
+    try { document.getElementById('browseContent').innerHTML = '<div class="error-box">列表渲染出错：'+esc(e.message||'未知错误')+'</div>'; } catch(e2) {}
   }
 }
 
@@ -1693,6 +1732,9 @@ function getBuilding(name) {
 
 // 常见姓氏首字母映射
 function pinyinFirst(name) {
+  if (name === null || name === undefined) return '#';
+  if (typeof name !== 'string') name = String(name);
+  name = name.trim();
   if (!name) return '#';
   var first = name.charAt(0);
   // 查映射表

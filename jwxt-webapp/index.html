@@ -1338,7 +1338,7 @@ window.__gotoSchedule = function() {
       const obj = raw ? JSON.parse(raw) : null;
       if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
     }
-    if (!best) { showView('main'); return; }
+    if (!best) { S.queryType = 'self'; const qw = document.getElementById('queryWeek'); if (qw) qw.value = ''; const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = ''; runQuery(); return; }
     S.queryType = 'self'; S.scheduleForm = 'table'; S.scheduleView = 'week';
     const qw = document.getElementById('queryWeek'); if (qw) qw.value = '';
     const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = '';

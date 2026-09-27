@@ -425,6 +425,48 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 
 /* 侧边/查询区扁平 */
 #querySection .card, #browseNav .card { border-radius: 14px; padding: 14px; background: transparent; border: 1px solid var(--line); }
+
+/* ================= 经典版：完整还原 v0.9.6 米色林间复古外观（设置→经典 切换） ================= */
+html[data-style="classic"] {
+  --cream:#efe7d4; --cream-2:#e6dcc4;
+  --green:#2e4a2a; --green-lite:#3a5a36; --green-deep:#243a21;
+  --pink:#e89cb1; --pink-deep:#d27e96;
+  --ink:#1a1a17; --ink-light:#8b7355;
+  --line:#d4cbb0; --row:#f5efdf;
+  --serif:Georgia,'Songti SC','SimSun',serif;
+  --mono:'Courier New',monospace;
+  --glass:#efe7d4; --glass-2:#e6dcc4; --glass-border:#2e4a2a; --glass-hi:transparent;
+  --blur:0px; --grad-a:transparent; --grad-b:transparent; --grad-c:transparent;
+  --sheet-bg:#efe7d4;
+}
+html[data-style="classic"][data-theme="dark"] {
+  --cream:#161b17; --cream-2:#1d231e;
+  --green:#8fae6e; --green-lite:#7a9960; --green-deep:#8fae6e;
+  --pink:#b0758a; --pink-deep:#c8869c; --ink:#e6e0cf; --ink-light:#c4baa2;
+  --line:#2e352c; --row:#1b211b;
+  --glass:#161b17; --glass-2:#1d231e; --glass-border:rgba(143,174,110,0.35); --glass-hi:transparent;
+  --blur:0px; --sheet-bg:#161b17;
+}
+html[data-style="classic"] html::before { background: var(--cream); animation: none; }
+html[data-style="classic"] body { background: var(--cream); color: var(--ink); font-family: var(--serif); }
+html[data-style="classic"] .topbar, html[data-style="classic"] .bottomnav, html[data-style="classic"] .sheet {
+  background: var(--cream); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none; border:1px solid var(--line);
+}
+html[data-style="classic"] .card, html[data-style="classic"] .course-card, html[data-style="classic"] .course-row,
+html[data-style="classic"] .type-btn, html[data-style="classic"] .teacher-item, html[data-style="classic"] .class-chip,
+html[data-style="classic"] .room-item, html[data-style="classic"] .today-course-chip, html[data-style="classic"] .stat-box {
+  background: var(--row); border: 2px solid var(--green); border-radius: 8px; box-shadow: none;
+}
+html[data-style="classic"] .course-card.green, html[data-style="classic"] .course-row.green { border-left: 2px solid var(--green); }
+html[data-style="classic"] .course-card.pink, html[data-style="classic"] .course-row.pink { border-left: 2px solid var(--pink); }
+html[data-style="classic"] button { background: var(--green); color:#fff; border-radius:6px; box-shadow:none; }
+html[data-style="classic"] button.outline { background:transparent; color:var(--green); }
+html[data-style="classic"] .type-btn.active { background: var(--green); color:#fff; box-shadow:none; }
+html[data-style="classic"] input[type="text"], html[data-style="classic"] input[type="password"], html[data-style="classic"] select { border:2px solid var(--green); border-radius:6px; background:var(--cream); }
+html[data-style="classic"] .gpa-hero { background: linear-gradient(160deg, var(--green-deep), var(--green)); }
+html[data-style="classic"] .letter-nav span.active { background: var(--green); }
+html[data-style="classic"] .sched-table thead th { background: var(--green); }
+html[data-style="classic"] .building-head { background: var(--green); }
 </style>
 </head>
 <body>

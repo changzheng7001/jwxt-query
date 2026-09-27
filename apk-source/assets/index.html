@@ -146,17 +146,19 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
 /* 课表表格（原生 table，兼容性最好） */
-.sched-table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 640px; }
-.sched-table th { padding: 7px 4px; background: var(--glass-2); color: var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; font-weight: 600; border: 1px solid var(--glass-border); white-space: nowrap; }
-.sched-table td { border: 1px solid var(--glass-border); padding: 4px; vertical-align: top; min-height: 44px; }
-.sched-table td.seg { width: 44px; text-align: center; color: var(--ink-light); font-family: var(--mono); font-size: 9px; white-space: nowrap; }
-.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.6; }
-.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 5px; padding: 4px 5px; margin-bottom: 3px; line-height: 1.35; cursor: pointer; }
-.sched-course .cn { font-weight: 600; font-size: 10px; display: block; word-break: break-all; }
-.sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; }
+.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 10px; min-width: 640px; }
+.sched-table thead th { padding: 8px 4px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+html[data-theme="dark"] .sched-table thead th { background: linear-gradient(135deg, var(--green-lite), var(--green)); color: var(--green-deep); }
+.sched-table td { border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px; vertical-align: top; min-height: 46px; background: var(--glass); }
+.sched-table td.seg { width: 44px; text-align: center; color: var(--ink-light); font-family: var(--mono); font-size: 9px; white-space: nowrap; background: var(--glass-2); border: none; }
+.sched-table td.empty { background: transparent; border-style: dashed; border-color: var(--line); }
+.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; text-align: center; line-height: 40px; }
+.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 7px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.10); transition: transform .1s; }
+.sched-course .cn { font-weight: 700; font-size: 10px; display: block; word-break: break-all; }
+.sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; margin-top: 2px; }
 .sched-course.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
 html[data-theme="dark"] .sched-course.pink { color: var(--cream); }
-.sched-course:active { transform: scale(0.97); }
+.sched-course:active { transform: scale(0.96); }
 .course-card { border-radius: 12px; border: 1px solid var(--glass-border); padding: 12px; margin-bottom: 8px;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   box-shadow: 0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
@@ -392,6 +394,7 @@ tr:nth-child(even) td { background: var(--row); }
       <span class="mono" id="browseTitle" style="color:var(--pink-deep);">列表</span>
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="mono" id="browseCount" style="color:var(--ink-light);"></span>
+        <button onclick="openBrowse(S.browseType, true)" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
         <button onclick="closeBrowse()" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">关闭</button>
       </div>
     </div>
@@ -1297,13 +1300,12 @@ function renderResult(type, data) {
       // 行
       SEGMENTS.forEach(seg => {
         h += '<tr><td class="seg">'+esc(seg.label)+'</td>';
+        const cell = (list) => list.length ? '<td>'+list.map(c=>courseCell(c, slotColor[seg.code])).join('')+'</td>' : '<td class="empty"><span class="e">—</span></td>';
         if (single) {
-          const list = courses.filter(c => c.weekday === daySet[0] && c.period === seg.code);
-          h += '<td>'+(list.length ? list.map(c=>courseCell(c, slotColor[seg.code])).join('') : '<span class="e">—</span>')+'</td>';
+          h += cell(courses.filter(c => c.weekday === daySet[0] && c.period === seg.code));
         } else {
           for (let d = 1; d <= 7; d++) {
-            const list = courses.filter(c => c.weekday === d && c.period === seg.code);
-            h += '<td>'+(list.length ? list.map(c=>courseCell(c, slotColor[seg.code])).join('') : '<span class="e">—</span>')+'</td>';
+            h += cell(courses.filter(c => c.weekday === d && c.period === seg.code));
           }
         }
         h += '</tr>';
@@ -1500,9 +1502,10 @@ async function openBrowse(type, forceRefresh) {
   document.getElementById('browseOverlay').style.display = 'block';
   document.getElementById('browseTitle').textContent = {teacher:'全校教师', class:'全校班级', classroom:'全校教室'}[type];
 
-  // 先读缓存
+  // 先读缓存（仅当缓存里确有内容才直接用，空/失败缓存不拦截刷新）
   const cached = getCache('browse_'+type);
-  if (cached && !forceRefresh) {
+  const cacheList = cached && (cached.data.teachers || cached.data.classes || cached.data.classrooms);
+  if (cacheList && cacheList.length && !forceRefresh) {
     S.browseData = cached.data;
     S.browseFiltered = cached.data;
     renderBrowse();
@@ -1510,9 +1513,7 @@ async function openBrowse(type, forceRefresh) {
   }
 
   if (!S.loggedIn) {
-    if (!cached) {
-      document.getElementById('browseContent').innerHTML = '<div class="error-box">未登录且无缓存数据<br><br>点右上角「登录」查询一次后，即可离线查看全校列表</div>';
-    }
+    document.getElementById('browseContent').innerHTML = '<div class="error-box">未登录且无缓存数据<br><br>点右上角「登录」查询一次后，即可离线查看全校列表</div>';
     return;
   }
 
@@ -1530,12 +1531,20 @@ async function openBrowse(type, forceRefresh) {
       const body = 'xnxqh=2026-2027-1&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1=1&zc2=20&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body), 'classroom');
     }
-    setCache('browse_'+type, data);
-    S.browseData = data;
-    S.browseFiltered = data;
-    renderBrowse();
+    // 只在实际解析到内容时才写入缓存，避免把空/失败结果污染缓存
+    const list = data && (data.teachers || data.classes || data.classrooms);
+    if (list && list.length) {
+      setCache('browse_'+type, data);
+      S.browseData = data;
+      S.browseFiltered = data;
+      renderBrowse();
+    } else {
+      // 查询失败或未解析到内容
+      const msg = (data && data.error) ? esc(data.error) : '未解析到数据';
+      document.getElementById('browseContent').innerHTML = '<div class="error-box">查询返回空或教务会话可能失效<br>' + msg + '<br><br>请先点顶栏「退出」再重新「登录」后，点本弹窗「刷新」重试</div>';
+    }
   } catch(e) {
-    if (cached) {
+    if (cached && !forceRefresh) {
       S.browseData = cached.data;
       S.browseFiltered = cached.data;
       renderBrowse();

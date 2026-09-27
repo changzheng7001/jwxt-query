@@ -145,20 +145,18 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--green); padding-bottom: 4px; margin-bottom: 8px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
-/* 课表表格（原生 table，兼容性最好） */
-.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 10px; min-width: 640px; }
-.sched-table thead th { padding: 8px 4px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-html[data-theme="dark"] .sched-table thead th { background: linear-gradient(135deg, var(--green-lite), var(--green)); color: var(--green-deep); }
-.sched-table td { border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px; vertical-align: top; min-height: 46px; background: var(--glass); }
-.sched-table td.seg { width: 44px; text-align: center; color: var(--ink-light); font-family: var(--mono); font-size: 9px; white-space: nowrap; background: var(--glass-2); border: none; }
-.sched-table td.empty { background: transparent; border-style: dashed; border-color: var(--line); }
-.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; text-align: center; line-height: 40px; }
-.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 7px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.10); transition: transform .1s; }
-.sched-course .cn { font-weight: 700; font-size: 10px; display: block; word-break: break-all; }
+/* 课表表格（与成绩表格同构，保证兼容可见） */
+.sched-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.sched-table th { padding: 7px 4px; background: var(--green); color: var(--cream); font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; font-weight: 600; border: 1px solid var(--green); white-space: nowrap; text-align: center; }
+.sched-table td { border: 1px solid var(--line); padding: 5px 4px; vertical-align: top; text-align: center; }
+.sched-table td.seg { font-family: var(--mono); font-size: 10px; color: var(--green); white-space: nowrap; background: var(--cream-2); }
+.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; line-height: 34px; }
+.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 6px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; }
+.sched-course .cn { font-weight: 700; font-size: 11px; display: block; word-break: break-all; }
 .sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; margin-top: 2px; }
 .sched-course.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
 html[data-theme="dark"] .sched-course.pink { color: var(--cream); }
-.sched-course:active { transform: scale(0.96); }
+.sched-course:active { transform: scale(0.97); }
 .course-card { border-radius: 12px; border: 1px solid var(--glass-border); padding: 12px; margin-bottom: 8px;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   box-shadow: 0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
@@ -239,7 +237,10 @@ tr:nth-child(even) td { background: var(--row); }
 .class-chip { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform .1s; }
 .class-chip:active { transform: scale(0.95); }
 .grade-group { margin-bottom: 14px; }
-.grade-title { font-size: 13px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--green); padding-bottom: 3px; margin-bottom: 6px; }
+/* 折叠三角形 */
+.caret { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .2s; }
+.open .caret, .caret.open { transform: rotate(180deg); }
+.grade-title { font-size: 13px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--green); padding-bottom: 3px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 
 /* 教室列表 */
 .building-item { border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 6px; overflow: hidden; background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
@@ -369,14 +370,17 @@ tr:nth-child(even) td { background: var(--row); }
     </div>
   </section>
 
-  <!-- 缓存信息 -->
+  <!-- 缓存信息（默认折叠） -->
   <section id="cacheInfoSection">
     <div class="card card-green">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCacheInfo()" style="cursor:pointer; user-select:none;">
         <span class="mono">缓存信息</span>
-        <button class="small outline" onclick="clearAllCache()">清空缓存</button>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span class="caret" id="cacheCaret" style="color:var(--green);"></span>
+          <button class="small outline" onclick="event.stopPropagation(); clearAllCache()">清空缓存</button>
+        </span>
       </div>
-      <div style="font-size:11px; color:var(--ink-light); line-height:1.8;">
+      <div id="cacheBody" style="display:none; font-size:11px; color:var(--ink-light); line-height:1.8;">
         <div>存储类型：WebView localStorage</div>
         <div>存储路径：/data/data/com.jwxt.query/app_webview/</div>
         <div style="margin-top:4px;">已缓存数据：</div>
@@ -476,6 +480,13 @@ let S = {
   scheduleView: 'week',  // 'week' | 'today'
   scheduleForm: 'table', // 'table' | 'list'
 };
+
+function toggleCacheInfo() {
+  const body = document.getElementById('cacheBody');
+  const caret = document.getElementById('cacheCaret');
+  if (body.style.display === 'none') { body.style.display = 'block'; caret.classList.add('open'); }
+  else { body.style.display = 'none'; caret.classList.remove('open'); }
+}
 
 function toggleTheme() {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -1381,25 +1392,18 @@ function setScheduleForm(v) {
 
 function courseCard(idx, cls) {
   var c = (S.lastCourses || [])[idx] || {};
-  let h = '<div class="course-row '+cls+'"';
+  let h = '<div class="course-card '+cls+'"';
   h += ' onclick="showCourseByIndex('+idx+')"';
   h += ' ontouchstart="detailPressStart(event)" ontouchend="detailPressEnd(event)" ontouchmove="detailPressMove()"';
   h += '>';
-  // 左侧节次列
-  h += '<div class="time-col"><div class="period">'+esc(c.periodLabel||'')+'</div>';
-  if (c.roomShort) h += '<div class="room-line">'+esc(c.roomShort)+'</div>';
-  else if (c.classroom) h += '<div class="room-line">'+esc(c.classroom)+'</div>';
-  h += '</div>';
-  // 右侧主体
-  h += '<div class="body">';
-  h += '<div class="name">'+esc(c.name)+'</div>';
-  var meta = [];
-  if (c.teacher) meta.push('教师 ' + c.teacher);
-  if (c.classes) meta.push('班级 ' + c.classes);
-  if (c.week) meta.push(c.week);
-  h += '<div class="meta">'+esc(meta.join('　'))+'</div>';
-  h += '</div>';
-  h += '</div>';
+  h += '<div class="period">'+esc(c.periodLabel||'')+'</div>';
+  h += '<div class="name">'+esc(c.name||'')+'</div>';
+  h += '<div class="info">';
+  if (c.teacher) h += '教师: '+esc(c.teacher)+'<br>';
+  if (c.classroom) h += '教室: '+esc(c.classroom)+'<br>';
+  if (c.classes) h += '班级: '+esc(c.classes)+'<br>';
+  if (c.week) h += '周次: '+esc(c.week);
+  h += '</div></div>';
   return h;
 }
 
@@ -1609,7 +1613,7 @@ function renderBrowse() {
     const keys = Object.keys(grades).sort((a,b) => b.localeCompare(a));
     let h = '';
     keys.forEach(g => {
-      h += '<div class="grade-group"><div class="grade-title">'+(g==='其他'?'其他':g+'级')+'</div><div class="class-chips">';
+      h += '<div class="grade-group"><div class="grade-title" onclick="this.classList.toggle(\'open\'); this.nextElementSibling.classList.toggle(\'hidden\')"><span>'+(g==='其他'?'其他':g+'级')+'</span><span class="caret"></span></div><div class="class-chips">';
       grades[g].forEach(c => {
         h += '<div class="class-chip" onclick="pickValue(\''+esc(c.name)+'\')">'+esc(c.name)+'</div>';
       });
@@ -1631,8 +1635,8 @@ function renderBrowse() {
     });
     let h = '';
     keys.forEach((b, i) => {
-      h += '<div class="building-item"><button class="building-head" onclick="this.nextElementSibling.classList.toggle(\'open\')">';
-      h += '<span>'+b+'</span><span>'+buildings[b].length+' 间</span></button>';
+      h += '<div class="building-item"><button class="building-head'+(i===0?' open':'')+'" onclick="this.classList.toggle(\'open\'); this.nextElementSibling.classList.toggle(\'open\')">';
+      h += '<span>'+b+'</span><span style="display:flex; align-items:center; gap:6px;"><span class="caret"></span>'+buildings[b].length+' 间</span></button>';
       h += '<div class="building-body'+(i===0?' open':'')+'"><div class="room-grid">';
       buildings[b].forEach(r => {
         h += '<div class="room-item" onclick="pickValue(\''+esc(r)+'\')">'+esc(r)+'</div>';

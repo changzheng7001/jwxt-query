@@ -6,38 +6,41 @@
 <title>教务查询</title>
 <style>
 :root {
-  --cream: #efe7d4; --cream-2: #e6dcc4;
-  --green: #2e4a2a; --green-lite: #3a5a36; --green-deep: #243a21;
-  --pink: #e89cb1; --pink-deep: #d27e96;
-  --ink: #1a1a17; --ink-light: #8b7355;
-  --line: #d4cbb0; --row: #f5efdf;
-  --serif: Georgia, 'Songti SC', 'SimSun', serif;
-  --mono: 'Courier New', monospace;
-  /* 液态玻璃 */
-  --glass: rgba(250,244,228,0.72);
-  --glass-2: rgba(236,225,196,0.66);
-  --glass-border: rgba(46,74,42,0.22);
-  --glass-hi: rgba(255,255,255,0.5);
-  --blur: 14px;
-  --grad-a: rgba(232,156,177,0.35);
-  --grad-b: rgba(46,74,42,0.30);
-  --grad-c: rgba(214,203,176,0.30);
-  --sheet-bg: rgba(250,244,228,0.97);
+  /* ===== Liquid Glass · 浅色（默认）：玻璃仅用于导航层，内容层清晰填充 ===== */
+  --bg: #f6f7f9; --cream: #f6f7f9; --cream-2: #eceef1;
+  --green: #0f9d94; --green-lite: #22b3a9; --green-deep: #0b7a74;
+  --pink: #e0648f; --pink-deep: #cf3f6f;
+  --ink: #1c2733; --ink-light: #6b7684;
+  --line: #e2e6eb; --row: #fafbfc;
+  --serif: -apple-system, 'PingFang SC', 'HarmonyOS Sans', 'MiSans', 'Microsoft YaHei', 'system-ui', sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  /* 玻璃（导航层专用）*/
+  --glass: rgba(255,255,255,0.55);
+  --glass-2: rgba(255,255,255,0.35);
+  --glass-border: rgba(15,23,42,0.10);
+  --glass-hi: rgba(255,255,255,0.7);
+  --blur: 22px;
+  --grad-a: rgba(15,157,148,0.16);
+  --grad-b: rgba(59,130,246,0.10);
+  --grad-c: rgba(224,100,143,0.06);
+  --sheet-bg: rgba(246,247,249,0.92);
 }
 html[data-theme="dark"] {
-  --cream: #161b17; --cream-2: #1d231e;
-  --green: #8fae6e; --green-lite: #7a9960; --green-deep: #8fae6e;
-  --pink: #b0758a; --pink-deep: #c8869c;
-  --ink: #e6e0cf; --ink-light: #c4baa2;
-  --line: #2e352c; --row: #1b211b;
-  --glass: rgba(26,32,27,0.82);
-  --glass-2: rgba(24,29,25,0.8);
-  --glass-border: rgba(143,174,110,0.35);
-  --glass-hi: rgba(255,255,255,0.07);
-  --grad-a: rgba(176,117,138,0.28);
-  --grad-b: rgba(143,174,110,0.26);
-  --grad-c: rgba(164,154,130,0.18);
-  --sheet-bg: rgba(23,28,24,0.97);
+  /* ===== Liquid Glass · 深色（克制，深蓝灰） ===== */
+  --bg: #0e1216; --cream: #0e1216; --cream-2: #151b21;
+  --green: #33c2b8; --green-lite: #4dd0c6; --green-deep: #1fa89e;
+  --pink: #ef7fa6; --pink-deep: #ff9dbd;
+  --ink: #e6ecf2; --ink-light: #8d99a6;
+  --line: #263038; --row: #131920;
+  --glass: rgba(255,255,255,0.07);
+  --glass-2: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-hi: rgba(255,255,255,0.12);
+  --blur: 22px;
+  --grad-a: rgba(51,194,184,0.15);
+  --grad-b: rgba(96,165,250,0.10);
+  --grad-c: rgba(239,127,166,0.06);
+  --sheet-bg: rgba(14,18,22,0.9);
 }
 /* 经典主题：关闭玻璃效果，恢复不透明白底 + 绿边框 */
 html[data-style="classic"] {
@@ -59,27 +62,27 @@ html[data-style="classic"] input[type="text"], html[data-style="classic"] input[
 html[data-style="classic"] button { border-width: 2px; border-radius: 6px; box-shadow: none; }
 html[data-style="classic"] button.outline { background: transparent; }
 html[data-style="classic"] .sheet { box-shadow: none; }
-/* 固定彩色光斑背景，供毛玻璃模糊透出 */
+/* 淡雅光斑背景，供导航层玻璃透出 */
 html::before {
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(420px 420px at 12% 8%, var(--grad-a), transparent 60%),
-    radial-gradient(520px 520px at 88% 20%, var(--grad-b), transparent 65%),
-    radial-gradient(480px 480px at 55% 92%, var(--grad-c), transparent 60%),
-    var(--cream);
-  animation: glassDrift 18s ease-in-out infinite alternate;
+    radial-gradient(520px 520px at 10% 4%, var(--grad-a), transparent 62%),
+    radial-gradient(560px 560px at 92% 14%, var(--grad-b), transparent 66%),
+    radial-gradient(480px 480px at 50% 96%, var(--grad-c), transparent 62%),
+    var(--bg);
+  animation: glassDrift 24s ease-in-out infinite alternate;
 }
 @keyframes glassDrift {
   0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
-  100% { background-position: 20% 10%, 70% 25%, 35% 80%, 0 0; }
+  100% { background-position: 18% 8%, 74% 24%, 40% 84%, 0 0; }
 }
 html[data-theme="dark"] body { background: transparent; }
 html[data-theme="dark"] html::before {
   background:
-    radial-gradient(420px 420px at 12% 8%, var(--grad-a), transparent 60%),
-    radial-gradient(520px 520px at 88% 20%, var(--grad-b), transparent 65%),
-    radial-gradient(480px 480px at 55% 92%, var(--grad-c), transparent 60%),
-    #11140f;
+    radial-gradient(520px 520px at 10% 4%, var(--grad-a), transparent 62%),
+    radial-gradient(560px 560px at 92% 14%, var(--grad-b), transparent 66%),
+    radial-gradient(480px 480px at 50% 96%, var(--grad-c), transparent 62%),
+    var(--bg);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; min-height: 100%; }
@@ -348,6 +351,80 @@ html[data-theme="dark"] .seg button.on { color: #0f120c; }
 .switch.on { background: var(--green); }
 .switch.on::after { transform: translateX(20px); }
 html[data-style="classic"] .settings-panel { background: var(--cream); }
+
+/* ================= Liquid Glass 重构：玻璃仅用于导航层，内容层清晰填充，teal 只强调主操作 ================= */
+main { max-width: 680px; padding: 14px 12px 96px; }
+
+/* --- 导航层：顶栏 · 底部导航 · 弹窗 用玻璃（磨砂透明），其余实心 --- */
+.topbar { background: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%); border-bottom: 1px solid var(--glass-border); box-shadow: 0 1px 16px rgba(15,23,42,0.06); }
+.sheet { background: var(--sheet-bg); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); }
+.bottomnav { background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); border: 1px solid var(--glass-border); box-shadow: 0 12px 36px rgba(15,23,42,0.14); }
+
+/* --- 内容层：实心浅色填充 + 细边框 + 柔和阴影，不用玻璃不用渐变 --- */
+.card { background: var(--row); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
+.card-green, .card-pink { background: var(--row); border-color: var(--line); }
+.card-header { border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px; }
+.card-header .mono { color: var(--green-deep); }
+.card-pink .card-header .mono { color: var(--pink-deep); }
+
+/* 课程卡 / 列表行：实心 + 左侧强调条 */
+.course-card, .course-row { background: var(--row); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+.course-card.green { background: var(--row); border-left: 4px solid var(--green); color: var(--ink); }
+.course-card.pink { background: var(--row); border-left: 4px solid var(--pink); color: var(--ink); }
+.course-row.green { background: var(--row); color: var(--ink); border-left: 4px solid var(--green); }
+.course-row.pink { background: var(--row); color: var(--ink); border-left: 4px solid var(--pink); }
+.course-card.green .period { color: var(--green-deep); }
+.course-card.pink .period { color: var(--pink-deep); }
+html[data-theme="dark"] .course-card.green, html[data-theme="dark"] .course-card.pink,
+html[data-theme="dark"] .course-row.green, html[data-theme="dark"] .course-row.pink { background: var(--row); color: var(--ink); }
+
+/* 教师 / 班级 / 教室 / 今日课程 chips：实心 + teal 文字（不铺渐变） */
+.teacher-item, .class-chip, .room-item, .today-course-chip {
+  background: var(--row); color: var(--green-deep); border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.04); border-radius: 12px;
+}
+.today-course-chip { min-width: 160px; }
+html[data-theme="dark"] .teacher-item, html[data-theme="dark"] .class-chip,
+html[data-theme="dark"] .room-item, html[data-theme="dark"] .today-course-chip { color: var(--green-lite); }
+
+/* 学籍 / 统计 / 楼栋 / 进度：实心 */
+.profile-item { background: var(--row); border-left: 3px solid var(--green); }
+.stat-box, .stat-box.pink, .stat-box.green, .stat-box.cream { background: var(--row); border: 1px solid var(--line); border-radius: 12px; color: var(--ink); }
+.stat-box.green .value, .stat-box.cream .value { color: var(--green-deep); }
+.stat-box.pink .value { color: var(--pink-deep); }
+.building-item { background: var(--row); border: 1px solid var(--line); }
+.building-head { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); border-radius: 10px; }
+.progress-bar-wrap { background: var(--cream-2); }
+.progress-bar { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); }
+
+/* GPA hero：唯一可用的强渐变 hero */
+.gpa-hero { background: linear-gradient(160deg, var(--green-deep), #0a635d); border-radius: 18px; }
+.gpa-hero .value, .gpa-hero .sub { color: #fff; }
+
+/* --- 只给主操作着色：主按钮 / 选中态 teal，其余中性 --- */
+button { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(15,157,148,0.25); }
+button.outline { background: var(--row); color: var(--green-deep); box-shadow: none; border: 1.5px solid var(--green); }
+button.small { min-height: 38px; border-radius: 10px; padding: 0 12px; font-size: 12px; }
+.btn-chip { min-height: 36px; border-radius: 999px; background: var(--cream-2); color: var(--green-deep); border: 1px solid var(--line); }
+.type-btn { min-height: 56px; border-radius: 14px; background: var(--row); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(15,23,42,0.04); }
+.type-btn.active { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; font-weight: 600; box-shadow: 0 6px 20px rgba(15,157,148,0.28); }
+
+/* 输入 / 选择 */
+input[type="text"], input[type="password"], select {
+  min-height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--row); padding: 0 14px; font-size: 15px;
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(15,157,148,0.15); }
+
+/* 字母导航 / 表格 */
+.letter-nav { border-radius: 14px; padding: 6px; background: var(--row); border: 1px solid var(--line); }
+.letter-nav span { color: var(--ink); }
+.letter-nav span.inactive { color: var(--ink-light); background: var(--cream-2); }
+.letter-nav span.active { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; }
+.sched-table thead th { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; }
+
+/* 侧边/查询区扁平 */
+#querySection .card, #browseNav .card { border-radius: 14px; padding: 14px; background: transparent; border: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -356,7 +433,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
   <div class="topbar-left">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.6</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.9</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -509,7 +586,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 设置面板 -->
 <section id="settingsSection" class="hidden settings-panel">
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.6</span></div>
+    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.9</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -533,7 +610,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.6（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.9（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>

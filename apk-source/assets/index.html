@@ -332,43 +332,40 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
   min-width: 64px;
 }
 .bottomnav .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.bottomnav .nav-item.active { color: var(--green); transform: translateY(-2px) scale(1.28); }
-.bottomnav .nav-item.active svg { filter: drop-shadow(0 2px 6px rgba(46,74,42,0.4)) drop-shadow(1.6px 0 1.6px rgba(90,170,255,0.6)) drop-shadow(-1.6px 0 1.6px rgba(255,70,80,0.55)); }
+.bottomnav .nav-item.active { color: var(--green); }
+.bottomnav .nav-item.active svg { filter: none; }
 html[data-theme="dark"] .bottomnav .nav-item.active { color: #eaf5c8; }
-html[data-theme="dark"] .bottomnav .nav-item.active svg { filter: drop-shadow(0 3px 9px rgba(190,220,140,0.55)); }
+html[data-theme="dark"] .bottomnav .nav-item.active svg { filter: none; }
 html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav::before { display: none; }
 html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); transform: translateY(-2px) scale(1.28); background: none; }
 /* 底部导航：液态玻璃——真实折射（bevel位移图）盖住图标，中心清晰、边缘弯曲+色差 */
 .bottomnav .glass-slide {
   position: absolute; top: 5px; bottom: 5px; left: 7px; width: 68px;
-  background: rgba(255,255,255,0.05);
+  background: transparent;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.35);
-  box-shadow: 0 6px 22px rgba(0,0,0,0.18), inset 1px 1px 1px rgba(255,255,255,0.6), inset -1px -1px 1px rgba(255,255,255,0.15);
   z-index: 2; pointer-events: none;
-  -webkit-backdrop-filter: blur(2px) saturate(180%) brightness(1.1);
-  backdrop-filter: blur(2px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(1px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(1px) saturate(180%) brightness(1.06);
   transition: left .3s cubic-bezier(.34,1.56,.64,1);
 }
 @supports (backdrop-filter: url(#lgGlass)) {
   .bottomnav .glass-slide {
-    -webkit-backdrop-filter: url(#lgGlass) blur(1.5px) saturate(180%) brightness(1.1);
-    backdrop-filter: url(#lgGlass) blur(1.5px) saturate(180%) brightness(1.1);
+    -webkit-backdrop-filter: url(#lgGlass) blur(1px) saturate(180%) brightness(1.06);
+    backdrop-filter: url(#lgGlass) blur(1px) saturate(180%) brightness(1.06);
   }
 }
-/* 透镜顶部折射高光 */
-.bottomnav .glass-slide::before {
-  content: ''; position: absolute; top: 2px; left: 8px; right: 8px; height: 55%;
-  border-radius: 16px 16px 8px 8px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0) 82%);
+/* 色差棱边：极细红蓝，只出现在玻璃覆盖边缘，随玻璃移动 */
+.bottomnav .glass-slide::after {
+  content: ''; position: absolute; inset: 0; border-radius: 22px;
+  box-shadow: inset 1px 0 2px -1px rgba(90,170,255,0.6), inset -1px 0 2px -1px rgba(255,70,80,0.55);
   pointer-events: none;
 }
 .bottomnav .nav-item { position: relative; z-index: 1; }
-.bottomnav .nav-item.refract { transform: translateY(-3px) scale(1.4); color: var(--green); }
-.bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 10px rgba(46,74,42,0.5)) drop-shadow(2px 0 2px rgba(90,170,255,0.65)) drop-shadow(-2px 0 2px rgba(255,70,80,0.6)); }
+.bottomnav .nav-item.refract { color: var(--green); }
+.bottomnav .nav-item.refract svg { filter: none; }
 html[data-theme="dark"] .bottomnav .nav-item.refract { color: #eaf5c8; }
-html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 12px rgba(190,220,140,0.6)); }
+html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: none; }
 html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.95); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }
 html[data-style="classic"] .bottomnav .glass-slide::before, html[data-style="classic"] .bottomnav .glass-slide::after { display: none; }
 html[data-style="classic"] .bottomnav .nav-item.refract { color: var(--green); }

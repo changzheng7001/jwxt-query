@@ -467,15 +467,50 @@ html[data-style="classic"] .gpa-hero { background: linear-gradient(160deg, var(-
 html[data-style="classic"] .letter-nav span.active { background: var(--green); }
 html[data-style="classic"] .sched-table thead th { background: var(--green); }
 html[data-style="classic"] .building-head { background: var(--green); }
+
+/* ===== 工作台布局：侧边栏 / 浏览页 / 设置独立页 ===== */
+.menu-btn { background:none; border:none; color:var(--green); display:flex; align-items:center; justify-content:center; padding:0 6px; cursor:pointer; line-height:1; flex-shrink:0; }
+.back-btn { display:none; }
+.back-btn.show { display:inline-block; }
+
+.sidebar-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.35); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:150; opacity:0; visibility:hidden; transition:opacity .28s, visibility .28s; }
+.sidebar-backdrop.show { opacity:1; visibility:visible; }
+.sidebar { position:fixed; top:0; left:0; bottom:0; width:min(320px, 86vw); z-index:151; display:flex; flex-direction:column;
+  background:var(--sheet-bg); -webkit-backdrop-filter:blur(28px) saturate(170%); backdrop-filter:blur(28px) saturate(170%);
+  border-right:1px solid var(--glass-border); box-shadow:16px 0 40px rgba(15,23,42,0.16);
+  transform:translateX(-105%); transition:transform .32s cubic-bezier(.32,.72,.35,1); }
+.sidebar.open { transform:translateX(0); }
+.sidebar-head { display:flex; align-items:center; justify-content:space-between; padding:18px 18px 12px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.sidebar-close { background:none; border:none; color:var(--ink); font-size:20px; padding:2px 8px; cursor:pointer; }
+.sidebar-body { flex:1; overflow-y:auto; padding:16px 14px 30px; display:flex; flex-direction:column; gap:16px; }
+.sidebar-item { display:flex; align-items:center; gap:12px; width:100%; min-height:52px; padding:0 16px; background:var(--row); color:var(--ink);
+  border:1px solid var(--line); border-radius:14px; font-size:15px; cursor:pointer; box-shadow:0 1px 2px rgba(15,23,42,0.04); }
+.sidebar-item svg { color:var(--green-deep); flex-shrink:0; }
+
+.view-panel { padding:14px 12px 96px; max-width:680px; margin:0 auto; }
+.page-head { display:flex; align-items:center; gap:10px; padding:10px 4px 14px; position:sticky; top:0; z-index:10; background:var(--bg); }
+.page-back { background:transparent; border:none; color:var(--green-deep); font-size:15px; padding:4px 6px; cursor:pointer; }
+
+/* 设置独立页：全屏可返回 */
+.settings-page { position:fixed; inset:0; z-index:140; overflow-y:auto; background:var(--bg);
+  padding:14px 12px 96px; max-width:680px; margin:0 auto; box-sizing:border-box; }
+.settings-page .card { margin-top:4px; }
+html[data-style="classic"] .sidebar, html[data-style="classic"] .settings-page { background:var(--cream); box-shadow:none; }
+html[data-style="classic"] .sidebar-backdrop { background:rgba(0,0,0,0.4); }
+html[data-style="classic"] .sidebar-item { border:2px solid var(--green); border-radius:8px; }
+html[data-style="classic"] .menu-btn, html[data-style="classic"] .page-back { color:var(--green); }
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar-left">
+    <button class="menu-btn" id="menuBtn" onclick="openSidebar()" aria-label="菜单">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 17h16"/></svg>
+    </button>
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.9</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.10</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -486,6 +521,72 @@ html[data-style="classic"] .building-head { background: var(--green); }
     <button id="logoutBtn" onclick="doLogout()" style="display:none; font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">退出</button>
   </div>
 </header>
+
+<!-- 左侧液态玻璃侧边栏（查询参数 / 缓存信息 / 设置入口） -->
+<div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>
+<aside id="sidebar" class="sidebar" aria-hidden="true">
+  <div class="sidebar-head">
+    <span class="mono" style="color:var(--green); letter-spacing:.14em;">菜单</span>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sidebar-body">
+
+    <!-- 查询参数 -->
+    <section id="querySection">
+      <div class="card card-pink">
+        <div class="card-header"><span class="mono">查询参数</span></div>
+        <div class="type-grid" id="typeGrid"></div>
+        <div id="nameRow" class="hidden">
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="queryName" placeholder="名称" style="flex:1; margin-bottom:0;" />
+            <button class="small outline" onclick="openPicker()" style="flex-shrink:0;">选择</button>
+          </div>
+        </div>
+        <div id="weekRow" class="hidden" style="display:flex; gap:6px; margin-bottom:16px;">
+          <input type="text" id="queryWeek" placeholder="周次" style="flex:1; margin-bottom:0;" />
+          <select id="queryWeekday" style="flex:1; margin-bottom:0;">
+            <option value="">星期</option>
+            <option value="1">一</option><option value="2">二</option><option value="3">三</option>
+            <option value="4">四</option><option value="5">五</option><option value="6">六</option><option value="7">日</option>
+          </select>
+        </div>
+        <div id="semesterRow" class="hidden">
+          <select id="querySemester"></select>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button style="flex:1;" onclick="runQuery()">查询</button>
+          <button style="flex:1;" onclick="runQuery(true)">刷新</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 缓存信息（默认折叠） -->
+    <section id="cacheInfoSection">
+      <div class="card card-green">
+        <div class="card-header" onclick="toggleCacheInfo()" style="cursor:pointer; user-select:none;">
+          <span class="mono">缓存信息</span>
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span class="caret" id="cacheCaret" style="color:var(--green);"></span>
+            <button class="small outline" onclick="event.stopPropagation(); clearAllCache()">清空缓存</button>
+          </span>
+        </div>
+        <div id="cacheBody" style="display:none; font-size:11px; color:var(--ink-light); line-height:1.8;">
+          <div>存储类型：WebView localStorage</div>
+          <div>存储路径：/data/data/com.jwxt.query/app_webview/</div>
+          <div style="margin-top:4px;">已缓存数据：</div>
+          <div id="cacheList" style="font-size:11px; color:var(--green-deep); padding:4px 0;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 设置入口（独立页面） -->
+    <button class="sidebar-item" onclick="closeSidebar();openSettings()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>设置</span>
+    </button>
+
+  </div>
+</aside>
 
 <main id="main">
 
@@ -519,64 +620,7 @@ html[data-style="classic"] .building-head { background: var(--green); }
     </div>
   </section>
 
-  <section id="querySection">
-    <div class="card card-pink">
-      <div class="card-header"><span class="mono">查询参数</span></div>
-      <div class="type-grid" id="typeGrid"></div>
-      <div id="nameRow" class="hidden">
-        <div style="display:flex; gap:6px;">
-          <input type="text" id="queryName" placeholder="名称" style="flex:1; margin-bottom:0;" />
-          <button class="small outline" onclick="openPicker()" style="flex-shrink:0;">选择</button>
-        </div>
-      </div>
-      <div id="weekRow" class="hidden" style="display:flex; gap:6px; margin-bottom:16px;">
-        <input type="text" id="queryWeek" placeholder="周次" style="flex:1; margin-bottom:0;" />
-        <select id="queryWeekday" style="flex:1; margin-bottom:0;">
-          <option value="">星期</option>
-          <option value="1">一</option><option value="2">二</option><option value="3">三</option>
-          <option value="4">四</option><option value="5">五</option><option value="6">六</option><option value="7">日</option>
-        </select>
-      </div>
-      <div id="semesterRow" class="hidden">
-        <select id="querySemester"></select>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button style="flex:1;" onclick="runQuery()">查询</button>
-        <button style="flex:1;" onclick="runQuery(true)">刷新</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 浏览入口 -->
-  <section id="browseNav">
-    <div class="card card-green">
-      <div class="card-header"><span class="mono">浏览列表</span></div>
-      <div class="btn-group">
-        <button class="btn-chip" onclick="openBrowse('teacher')">全校教师</button>
-        <button class="btn-chip" onclick="openBrowse('class')">全校班级</button>
-        <button class="btn-chip" onclick="openBrowse('classroom')">全校教室</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 缓存信息（默认折叠） -->
-  <section id="cacheInfoSection">
-    <div class="card card-green">
-      <div class="card-header" onclick="toggleCacheInfo()" style="cursor:pointer; user-select:none;">
-        <span class="mono">缓存信息</span>
-        <span style="display:flex; align-items:center; gap:8px;">
-          <span class="caret" id="cacheCaret" style="color:var(--green);"></span>
-          <button class="small outline" onclick="event.stopPropagation(); clearAllCache()">清空缓存</button>
-        </span>
-      </div>
-      <div id="cacheBody" style="display:none; font-size:11px; color:var(--ink-light); line-height:1.8;">
-        <div>存储类型：WebView localStorage</div>
-        <div>存储路径：/data/data/com.jwxt.query/app_webview/</div>
-        <div style="margin-top:4px;">已缓存数据：</div>
-        <div id="cacheList" style="font-size:11px; color:var(--green-deep); padding:4px 0;"></div>
-      </div>
-    </div>
-  </section>
+  <!-- 查询参数 / 缓存信息 已移至左侧侧边栏；浏览列表已移至底部导航“浏览”页 -->
 
   <!-- 浏览结果 -->
   <!-- 底部弹出弹窗遮罩 -->
@@ -625,10 +669,29 @@ html[data-style="classic"] .building-head { background: var(--green); }
 
 </main>
 
-<!-- 设置面板 -->
-<section id="settingsSection" class="hidden settings-panel">
+<!-- 浏览列表页（底部导航“浏览”tab） -->
+<section id="browseNav" class="view-panel hidden">
+  <div class="page-head">
+    <span class="mono" style="color:var(--green);">浏览列表</span>
+    <span class="mono" style="color:var(--ink-light);">全校数据</span>
+  </div>
+  <div class="card card-green">
+    <div class="btn-group">
+      <button class="btn-chip" onclick="openBrowse('teacher')">全校教师</button>
+      <button class="btn-chip" onclick="openBrowse('class')">全校班级</button>
+      <button class="btn-chip" onclick="openBrowse('classroom')">全校教室</button>
+    </div>
+  </div>
+</section>
+
+<!-- 设置独立页面（可从侧边栏 / 底部导航进入，返回首页） -->
+<section id="settingsSection" class="hidden settings-page">
+  <div class="page-head">
+    <button class="page-back" onclick="closeSettings()">← 返回</button>
+    <span class="mono" style="color:var(--green);">设置</span>
+    <span class="mono" style="color:var(--ink-light);">v0.9.10</span>
+  </div>
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.9</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -652,7 +715,7 @@ html[data-style="classic"] .building-head { background: var(--green); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.9（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.10（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>
@@ -662,6 +725,9 @@ html[data-style="classic"] .building-head { background: var(--green); }
 <nav id="bottomNav" class="bottomnav">
   <button class="nav-item active" data-tab="home" onclick="showTab('home')">
     <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>首页</span>
+  </button>
+  <button class="nav-item" data-tab="browse" onclick="showTab('browse')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg><span>浏览</span>
   </button>
   <button class="nav-item" data-tab="settings" onclick="showTab('settings')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.15-1.42l2.1-1.5-2-3.46-2.46 1a7 7 0 0 0-2.46-1.43L13.6 2.6h-3.2l-.43 2.59a7 7 0 0 0-2.46 1.43l-2.46-1-2 3.46 2.1 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .15 1.42l-2.1 1.5 2 3.46 2.46-1a7 7 0 0 0 2.46 1.43l.43 2.59h3.2l.43-2.59a7 7 0 0 0 2.46-1.43l2.46 1 2-3.46-2.1-1.5A7 7 0 0 0 19 12z"/></svg><span>设置</span>
@@ -756,13 +822,56 @@ function restoreTheme() {
   setStyleMode(s);
 }
 
-// ==== 底部导航 & 设置面板 ====
+// ==== 底部导航（首页 / 浏览 / 设置）& 侧边栏 & 设置独立页 ====
 function showTab(which) {
-  const set = document.getElementById('settingsSection');
-  if (set) set.classList.toggle('hidden', which !== 'settings');
   const nav = document.getElementById('bottomNav');
   if (nav) nav.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === which));
+  const set = document.getElementById('settingsSection');
+  const browse = document.getElementById('browseNav');
+  const main = document.getElementById('main');
+  const backBtn = document.getElementById('backBtn');
+  if (which === 'settings') {
+    if (main) main.style.display = 'none';
+    if (browse) browse.classList.add('hidden');
+    if (set) { set.classList.remove('hidden'); try { refreshSettingsCache(); } catch(e){} }
+    if (backBtn) backBtn.classList.add('show');
+  } else if (which === 'browse') {
+    if (main) main.style.display = 'none';
+    if (set) set.classList.add('hidden');
+    if (browse) browse.classList.remove('hidden');
+    if (backBtn) backBtn.classList.remove('show');
+  } else { // home
+    if (main) main.style.display = '';
+    if (set) set.classList.add('hidden');
+    if (browse) browse.classList.add('hidden');
+    if (backBtn) backBtn.classList.toggle('show', S.view !== 'main');
+  }
 }
+function openSettings() { showTab('settings'); }
+function closeSettings() { showTab('home'); }
+function openSidebar() {
+  const s = document.getElementById('sidebar'); const b = document.getElementById('sidebarBackdrop');
+  if (s) s.classList.add('open');
+  if (b) b.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  const s = document.getElementById('sidebar'); const b = document.getElementById('sidebarBackdrop');
+  if (s) s.classList.remove('open');
+  if (b) b.classList.remove('show');
+  document.body.style.overflow = '';
+}
+// 手势：左侧边缘向右滑打开侧边栏；侧边栏内向左滑收起
+(function initSidebarSwipe() {
+  var sb = document.getElementById('sidebar');
+  var ex = -1, sx = 0;
+  document.addEventListener('touchstart', function(e){ if (e.touches[0].clientX < 24) ex = e.touches[0].clientX; else ex = -1; }, {passive:true});
+  document.addEventListener('touchend', function(e){ if (ex < 0) return; if (e.changedTouches[0].clientX - ex > 70) openSidebar(); }, {passive:true});
+  if (sb) {
+    sb.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
+    sb.addEventListener('touchend', function(e){ if (e.changedTouches[0].clientX - sx < -60) closeSidebar(); }, {passive:true});
+  }
+})();
 function toggleNotify() {
   const sw = document.getElementById('notifySwitch');
   if (!sw) return;
@@ -1264,8 +1373,7 @@ function setCache(k, v) {
 function showView(v, pushHistory) {
   var prevView = S.view;
   S.view = v;
-  document.getElementById('querySection').style.display = v === 'main' ? '' : 'none';
-  document.getElementById('browseNav').style.display = v === 'main' ? '' : 'none';
+  // querySection 在左侧侧边栏、browseNav 在浏览页，均由各自容器控制，不再在此显隐
   document.getElementById('resultSection').classList.toggle('hidden', v !== 'result');
   document.getElementById('backBtn').classList.toggle('show', v !== 'main');
   window.scrollTo(0, 0);
@@ -1285,14 +1393,12 @@ function closeBrowse() {
   document.getElementById('browseOverlay').style.display = 'none';
 }
 function goBack() {
-  // 如果弹窗开着，先关弹窗
-  if (!document.getElementById('browseSection').classList.contains('hidden')) {
-    closeBrowse();
-    return;
-  }
-  if (S.view !== 'main') {
-    history.back();
-  }
+  // 依次收拢：侧边栏 → 浏览/详情弹窗 → 设置页 → 浏览tab → 结果页
+  try { if (document.getElementById('sidebar').classList.contains('open')) { closeSidebar(); return; } } catch(e){}
+  if (!document.getElementById('browseSection').classList.contains('hidden')) { closeBrowse(); return; }
+  try { if (!document.getElementById('settingsSection').classList.contains('hidden')) { closeSettings(); return; } } catch(e){}
+  try { if (!document.getElementById('browseNav').classList.contains('hidden')) { showTab('home'); return; } } catch(e){}
+  if (S.view !== 'main') { history.back(); }
 }
 // 监听返回键
 window.addEventListener('popstate', function(e) {

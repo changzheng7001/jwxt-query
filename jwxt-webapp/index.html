@@ -145,18 +145,23 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--green); padding-bottom: 4px; margin-bottom: 8px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
-/* 课表表格（与成绩表格同构，保证兼容可见） */
-.sched-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-.sched-table th { padding: 7px 4px; background: var(--green); color: var(--cream); font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; font-weight: 600; border: 1px solid var(--green); white-space: nowrap; text-align: center; }
-.sched-table td { border: 1px solid var(--line); padding: 5px 4px; vertical-align: top; text-align: center; }
-.sched-table td.seg { font-family: var(--mono); font-size: 10px; color: var(--green); white-space: nowrap; background: var(--cream-2); }
-.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; line-height: 34px; }
-.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 6px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; }
-.sched-course .cn { font-weight: 700; font-size: 11px; display: block; word-break: break-all; }
+/* 课表表格（美化版，玻璃主题默认） */
+.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 10px; min-width: 620px; }
+.sched-table thead th { padding: 8px 4px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.10); }
+html[data-theme="dark"] .sched-table thead th { background: linear-gradient(135deg, var(--green-lite), var(--green)); color: var(--green-deep); }
+.sched-table td { border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px; vertical-align: top; text-align: center; background: var(--glass); }
+.sched-table td.seg { font-family: var(--mono); font-size: 9px; color: var(--green); white-space: nowrap; background: var(--glass-2); border: none; }
+.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; line-height: 38px; }
+.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 7px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.10); }
+.sched-course .cn { font-weight: 700; font-size: 10px; display: block; word-break: break-all; }
 .sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; margin-top: 2px; }
 .sched-course.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
 html[data-theme="dark"] .sched-course.pink { color: var(--cream); }
 .sched-course:active { transform: scale(0.97); }
+/* 经典主题用保守化表格 */
+html[data-style="classic"] .sched-table { border-collapse: collapse; border-spacing: 0; min-width: 0; font-size: 11px; }
+html[data-style="classic"] .sched-table thead th { background: var(--green); color: var(--cream); border-radius: 0; box-shadow: none; border: 1px solid var(--green); }
+html[data-style="classic"] .sched-table td { border: 1px solid var(--line); border-radius: 0; background: transparent; }
 .course-card { border-radius: 12px; border: 1px solid var(--glass-border); padding: 12px; margin-bottom: 8px;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   box-shadow: 0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
@@ -238,7 +243,7 @@ tr:nth-child(even) td { background: var(--row); }
 .class-chip:active { transform: scale(0.95); }
 .grade-group { margin-bottom: 14px; }
 /* 折叠三角形 */
-.caret { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .2s; }
+.caret { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .6s; }
 .open .caret, .caret.open { transform: rotate(180deg); }
 .grade-title { font-size: 13px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--green); padding-bottom: 3px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 
@@ -1353,7 +1358,18 @@ function renderResult(type, data) {
       const today = now.getDay();
       dayArg = [today === 0 ? 7 : today];
     }
-    h += (S.scheduleForm === 'list') ? buildList(dayArg) : buildTable(dayArg);
+    let bodyHtml;
+    if (S.scheduleForm === 'list') {
+      bodyHtml = buildList(dayArg);
+    } else {
+      try {
+        bodyHtml = buildTable(dayArg);
+      } catch(tblErr) {
+        // 表格渲染失败时自动回退到列表，避免空白
+        bodyHtml = '<div class="error-box" style="margin-bottom:10px;">表格渲染出错，已切换为列表显示：'+esc(tblErr.message||'')+'</div>' + buildList(dayArg);
+      }
+    }
+    h += bodyHtml;
     el.innerHTML = h;
   }
 }

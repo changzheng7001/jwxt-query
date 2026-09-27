@@ -1093,16 +1093,13 @@ function init() {
 
   // 今日课程
   renderTodayCourses();
-  maybeNotifyToday();
+  refreshOngoing();
 }
 
-// 打开 App 时若已生成今日课程数据，发一条系统通知（每天最多一次；force=true 忽略标记用于权限授予后补发）
-function maybeNotifyToday(force) {
+// 每次打开 App 刷新"今日课程"常驻通知（ongoing，一直显示在通知栏，点击跳本周课表）
+function refreshOngoing() {
   try {
     if (!(window.Android && Android.showNotification)) return;
-    const last = localStorage.getItem('jwxt_notify_date');
-    const todayStr = new Date().toISOString().slice(0, 10);
-    if (!force && last === todayStr) return;
     const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
     const names = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -1117,14 +1114,12 @@ function maybeNotifyToday(force) {
     let text;
     if (names.length) text = '今日' + names.length + '门课：' + uniq.join('、') + (names.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
     else text = '今日无课，好好休息（点此查看本周课表）';
-    const ok = Android.showNotification('今日课程', text);
-    localStorage.setItem('jwxt_notify_date', todayStr);
-    return ok;
+    Android.showNotification('今日课程', text, true);
   } catch (e) {}
 }
 
-// 通知权限授予后补发通知
-window.__retryNotif = function() { maybeNotifyToday(true); };
+// 通知权限授予后补发常驻通知
+window.__retryNotif = function() { refreshOngoing(); };
 
 // 通知点击跳转：进入本人课表本周表格
 window.__gotoSchedule = function() {

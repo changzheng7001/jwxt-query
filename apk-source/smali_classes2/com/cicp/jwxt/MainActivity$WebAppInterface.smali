@@ -765,7 +765,7 @@
     :goto_0
     return-void
 .end method
-.method public showNotification(Ljava/lang/String;Ljava/lang/String;)V
+.method public showNotification(Ljava/lang/String;Ljava/lang/String;Z)Z
     .annotation runtime Landroid/webkit/JavascriptInterface;
     .end annotation
 
@@ -789,7 +789,8 @@
     aput-object v10, v8, v9
     const/16 v9, 0x7d1
     invoke-virtual {v0, v8, v9}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
-    return-void
+    const/4 v0, 0x0
+    return v0
     :cond_hasperm
     :try_end_perm
     .catch Ljava/lang/Exception; {:try_start_perm .. :try_end_perm} :catch_perm
@@ -843,17 +844,20 @@
     invoke-virtual {v5, p1}, Landroid/app/Notification$Builder;->setContentTitle(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
     invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
     invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
-    const/4 v3, 0x1
-    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setAutoCancel(Z)Landroid/app/Notification$Builder;
+    invoke-virtual {v5, p3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
     invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
     move-result-object v3
     const/4 v4, 0x1
     invoke-virtual {v1, v4, v3}, Landroid/app/NotificationManager;->notify(ILandroid/app/Notification;)V
+    const/4 v0, 0x1
+    return v0
     :try_end_0
     .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
     goto :goto_ret
     :catch_0
     move-exception v2
+    const/4 v0, 0x0
+    return v0
     :goto_ret
     return-void
 .end method

@@ -1304,6 +1304,14 @@ function renderResult(type, data) {
         + '<span class="cn">'+esc(c.name||'')+'</span>'
         + '<span class="cr">'+esc(c.classroom||'')+'</span></div>';
     }
+    // 节次归一化：优先用 period，否则从 periodLabel 提取数字转成 seg.code 格式（如 '第5-6节'→'0506'）
+    function periodKey(c) {
+      if (c.period) return c.period;
+      const m = (c.periodLabel || '').match(/\d+/g);
+      if (m && m.length >= 2) return ('0' + m[0]).slice(-2) + ('0' + m[m.length - 1]).slice(-2);
+      if (m && m.length === 1) return ('0' + m[0]).slice(-2);
+      return c.period || '';
+    }
     function buildTable(daySet) {
       // daySet: 若为 null 表示周视图(7列)；否则 [dayIdx] 表示仅今天
       const single = daySet && daySet.length === 1;
@@ -1318,10 +1326,10 @@ function renderResult(type, data) {
         h += '<tr><td class="seg">'+esc(seg.label)+'</td>';
         const cell = (list) => list.length ? '<td>'+list.map(c=>courseCell(c, slotColor[seg.code])).join('')+'</td>' : '<td class="empty"><span class="e">—</span></td>';
         if (single) {
-          h += cell(courses.filter(c => c.weekday === daySet[0] && c.period === seg.code));
+          h += cell(courses.filter(c => c.weekday === daySet[0] && periodKey(c) === seg.code));
         } else {
           for (let d = 1; d <= 7; d++) {
-            h += cell(courses.filter(c => c.weekday === d && c.period === seg.code));
+            h += cell(courses.filter(c => c.weekday === d && periodKey(c) === seg.code));
           }
         }
         h += '</tr>';
@@ -1335,7 +1343,7 @@ function renderResult(type, data) {
       const days = single ? daySet : [1,2,3,4,5,6,7];
       let h = '';
       days.forEach(d => {
-        const list = courses.filter(c => c.weekday === d).sort((a,b)=>(a.period||'').localeCompare(b.period||''));
+        const list = courses.filter(c => c.weekday === d).sort((a,b)=>periodKey(a).localeCompare(periodKey(b)));
         h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+esc(WEEKDAYS[d-1])+(single?' · 今天':'')+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+list.length+'节</span></div>';
         if (!list.length) h += '<p class="empty-day">'+(single?'今天无课':'无课')+'</p>';
         else list.forEach((c, ci) => { h += courseCard(courses.indexOf(c), ci%2===0?'green':'pink'); });

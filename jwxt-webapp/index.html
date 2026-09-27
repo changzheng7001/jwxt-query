@@ -986,6 +986,8 @@ function cacheKey(type, params) {
   var k = type;
   if (params && params.name) k += '_' + params.name;
   if (params && params.semester) k += '_' + params.semester;
+  if (params && params.week) k += '_w' + params.week;
+  if (params && params.weekday) k += '_d' + params.weekday;
   return k;
 }
 function getCache(k) {
@@ -1140,7 +1142,6 @@ async function runQuery(forceRefresh) {
 
   var ck = cacheKey(type, params);
   var cached = getCache(ck);
-  if (!cached) cached = getCache(type);
 
   var debug = '调试: type='+type+' ck='+ck+' 缓存='+(cached?'有':'无')+' 登录='+(S.loggedIn?'是':'否');
 
@@ -1403,7 +1404,7 @@ function setScheduleView(v) {
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
   const ck = cacheKey(type, params);
-  const cached = getCache(ck) || getCache(type);
+  const cached = getCache(ck);
   if (cached) renderResult(type, cached.data);
   else alert('无缓存数据，请先查询');
 }
@@ -1419,7 +1420,7 @@ function setScheduleForm(v) {
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
   const ck = cacheKey(type, params);
-  const cached = getCache(ck) || getCache(type);
+  const cached = getCache(ck);
   if (cached) renderResult(type, cached.data);
   else alert('无缓存数据，请先查询');
 }

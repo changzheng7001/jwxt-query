@@ -684,10 +684,20 @@ function parseSelfSchedule(html, weekday, week) {
           const t = pp.textContent.trim();
           if (t.startsWith('教师')) c.teacher = t.replace(/^教师\s*[:：]\s*/,'').replace(/[.,，。]$/,'').trim();
         });
-        const sp = item.querySelector('span.text');
-        if (sp) {
-          const nums = sp.textContent.trim().match(/\d{2}/g) || [];
-          if (nums.length >= 2) c.periodLabel = '第'+nums[0]+'-'+nums[nums.length-1]+'节';
+        // 节次提取：优先 .tch-name span（含"节"文本，如 "01~02~03节"）；其次 span.text；否则回退行label
+        let nums = [];
+        item.querySelectorAll('.tch-name span').forEach(s => {
+          const t = s.textContent.trim();
+          if (t.indexOf('节') >= 0) nums = t.match(/\d{2}/g) || [];
+        });
+        if (!nums.length) {
+          const sp = item.querySelector('span.text');
+          if (sp) nums = sp.textContent.trim().match(/\d{2}/g) || [];
+        }
+        if (nums.length >= 2) {
+          const s = parseInt(nums[0], 10), e = parseInt(nums[nums.length - 1], 10);
+          c.period = (s < 10 ? '0' + s : '' + s) + (e < 10 ? '0' + e : '' + e);
+          c.periodLabel = '第' + s + '-' + e + '节';
         }
         const img1 = item.querySelector('img[src*="item1"]');
         if (img1 && img1.parentElement) c.classroom = img1.parentElement.textContent.trim();
@@ -697,7 +707,7 @@ function parseSelfSchedule(html, weekday, week) {
   }
   const seen = new Set();
   const uniq = courses.filter(c => {
-    const k = c.weekday+c.name+c.teacher+c.classroom;
+    const k = c.weekday + '|' + c.name + '|' + c.teacher + '|' + c.classroom + '|' + (c.period || c.periodLabel || '');
     if (seen.has(k)) return false; seen.add(k); return true;
   });
   const wd = parseInt(weekday);

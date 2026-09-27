@@ -12,8 +12,8 @@ packageInfo:
   forcedPackageId: 127
   renameManifestPackage: null
 versionInfo:
-  versionCode: 11
-  versionName: 0.9.2
+  versionCode: 12
+  versionName: 0.9.3
 resourcesAreCompressed: false
 sharedLibrary: false
 sparseResources: false

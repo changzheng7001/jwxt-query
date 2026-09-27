@@ -1096,13 +1096,13 @@ function init() {
   maybeNotifyToday();
 }
 
-// 打开 App 时若有今日课程，发一条系统通知（每天最多一次）
-function maybeNotifyToday() {
+// 打开 App 时若已生成今日课程数据，发一条系统通知（每天最多一次；force=true 忽略标记用于权限授予后补发）
+function maybeNotifyToday(force) {
   try {
     if (!(window.Android && Android.showNotification)) return;
     const last = localStorage.getItem('jwxt_notify_date');
     const todayStr = new Date().toISOString().slice(0, 10);
-    if (last === todayStr) return;
+    if (!force && last === todayStr) return;
     const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
     const names = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -1113,13 +1113,18 @@ function maybeNotifyToday() {
       if (!data || !data.courses) continue;
       data.courses.forEach(c => { if (c.weekday === wd && c.name) names.push(c.name); });
     }
-    if (!names.length) return;
     const uniq = names.filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
-    const text = '今日' + names.length + '门课：' + uniq.join('、') + (names.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
-    Android.showNotification('今日课程', text);
+    let text;
+    if (names.length) text = '今日' + names.length + '门课：' + uniq.join('、') + (names.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
+    else text = '今日无课，好好休息（点此查看本周课表）';
+    const ok = Android.showNotification('今日课程', text);
     localStorage.setItem('jwxt_notify_date', todayStr);
+    return ok;
   } catch (e) {}
 }
+
+// 通知权限授予后补发通知
+window.__retryNotif = function() { maybeNotifyToday(true); };
 
 // 通知点击跳转：进入本人课表本周表格
 window.__gotoSchedule = function() {
@@ -1168,7 +1173,13 @@ function renderTodayCourses() {
       });
     }
   } catch (e) {}
-  if (!list.length) { sec.classList.add('hidden'); return; }
+  if (!list.length) {
+    el.innerHTML = '<div class="today-course-empty">今日无课</div>';
+    const cnt0 = document.getElementById('todayCount');
+    if (cnt0) cnt0.textContent = '0门';
+    sec.classList.remove('hidden');
+    return;
+  }
   list.sort((a, b) => todaySpan(a) - todaySpan(b));
   let h = '<div class="today-course-scroll">';
   list.forEach(c => {

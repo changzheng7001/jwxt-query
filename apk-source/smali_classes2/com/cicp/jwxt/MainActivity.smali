@@ -227,3 +227,29 @@
     :cond_done
     return-void
 .end method
+.method public onRequestPermissionsResult(I[Ljava/lang/String;[I)V
+    .locals 4
+
+    invoke-super {p0, p1, p2, p3}, Landroid/app/Activity;->onRequestPermissionsResult(I[Ljava/lang/String;[I)V
+
+    const/16 v0, 0x7d1
+    if-ne p1, v0, :cond_done
+
+    array-length v1, p3
+    if-lez v1, :cond_done
+
+    const/4 v1, 0x0
+    aget v1, p3, v1
+    if-eqz v1, :cond_done
+
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v2, "window.__retryNotif&&window.__retryNotif()"
+
+    const/4 v3, 0x0
+
+    invoke-virtual {v1, v2, v3}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
+    :cond_done
+    return-void
+.end method

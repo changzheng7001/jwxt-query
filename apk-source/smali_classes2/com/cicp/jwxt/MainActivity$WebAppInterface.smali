@@ -769,9 +769,34 @@
     .annotation runtime Landroid/webkit/JavascriptInterface;
     .end annotation
 
-    .locals 9
+    .locals 11
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    # API33+ 无通知权限 -> 请求权限后返回（授权后由 JS 补发）
+    :try_start_perm
+    sget v8, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v9, 0x21
+    if-lt v8, v9, :cond_hasperm
+    const-string v8, "android.permission.POST_NOTIFICATIONS"
+    invoke-virtual {v0, v8}, Landroid/content/Context;->checkSelfPermission(Ljava/lang/String;)I
+    move-result v8
+    if-nez v8, :cond_hasperm
+    const/4 v8, 0x1
+    new-array v8, v8, [Ljava/lang/String;
+    const/4 v9, 0x0
+    const-string v10, "android.permission.POST_NOTIFICATIONS"
+    aput-object v10, v8, v9
+    const/16 v9, 0x7d1
+    invoke-virtual {v0, v8, v9}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
+    return-void
+    :cond_hasperm
+    :try_end_perm
+    .catch Ljava/lang/Exception; {:try_start_perm .. :try_end_perm} :catch_perm
+    goto :goto_perm
+    :catch_perm
+    move-exception v8
+    :goto_perm
 
     :try_start_0
     const-string v1, "notification"

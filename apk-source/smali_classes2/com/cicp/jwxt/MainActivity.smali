@@ -80,7 +80,7 @@
 .end method
 
 .method protected onCreate(Landroid/os/Bundle;)V
-    .locals 4
+    .locals 5
     .param p1, "savedInstanceState"    # Landroid/os/Bundle;
 
     .line 119
@@ -197,6 +197,8 @@
     invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
+
+    if-eqz v1, :cond_done
 
     const-string v2, "schedule"
 

@@ -277,8 +277,9 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 .profile-item .v { font-size: 14px; font-weight: 500; margin-top: 2px; word-break: break-all; }
 
 /* 查询类型卡片按钮组 */
-.type-list { display: flex; flex-direction: column; gap: 4px; }
-.type-list .type-btn { min-height: 44px; border-radius: 10px; padding: 0 14px; text-align: left; display: flex; align-items: center; }
+.type-list { display: flex; flex-direction: column; gap: 2px; }
+.type-list .type-btn { min-height: 42px; padding: 0 6px; text-align: left; display: flex; align-items: center; background: transparent; border: none; border-radius: 8px; color: var(--ink); }
+.type-list .type-btn.active { background: rgba(15,157,148,0.10); color: var(--green); }
 .type-btn {
   min-height: 52px; padding: 10px 8px; border: 1px solid var(--glass-border); border-radius: 12px;
   background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -325,10 +326,10 @@ main { padding-bottom: 28px; }
 .seg button.on { background: var(--green); color: var(--cream); }
 html[data-theme="dark"] .seg button.on { color: #0f120c; }
 .set-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.switch { position: relative; display: inline-block; width: 46px; height: 26px; border-radius: 999px; background: #cdd3da; transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; vertical-align: middle; }
-.switch::after { content: ''; position: absolute; top: 50%; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transform: translateY(-50%); transition: left .25s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-.switch.on { background: var(--green); }
-.switch.on::after { left: calc(100% - 23px); }
+.switch { position: relative; display: inline-block; width: 50px; height: 29px; border-radius: 999px; background: #d7dbe1; transition: background .3s ease; cursor: pointer; border: none; flex-shrink: 0; vertical-align: middle; box-shadow: inset 0 1px 2px rgba(0,0,0,0.12); }
+.switch::after { content: ''; position: absolute; top: 50%; left: 3px; width: 23px; height: 23px; border-radius: 50%; background: #fff; transform: translateY(-50%); transition: left .3s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 2px 6px rgba(0,0,0,0.28); }
+.switch.on { background: linear-gradient(180deg, var(--green-lite), var(--green)); }
+.switch.on::after { left: calc(100% - 26px); }
 /* 设置页顶部标题条：去掉突兀的白色块 */
 .settings-page .page-head { background: transparent; }
 html[data-style="classic"] .settings-panel { background: var(--cream); }
@@ -449,10 +450,10 @@ html[data-style="classic"] .letter-nav span.active { background: var(--green); }
 html[data-style="classic"] .sched-table thead th { background: var(--green); }
 html[data-style="classic"] .building-head { background: var(--green); }
 /* 经典主题：查询类型按钮用高对比（浅米底 + 近黑字，避免绿色字被色块盖住） */
-html[data-style="classic"] .type-list .type-btn { color: var(--ink); background: var(--cream-2); border-color: var(--green); }
+html[data-style="classic"] .type-list .type-btn { color: var(--ink); background: transparent; border: none; }
 html[data-style="classic"] .type-list .type-btn.active { background: var(--green); color: #fff; }
 html[data-style="classic"] .btn-chip { color: var(--green); background: var(--cream-2); border: 2px solid var(--green); }
-html[data-style="classic"] .sidebar-item { color: var(--green); }
+html[data-style="classic"] .sidebar-foot .sidebar-item { background: var(--green); color: #fff; border-color: var(--green); }
 
 /* ===== 工作台布局：侧边栏 / 浏览页 / 设置独立页 ===== */
 .menu-btn { background:none; border:none; color:var(--green); display:flex; align-items:center; justify-content:center; padding:0 6px; cursor:pointer; line-height:1; flex-shrink:0; }
@@ -461,7 +462,7 @@ html[data-style="classic"] .sidebar-item { color: var(--green); }
 
 .sidebar-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.35); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:165; opacity:0; visibility:hidden; transition:opacity .28s, visibility .28s; }
 .sidebar-backdrop.show { opacity:1; visibility:visible; }
-.sidebar { position:fixed; top:0; left:0; bottom:0; width:min(320px, 86vw); z-index:166; display:flex; flex-direction:column;
+.sidebar { position:fixed; top:0; left:0; bottom:0; width:min(264px, 80vw); z-index:166; display:flex; flex-direction:column;
   background:var(--sheet-bg); -webkit-backdrop-filter:blur(28px) saturate(170%); backdrop-filter:blur(28px) saturate(170%);
   border-right:1px solid var(--glass-border); box-shadow:16px 0 40px rgba(15,23,42,0.16);
   transform:translateX(-105%); transition:transform .32s cubic-bezier(.32,.72,.35,1); }
@@ -484,7 +485,8 @@ html[data-style="classic"] .sidebar-item { color: var(--green); }
 html[data-style="classic"] .sidebar, html[data-style="classic"] .settings-page { background:var(--cream); box-shadow:none; }
 html[data-style="classic"] .sidebar-backdrop { background:rgba(0,0,0,0.4); }
 html[data-style="classic"] .sidebar-item { border:2px solid var(--green); border-radius:8px; }
-html[data-style="classic"] .menu-btn, html[data-style="classic"] .page-back { color:var(--green); }
+html[data-style="classic"] .menu-btn { color: var(--green); background: transparent; border: none; }
+html[data-style="classic"] .page-back { color: #fff; background: var(--green); border: none; }
 
 /* ===== 侧边栏底部固定（豆包式）===== */
 .sidebar-foot { border-top:1px solid var(--line); padding:14px; flex-shrink:0; background:var(--sheet-bg); }
@@ -520,7 +522,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
     </button>
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.13</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.14</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -543,10 +545,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
 
     <!-- 查询参数（单列，点击直接查询） -->
     <section id="querySection">
-      <div class="card card-pink">
-        <div class="card-header"><span class="mono">查询参数</span></div>
-        <div class="type-list" id="typeGrid"></div>
-      </div>
+      <div class="type-list" id="typeGrid"></div>
     </section>
 
     <!-- 浏览列表（全校数据） -->
@@ -691,7 +690,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
   <div class="page-head">
     <button class="page-back" onclick="closeSettings()">← 返回</button>
     <span class="mono" style="color:var(--green);">设置</span>
-    <span class="mono" style="color:var(--ink-light);">v0.9.13</span>
+    <span class="mono" style="color:var(--ink-light);">v0.9.14</span>
   </div>
   <div class="card">
 
@@ -717,7 +716,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.13（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.14（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>
@@ -1403,11 +1402,8 @@ function goBack() {
 }
 // 监听返回键
 window.addEventListener('popstate', function(e) {
-  if (e.state && e.state.view) {
-    showView(e.state.view, false);
-  } else {
-    showView('main', false);
-  }
+  // 系统返回键/返回手势：统一退回首页（结果标签保留）
+  showView('main', false);
 });
 
 // ============ 初始化 ============
@@ -1486,10 +1482,10 @@ window.__gotoSchedule = function() {
     S.queryType = 'self'; S.scheduleForm = 'table'; S.scheduleView = 'week';
     const qw = document.getElementById('queryWeek'); if (qw) qw.value = '';
     const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = '';
-    document.getElementById('cacheNotice').classList.remove('hidden');
-    showView('result', true);
-    document.getElementById('resultLabel').textContent = '我的课表 (本周)';
-    renderResult('self', best);
+    // 多标签：创建/复用「我的课表」结果标签并激活，一步到位跳转本周表格
+    const key = 'self|' + cacheKey('self', {});
+    upsertTab(key, 'self', '我的课表', best, true, '通知跳转·本周');
+    activateTab(key);
   } catch (e) {}
 };
 
@@ -1694,7 +1690,7 @@ function renderIntoActive() {
   var notice = document.getElementById('cacheNotice');
   var labelEl = document.getElementById('resultLabel');
   if (!t) return;
-  showView('result', false);
+  showView('result');
   if (notice) notice.classList.toggle('hidden', !t.cached);
   if (labelEl) labelEl.textContent = t.label + (t.cached ? ' (缓存)' : '');
   if (t.data == null) { content.innerHTML = '<div style="padding:20px; text-align:center;">查询中... 类型: '+esc(t.type)+'</div>'; return; }

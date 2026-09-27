@@ -975,6 +975,20 @@ function parseSelfSchedule(html, weekday, week) {
         }
         const img1 = item.querySelector('img[src*="item1"]');
         if (img1 && img1.parentElement) c.classroom = img1.parentElement.textContent.trim();
+        // 周次：详情中 img[item3] 所在 span 的 "第X周"（课程实际授课周次，非查询参数）
+        const img3 = item.querySelector('img[src*="item3"]');
+        if (img3 && img3.parentElement) {
+          const m = img3.parentElement.textContent.match(/第\s*(\d+)\s*周/);
+          if (m) c.week = '第' + m[1] + '周';
+        }
+        // 教师：item-box 未取到时，从前置 span.box 短名视图取
+        if (!c.teacher) {
+          const box = item.previousElementSibling;
+          if (box) box.querySelectorAll('p').forEach(pp => {
+            const t = pp.textContent.trim();
+            if (t.indexOf('教师') >= 0) c.teacher = t.replace(/^教师\s*[:：]\s*/, '').replace(/[.,，。]+$/, '').trim();
+          });
+        }
         courses.push(c);
       }
     }
@@ -1363,18 +1377,25 @@ function refreshOngoing() {
     if (!(window.Android && Android.showNotification)) return;
     if ((localStorage.getItem('jwxt_notify_on') || '1') === '0') return;
     const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
-    const names = [];
+    const items = [];
+    const seen = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (!k || k.indexOf(CK + 'self') !== 0) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
-      data.courses.forEach(c => { if (c.weekday === wd && c.name) names.push(c.name); });
+      data.courses.forEach(c => {
+        if (c.weekday !== wd || !c.name) return;
+        const key = c.name + '|' + (c.teacher || '') + '|' + (c.classroom || '');
+        if (seen.has(key)) return; seen.add(key);
+        const label = c.name + (c.teacher ? ' ' + c.teacher : '') + (c.classroom ? '·' + c.classroom : '');
+        items.push(label);
+      });
     }
-    const uniq = names.filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
+    const uniq = items.slice(0, 3);
     let text;
-    if (names.length) text = '今日' + names.length + '门课：' + uniq.join('、') + (names.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
+    if (items.length) text = '今日' + items.length + '门课：' + uniq.join('、') + (items.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
     else text = '今日无课，好好休息（点此查看本周课表）';
     Android.showNotification('今日课程', text, true);
   } catch (e) {}

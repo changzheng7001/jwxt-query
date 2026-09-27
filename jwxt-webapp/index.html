@@ -326,14 +326,20 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 html[data-theme="dark"] .bottomnav .nav-item.active { background: rgba(143,174,110,0.22); }
 html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav .nav-item.active { background: var(--cream-2); }
-/* 底部导航：拖动划过图标时的光折射效果（径向白光 + 绿光晕 + 内发光） */
-.bottomnav .nav-item.draghover {
-  background: radial-gradient(circle at center, rgba(255,255,255,0.75), rgba(46,74,42,0.10) 62%);
-  color: var(--green);
-  box-shadow: 0 0 16px 5px rgba(46,74,42,0.28), inset 0 0 5px 2px rgba(255,255,255,0.6);
-  transform: translateY(-3px) scale(1.06);
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+/* 底部导航：随手指滑动的玻璃折射层（盖在图标上，图标透过玻璃扭曲可见） */
+.bottomnav .glass-slide {
+  position: absolute; top: 7px; bottom: 7px; left: 7px; width: 70px;
+  background: rgba(255,255,255,0.34);
+  -webkit-backdrop-filter: blur(2.5px) saturate(1.5); backdrop-filter: blur(2.5px) saturate(1.5);
+  border-radius: 999px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.16), inset 0 0 3px rgba(255,255,255,0.7), inset 0 -1px 2px rgba(255,255,255,0.4);
+  z-index: 2; pointer-events: none;
+  transition: left .28s cubic-bezier(.34,1.56,.64,1);
 }
+.bottomnav .nav-item { position: relative; z-index: 1; }
+.bottomnav .nav-item.refract { transform: translateY(-2px) scale(1.14); color: var(--green); }
+.bottomnav .nav-item.refract svg { filter: drop-shadow(0 0 7px rgba(46,74,42,0.45)); }
+html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.6); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.5); }
 main { padding-bottom: 86px; }
 
 /* ==== 设置面板 ==== */
@@ -347,14 +353,14 @@ main { padding-bottom: 86px; }
 .settings-panel .set-desc { font-size: 11px; color: var(--ink-light); margin-top: 2px; line-height: 1.5; }
 .settings-panel .set-hint { font-size: 11px; color: var(--ink-light); background: var(--glass-2); border: 1px dashed var(--glass-border); border-radius: 8px; padding: 10px 12px; margin: 4px 0 14px; line-height: 1.6; }
 .seg { display: flex; gap: 6px; }
-.seg button { font-size: 12px; padding: 6px 14px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
+.seg button { font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
 .seg button.on { background: var(--green); color: var(--cream); }
 html[data-theme="dark"] .seg button.on { color: #0f120c; }
-.set-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.switch { position: relative; width: 51px; height: 31px; border-radius: 999px; background: rgba(139,116,85,0.35); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
-.switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+.set-btn { font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
+.switch { position: relative; width: 44px; height: 25px; border-radius: 999px; background: rgba(139,116,85,0.35); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
+.switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
 .switch.on { background: var(--green); }
-.switch.on::after { transform: translateX(20px); }
+.switch.on::after { transform: translateX(19px); }
 html[data-style="classic"] .settings-panel { background: var(--cream); }
 </style>
 </head>
@@ -364,7 +370,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
   <div class="topbar-left">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.7</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.8</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -517,7 +523,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 设置面板 -->
 <section id="settingsSection" class="hidden settings-panel">
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.7</span></div>
+    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.8</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -541,7 +547,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.7（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.8（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>
@@ -549,6 +555,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 
 <!-- 底部液态玻璃导航栏 -->
 <nav id="bottomNav" class="bottomnav">
+  <div class="glass-slide"></div>
   <button class="nav-item active" data-tab="home" onclick="showTab('home')">
     <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>首页</span>
   </button>
@@ -652,12 +659,28 @@ function showTab(which) {
   const nav = document.getElementById('bottomNav');
   if (nav) nav.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === which));
 }
-// 底部导航：支持手指拖动，划过图标时带光折射效果
+// 底部导航：手指拖动玻璃层滑动，划过图标时图标折射扭曲，松手落定
 (function initNavDrag() {
   var nav = document.getElementById('bottomNav');
   if (!nav) return;
+  var slide = nav.querySelector('.glass-slide');
   var items = Array.prototype.slice.call(nav.querySelectorAll('.nav-item'));
-  function clear() { items.forEach(function(n){ n.classList.remove('draghover'); }); }
+  if (!slide || !items.length) return;
+  var W = 70;
+  function positionSlideTo(el, instant) {
+    var b = el.getBoundingClientRect();
+    var r = nav.getBoundingClientRect();
+    W = b.width;
+    if (instant) slide.style.transition = 'none';
+    slide.style.left = (b.left - r.left) + 'px';
+    slide.style.width = W + 'px';
+    if (instant) { void slide.offsetWidth; slide.style.transition = ''; }
+  }
+  function snapToActive() {
+    var a = nav.querySelector('.nav-item.active') || items[0];
+    positionSlideTo(a, false);
+  }
+  snapToActive();
   function hit(x) {
     for (var i = 0; i < items.length; i++) {
       var b = items[i].getBoundingClientRect();
@@ -665,21 +688,35 @@ function showTab(which) {
     }
     return null;
   }
+  function refractAll(x) {
+    var cur = hit(x);
+    items.forEach(function(n){ n.classList.toggle('refract', n === cur); });
+  }
   var dragging = false;
   nav.addEventListener('touchstart', function(){ dragging = true; }, {passive:true});
   nav.addEventListener('touchmove', function(e){
     if (!dragging || !e.touches[0]) return;
-    var it = hit(e.touches[0].clientX);
-    items.forEach(function(n){ n.classList.toggle('draghover', n === it); });
+    var r = nav.getBoundingClientRect();
+    var x = e.touches[0].clientX;
+    var half = nav.querySelector('.nav-item').getBoundingClientRect().width / 2;
+    slide.style.transition = 'none';
+    slide.style.left = (x - r.left - half) + 'px';
+    slide.style.width = W + 'px';
+    refractAll(x);
   }, {passive:true});
   nav.addEventListener('touchend', function(e){
-    if (!dragging) return;
-    dragging = false;
-    var it = hit(e.changedTouches[0].clientX);
-    clear();
-    if (it) showTab(it.dataset.tab);
+    if (!dragging) return; dragging = false;
+    var x = e.changedTouches[0].clientX;
+    var it = hit(x);
+    items.forEach(function(n){ n.classList.remove('refract'); });
+    slide.style.transition = '';
+    if (it) { showTab(it.dataset.tab); snapToActive(); }
+    else snapToActive();
   }, {passive:true});
-  nav.addEventListener('touchcancel', function(){ dragging = false; clear(); }, {passive:true});
+  nav.addEventListener('touchcancel', function(){
+    dragging = false; items.forEach(function(n){ n.classList.remove('refract'); });
+    slide.style.transition = ''; snapToActive();
+  }, {passive:true});
 })();
 function toggleNotify() {
   const sw = document.getElementById('notifySwitch');
@@ -1002,7 +1039,7 @@ async function doQuery(type, params) {
       return parseSchedule(httpPost('/jsxsd/kbcx/kbxx_teacher_ifr', body), 'teacher');
     }
     case 'classroom': {
-      const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1='+(params.week||'1')+'&zc2='+(params.week||'20')+'&jc1=&jc2=';
+      const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs='+encodeURIComponent(params.name||'')+'&jsid=&zc1='+(params.week||'1')+'&zc2='+(params.week||'20')+'&jc1=&jc2=';
       return parseSchedule(httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body), 'classroom');
     }
     case 'class': {

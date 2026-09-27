@@ -10,9 +10,19 @@
   --green: #2e4a2a; --green-lite: #3a5a36; --green-deep: #243a21;
   --pink: #e89cb1; --pink-deep: #d27e96;
   --ink: #1a1a17; --ink-light: #8b7355;
+  --line: #d4cbb0; --row: #f5efdf;
   --serif: Georgia, 'Songti SC', 'SimSun', serif;
   --mono: 'Courier New', monospace;
 }
+/* 深色主题：绿系提亮、背景转墨色，保持"绿底+奶油字/墨字"两种搭配都自洽 */
+html[data-theme="dark"] {
+  --cream: #161b17; --cream-2: #1d231e;
+  --green: #8fae6e; --green-lite: #7a9960; --green-deep: #101810;
+  --pink: #b0758a; --pink-deep: #c8869c;
+  --ink: #e6e0cf; --ink-light: #a49a82;
+  --line: #2e352c; --row: #1b211b;
+}
+html[data-theme="dark"] body { background: #11140f; }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; min-height: 100%; }
 body { background: var(--cream); color: var(--ink); font-family: var(--serif); font-size: 15px; line-height: 1.5; }
@@ -79,8 +89,8 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th { text-align: left; padding: 8px 6px; background: var(--cream-2); border-bottom: 2px solid var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); white-space: nowrap; }
-td { padding: 8px 6px; border-bottom: 1px solid #d4cbb0; }
-tr:nth-child(even) td { background: #f5efdf; }
+td { padding: 8px 6px; border-bottom: 1px solid var(--line); }
+tr:nth-child(even) td { background: var(--row); }
 .failed { color: var(--pink-deep); font-weight: 600; }
 
 /* GPA */
@@ -100,10 +110,10 @@ tr:nth-child(even) td { background: #f5efdf; }
 .letter-nav { display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 10px; padding: 6px; background: transparent; border-radius: 6px; position: sticky; top: 90px; z-index: 100; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .letter-nav::-webkit-scrollbar { display: none; }
 .letter-nav span { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; font-size: 11px; font-family: monospace; font-weight: 600; border-radius: 4px; cursor: pointer; }
-.letter-nav span.active { background: #2e4a2a; color: #efe7d4; border: 1px solid #2e4a2a; }
-.letter-nav span.inactive { background: #e6dcc4; color: #8b7355; border: 1px solid #c9b895; opacity: 0.5; cursor: default; }
+.letter-nav span.active { background: var(--green); color: var(--cream); border: 1px solid var(--green); }
+.letter-nav span.inactive { background: var(--cream-2); color: var(--ink-light); border: 1px solid var(--line); opacity: 0.5; cursor: default; }
 .teacher-group { margin-bottom: 14px; }
-.teacher-group-title { font-size: 13px; font-weight: 700; color: var(--pink-deep); border-bottom: 2px solid #2e4a2a; padding: 4px 0; margin-bottom: 6px; background: #efe7d4; }
+.teacher-group-title { font-size: 13px; font-weight: 700; color: var(--pink-deep); border-bottom: 2px solid var(--green); padding: 4px 0; margin-bottom: 6px; background: var(--cream); }
 .teacher-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .teacher-item { background: var(--green); color: var(--cream); border-radius: 5px; padding: 8px; text-align: center; cursor: pointer; font-size: 13px; }
 
@@ -166,6 +176,7 @@ tr:nth-child(even) td { background: #f5efdf; }
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
     <span class="mono" id="statusText" style="font-size:8px;">缓存模式</span>
+    <button id="themeBtn" onclick="toggleTheme()" style="font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">深色</button>
     <button id="loginBtn" onclick="showLogin()" style="font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">登录</button>
     <button id="logoutBtn" onclick="doLogout()" style="display:none; font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">退出</button>
   </div>
@@ -252,17 +263,27 @@ tr:nth-child(even) td { background: #f5efdf; }
   <!-- 底部弹出弹窗遮罩 -->
   <div id="browseOverlay" onclick="closeBrowse()" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(26,26,23,0.5); z-index:200;"></div>
   <!-- 底部弹出弹窗 -->
-  <section id="browseSection" class="hidden" style="position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto; max-height:80vh; z-index:201; border-radius:8px 8px 0 0; border:2px solid #2e4a2a; border-bottom:none; background:#efe7d4; display:flex; flex-direction:column; overflow:hidden;">
-    <div class="card-header" style="border-bottom:2px solid #e89cb1; padding:12px 16px; flex-shrink:0;">
-      <span class="mono" id="browseTitle" style="color:#d27e96;">列表</span>
+  <section id="browseSection" class="hidden" style="position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto; max-height:80vh; z-index:201; border-radius:8px 8px 0 0; border:2px solid var(--green); border-bottom:none; background:var(--cream); display:flex; flex-direction:column; overflow:hidden;">
+    <div class="card-header" style="border-bottom:2px solid var(--pink); padding:12px 16px; flex-shrink:0;">
+      <span class="mono" id="browseTitle" style="color:var(--pink-deep);">列表</span>
       <div style="display:flex; align-items:center; gap:8px;">
-        <span class="mono" id="browseCount" style="color:#8b7355;"></span>
-        <button onclick="closeBrowse()" style="font-size:12px; padding:4px 12px; border:1px solid #2e4a2a; background:transparent; color:#2e4a2a; border-radius:4px; cursor:pointer;">关闭</button>
+        <span class="mono" id="browseCount" style="color:var(--ink-light);"></span>
+        <button onclick="closeBrowse()" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">关闭</button>
       </div>
     </div>
-    <div style="padding:8px 16px; flex-shrink:0;"><input type="text" id="browseSearch" placeholder="搜索..." oninput="filterBrowse()" style="width:100%; padding:10px; border:2px solid #2e4a2a; border-radius:6px; background:#efe7d4; font-size:14px;" /></div>
+    <div style="padding:8px 16px; flex-shrink:0;"><input type="text" id="browseSearch" placeholder="搜索..." oninput="filterBrowse()" style="width:100%; padding:10px; border:2px solid var(--green); border-radius:6px; background:var(--cream); font-size:14px; color:var(--ink);" /></div>
     <div id="letterNavContainer" style="flex-shrink:0; padding:0 16px 8px;"></div>
     <div id="browseContent" style="overflow-y:auto; padding:0 16px 16px; flex:1;"></div>
+  </section>
+
+  <!-- 课程详情弹窗 -->
+  <div id="detailOverlay" onclick="closeDetail()" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:300;"></div>
+  <section id="detailSection" class="hidden" style="position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto; max-height:80vh; z-index:301; border-radius:8px 8px 0 0; border:2px solid var(--green); border-bottom:none; background:var(--cream); display:flex; flex-direction:column; overflow:hidden;">
+    <div class="card-header" style="border-bottom:2px solid var(--pink); padding:12px 16px; flex-shrink:0;">
+      <span class="mono" id="detailTitle" style="color:var(--pink-deep);">课程详情</span>
+      <button onclick="closeDetail()" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">关闭</button>
+    </div>
+    <div id="detailBody" style="overflow-y:auto; padding:16px; flex:1;"></div>
   </section>
 
   <!-- 查询结果 -->
@@ -272,7 +293,7 @@ tr:nth-child(even) td { background: #f5efdf; }
         <span class="mono">查询结果</span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span class="mono" id="resultLabel"></span>
-          <button onclick="runQuery(true)" style="font-size:11px; padding:3px 10px; border:1px solid #2e4a2a; background:transparent; color:#2e4a2a; border-radius:4px; cursor:pointer;">刷新</button>
+          <button onclick="runQuery(true)" style="font-size:11px; padding:3px 10px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
         </div>
       </div>
       <div class="cache-notice hidden" id="cacheNotice">离线缓存 · 未登录无法刷新</div>
@@ -325,7 +346,25 @@ let S = {
   browseData: null,
   browseFiltered: null,
   view: 'main',
+  scheduleView: 'week',  // 'week' | 'today'
 };
+
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
+  try { localStorage.setItem('jwxt_theme', dark ? 'light' : 'dark'); } catch(e) {}
+  document.getElementById('themeBtn').textContent = dark ? '深色' : '浅色';
+}
+
+function restoreTheme() {
+  var t = 'light';
+  try { t = localStorage.getItem('jwxt_theme') || 'light'; } catch(e) {}
+  if (t === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    var b = document.getElementById('themeBtn');
+    if (b) b.textContent = '浅色';
+  }
+}
 
 function httpGet(p) { return Android.httpRequest('GET', BASE + p, ''); }
 function httpPost(p, body) { return Android.httpRequest('POST', BASE + p, body); }
@@ -839,6 +878,8 @@ function init() {
     if (c.password) document.getElementById('password').value = c.password;
   } catch {}
 
+  restoreTheme();
+
   // 查询类型：卡片式按钮组
   const typeGrid = document.getElementById('typeGrid');
   TYPES.forEach(t => {
@@ -1054,14 +1095,14 @@ function renderResult(type, data) {
         }
       }
       if (isHighlight) {
-        h += '<div style="background:#2e4a2a; border:2px solid #2e4a2a; border-radius:6px; padding:12px;">';
-        h += '<div style="font-size:11px; color:#e89cb1; font-family:monospace;">' + esc(k) + '</div>';
-        h += '<div style="font-size:15px; color:#efe7d4; margin-top:4px;">' + esc(data[k] || '—') + '</div>';
+        h += '<div style="background:var(--green); border:2px solid var(--green); border-radius:6px; padding:12px;">';
+        h += '<div style="font-size:11px; color:var(--pink); font-family:monospace;">' + esc(k) + '</div>';
+        h += '<div style="font-size:15px; color:var(--cream); margin-top:4px;">' + esc(data[k] || '—') + '</div>';
         h += '</div>';
       } else {
-        h += '<div style="background:#e6dcc4; border:2px solid #2e4a2a; border-radius:6px; padding:12px;">';
-        h += '<div style="font-size:11px; color:#2e4a2a; font-family:monospace;">' + esc(k) + '</div>';
-        h += '<div style="font-size:15px; color:#1a1a17; margin-top:4px;">' + esc(data[k] || '—') + '</div>';
+        h += '<div style="background:var(--cream-2); border:2px solid var(--green); border-radius:6px; padding:12px;">';
+        h += '<div style="font-size:11px; color:var(--green); font-family:monospace;">' + esc(k) + '</div>';
+        h += '<div style="font-size:15px; color:var(--ink); margin-top:4px;">' + esc(data[k] || '—') + '</div>';
         h += '</div>';
       }
     });
@@ -1088,33 +1129,140 @@ function renderResult(type, data) {
     el.innerHTML = h + '</tbody></table></div>';
 
   } else {
-    // 课表类 - 林间刊页卡片风格
+    // 课表类 - 林间刊页卡片风格，支持周/日视图切换 + 点击详情 + 长按复制
     const courses = data.courses || [];
     if (!courses.length) { el.innerHTML = '<div class="empty-text">未查询到课程</div>'; return; }
-    let h = '';
-    WEEKDAYS.forEach((wd, i) => {
-      const dayCourses = courses.filter(c => c.weekday === i+1);
-      h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+wd+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+dayCourses.length+'节</span></div>';
-      if (!dayCourses.length) h += '<p class="empty-day">无课</p>';
-      else {
-        dayCourses.sort((a,b) => (a.period||'').localeCompare(b.period||''));
-        dayCourses.forEach((c, ci) => {
-          const cls = ci % 2 === 0 ? 'green' : 'pink';
-          h += '<div class="course-card '+cls+'">';
-          h += '<div class="period">'+esc(c.periodLabel||'')+'</div>';
-          h += '<div class="name">'+esc(c.name)+'</div>';
-          h += '<div class="info">';
-          if (c.teacher) h += '教师: '+esc(c.teacher)+'<br>';
-          if (c.classroom) h += '教室: '+esc(c.classroom)+'<br>';
-          if (c.classes) h += '班级: '+esc(c.classes)+'<br>';
-          if (c.week) h += '周次: '+esc(c.week);
-          h += '</div></div>';
-        });
-      }
+    S.lastCourses = courses;
+    // 视图切换条
+    let h = '<div style="display:flex; gap:6px; margin-bottom:12px;">';
+    h += '<button class="small" style="flex:1;'+(S.scheduleView==='week'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'week\')">本周</button>';
+    h += '<button class="small" style="flex:1;'+(S.scheduleView==='today'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'today\')">今天</button>';
+    h += '</div>';
+    if (S.scheduleView === 'today') {
+      // 日视图：只看今天，按节次排序紧凑展示
+      const now = new Date();
+      const today = now.getDay(); // 1=周一...6=周六,0=周日
+      const dayIdx = today === 0 ? 7 : today;
+      const dayCourses = courses.filter(c => c.weekday === dayIdx)
+        .sort((a,b) => (a.period||'').localeCompare(b.period||''));
+      h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+esc(WEEKDAYS[dayIdx-1])+' · 今天</span><span class="mono" style="font-size:9px; color:var(--green);">'+dayCourses.length+'节</span></div>';
+      if (!dayCourses.length) h += '<p class="empty-day">今天无课</p>';
+      else dayCourses.forEach((c, ci) => {
+        const cls = ci % 2 === 0 ? 'green' : 'pink';
+        h += courseCard(ci, cls);
+      });
       h += '</div>';
-    });
+    } else {
+      // 周视图：按星期分组
+      WEEKDAYS.forEach((wd, i) => {
+        const dayCourses = courses.filter(c => c.weekday === i+1);
+        h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+wd+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+dayCourses.length+'节</span></div>';
+        if (!dayCourses.length) h += '<p class="empty-day">无课</p>';
+        else {
+          dayCourses.sort((a,b) => (a.period||'').localeCompare(b.period||''));
+          dayCourses.forEach((c, ci) => {
+            const cls = ci % 2 === 0 ? 'green' : 'pink';
+            h += courseCard(ci, cls);
+          });
+        }
+        h += '</div>';
+      });
+    }
     el.innerHTML = h;
   }
+}
+
+function setScheduleView(v) {
+  S.scheduleView = v;
+  const type = S.queryType;
+  const params = {};
+  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
+  if (NEEDS_WEEK.indexOf(type) >= 0) {
+    params.week = document.getElementById('queryWeek').value.trim();
+    params.weekday = document.getElementById('queryWeekday').value;
+  }
+  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+  const ck = cacheKey(type, params);
+  const cached = getCache(ck) || getCache(type);
+  if (cached) renderResult(type, cached.data);
+  else alert('无缓存数据，请先查询');
+}
+
+function courseCard(idx, cls) {
+  var c = (S.lastCourses || [])[idx] || {};
+  let h = '<div class="course-card '+cls+'"';
+  h += ' onclick="showCourseByIndex('+idx+')"';
+  h += ' ontouchstart="detailPressStart(event)" ontouchend="detailPressEnd(event)" ontouchmove="detailPressMove()"';
+  h += '>';
+  h += '<div class="period">'+esc(c.periodLabel||'')+'</div>';
+  h += '<div class="name">'+esc(c.name)+'</div>';
+  h += '<div class="info">';
+  if (c.teacher) h += '教师: '+esc(c.teacher)+'<br>';
+  if (c.classroom) h += '教室: '+esc(c.classroom)+'<br>';
+  if (c.classes) h += '班级: '+esc(c.classes)+'<br>';
+  if (c.week) h += '周次: '+esc(c.week);
+  h += '</div></div>';
+  return h;
+}
+
+function showCourseByIndex(idx) {
+  var c = (S.lastCourses || [])[idx];
+  if (!c) return;
+  var h = '<div style="text-align:center; margin-bottom:14px;"><div style="font-size:22px; font-weight:700; color:var(--green);">'+esc(c.name||'')+'</div>';
+  if (c.periodLabel) h += '<div class="mono" style="color:var(--pink-deep); margin-top:4px;">'+esc(c.periodLabel)+'</div>';
+  h += '</div>';
+  h += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
+  var fields = [['教师','teacher'],['教室','classroom'],['班级','classes'],['周次','week'],['星期','weekday_name'],['节次','period']];
+  fields.forEach(function(f) {
+    var v = c[f[1]];
+    if (v) {
+      h += '<div style="background:var(--cream-2); border-left:3px solid var(--green); padding:8px 10px; border-radius:0 6px 6px 0;">';
+      h += '<div style="font-size:10px; color:var(--ink-light); font-family:var(--mono); letter-spacing:0.1em;">'+esc(f[0])+'</div>';
+      h += '<div style="font-size:14px; font-weight:500; margin-top:2px;">'+esc(v)+'</div></div>';
+    }
+  });
+  h += '</div>';
+  document.getElementById('detailBody').innerHTML = h;
+  document.getElementById('detailOverlay').style.display = 'block';
+  document.getElementById('detailSection').classList.remove('hidden');
+  document.getElementById('detailSection').style.display = 'flex';
+}
+
+// 长按复制
+var _pressTimer = null, _pressMoved = false;
+function detailPressStart(e) {
+  _pressMoved = false;
+  _pressTimer = setTimeout(function() {
+    if (_pressMoved) return;
+    // 复制教室或课程名
+    var el = e.currentTarget;
+    var name = el.querySelector('.name') ? el.querySelector('.name').textContent : '';
+    var info = el.querySelector('.info') ? el.querySelector('.info').textContent : '';
+    var room = '';
+    var m = info.match(/教室[:：]\s*([^\n]+)/);
+    if (m) room = m[1].trim();
+    var text = room ? (name + ' · ' + room) : name;
+    if (window.Android && Android.copy) {
+      Android.copy(text);
+      alert('已复制：' + text);
+    } else {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        alert('已复制：' + text);
+      } catch(e2) { alert('复制失败'); }
+    }
+  }, 600);
+}
+function detailPressEnd(e) { clearTimeout(_pressTimer); }
+function detailPressMove() { _pressMoved = true; clearTimeout(_pressTimer); }
+
+function closeDetail() {
+  document.getElementById('detailOverlay').style.display = 'none';
+  document.getElementById('detailSection').classList.add('hidden');
+  document.getElementById('detailSection').style.display = 'none';
 }
 
 // ============ 浏览列表 ============
@@ -1213,7 +1361,7 @@ function renderBrowse() {
     let h = '';
     ALPHABET.forEach(l => {
       if (!groups[l]) return;
-      h += '<div class="teacher-group" id="group_'+l+'"><div class="teacher-group-title">'+l+' <span style="font-size:11px; color:#d27e96; margin-left:8px;">'+groups[l].length+' 人</span></div><div class="teacher-grid">';
+      h += '<div class="teacher-group" id="group_'+l+'"><div class="teacher-group-title">'+l+' <span style="font-size:11px; color:var(--pink-deep); margin-left:8px;">'+groups[l].length+' 人</span></div><div class="teacher-grid">';
       groups[l].forEach(t => {
         h += '<div class="teacher-item" onclick="pickValue(\''+esc(t)+'\')">'+esc(t)+'</div>';
       });

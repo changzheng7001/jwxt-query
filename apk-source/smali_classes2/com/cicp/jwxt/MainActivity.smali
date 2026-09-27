@@ -184,7 +184,7 @@
 .end method
 
 .method protected onResume()V
-    .locals 3
+    .locals 6
 
     invoke-super {p0}, Landroid/app/Activity;->onResume()V
 
@@ -208,13 +208,18 @@
 
     if-eqz v1, :cond_done
 
-    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+    # 延迟到网页加载完成后跳转到我的课表结果（避免冷启动时 JS 未就绪导致跳转落空）
+    new-instance v2, Landroid/os/Handler;
 
-    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
+    invoke-direct {v2}, Landroid/os/Handler;-><init>()V
 
-    const/4 v0, 0x0
+    new-instance v3, Lcom/cicp/jwxt/MainActivity$1;
 
-    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+    invoke-direct {v3, p0}, Lcom/cicp/jwxt/MainActivity$1;-><init>(Lcom/cicp/jwxt/MainActivity;)V
+
+    const-wide/16 v4, 0x320
+
+    invoke-virtual {v2, v3, v4, v5}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
 
     invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
 
@@ -225,6 +230,20 @@
     invoke-virtual {v1, v2}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
 
     :cond_done
+    return-void
+.end method
+
+.method public gotoSchedule()V
+    .locals 3
+
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
+
+    const/4 v0, 0x0
+
+    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
     return-void
 .end method
 .method public onRequestPermissionsResult(I[Ljava/lang/String;[I)V

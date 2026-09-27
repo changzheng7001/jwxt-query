@@ -332,24 +332,30 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
   min-width: 64px;
 }
 .bottomnav .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.bottomnav .nav-item.active { color: var(--green); transform: translateY(-3px) scale(1.38); z-index: 3; }
-.bottomnav .nav-item.active svg { filter: drop-shadow(0 3px 9px rgba(46,74,42,0.45)); }
+.bottomnav .nav-item.active { color: var(--green); transform: translateY(-2px) scale(1.28); }
+.bottomnav .nav-item.active svg { filter: drop-shadow(0 2px 6px rgba(46,74,42,0.4)) drop-shadow(1.6px 0 1.6px rgba(90,170,255,0.6)) drop-shadow(-1.6px 0 1.6px rgba(255,70,80,0.55)); }
 html[data-theme="dark"] .bottomnav .nav-item.active { color: #eaf5c8; }
 html[data-theme="dark"] .bottomnav .nav-item.active svg { filter: drop-shadow(0 3px 9px rgba(190,220,140,0.55)); }
 html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav::before { display: none; }
-html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); transform: translateY(-3px) scale(1.38); z-index: 3; background: none; }
-/* 底部导航：液态玻璃——光泽透镜作折射层，选中的图标在透镜上放大突出 */
+html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); transform: translateY(-2px) scale(1.28); background: none; }
+/* 底部导航：液态玻璃——真实折射（bevel位移图）盖住图标，中心清晰、边缘弯曲+色差 */
 .bottomnav .glass-slide {
   position: absolute; top: 5px; bottom: 5px; left: 7px; width: 68px;
-  /* 折射色渐变光泽（白→蓝紫→粉），模拟光透过玻璃的色散 */
-  background: linear-gradient(140deg, rgba(255,255,255,0.62), rgba(190,215,255,0.32) 48%, rgba(255,205,235,0.36) 100%);
+  background: rgba(255,255,255,0.05);
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.78);
-  box-shadow: 0 4px 22px rgba(0,0,0,0.16), inset 0 1px 3px rgba(255,255,255,0.95), inset 0 -4px 10px rgba(255,255,255,0.45);
-  z-index: 1; pointer-events: none;
-  filter: url(#liquidGlassFilter);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.18), inset 1px 1px 1px rgba(255,255,255,0.6), inset -1px -1px 1px rgba(255,255,255,0.15);
+  z-index: 2; pointer-events: none;
+  -webkit-backdrop-filter: blur(2px) saturate(180%) brightness(1.1);
+  backdrop-filter: blur(2px) saturate(180%) brightness(1.1);
   transition: left .3s cubic-bezier(.34,1.56,.64,1);
+}
+@supports (backdrop-filter: url(#lgGlass)) {
+  .bottomnav .glass-slide {
+    -webkit-backdrop-filter: url(#lgGlass) blur(1.5px) saturate(180%) brightness(1.1);
+    backdrop-filter: url(#lgGlass) blur(1.5px) saturate(180%) brightness(1.1);
+  }
 }
 /* 透镜顶部折射高光 */
 .bottomnav .glass-slide::before {
@@ -358,9 +364,9 @@ html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); tr
   background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0) 82%);
   pointer-events: none;
 }
-.bottomnav .nav-item { position: relative; z-index: 2; }
-.bottomnav .nav-item.refract { transform: translateY(-4px) scale(1.46); color: var(--green); z-index: 3; }
-.bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 12px rgba(46,74,42,0.5)); }
+.bottomnav .nav-item { position: relative; z-index: 1; }
+.bottomnav .nav-item.refract { transform: translateY(-3px) scale(1.4); color: var(--green); }
+.bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 10px rgba(46,74,42,0.5)) drop-shadow(2px 0 2px rgba(90,170,255,0.65)) drop-shadow(-2px 0 2px rgba(255,70,80,0.6)); }
 html[data-theme="dark"] .bottomnav .nav-item.refract { color: #eaf5c8; }
 html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: drop-shadow(0 4px 12px rgba(190,220,140,0.6)); }
 html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.95); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }
@@ -395,9 +401,9 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 液态玻璃折射滤镜：玻璃边缘弯曲背景（feDisplacementMap），Chromium/Android WebView 支持 -->
 <svg width="0" height="0" style="position:absolute;" aria-hidden="true" focusable="false">
   <defs>
-    <filter id="liquidGlassFilter" x="-40%" y="-40%" width="180%" height="180%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.007" numOctaves="2" seed="7" result="noise"/>
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="16"/>
+    <filter id="lgGlass" x="-20%" y="-20%" width="140%" height="140%" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+      <feImage href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAAA4CAIAAADLkclfAAAEiUlEQVR4nM2aYZLbIAyFBfFuL7eH6r2bhf5IgCc9SXY2rRONh8EY4/dFIDBO+fr6XUWKiEndwjx9+S2bVNk+7ufm8sFTzBQR0amxLlIgbSIV0nljF6mQmltcJZ9/ZLsVbNtS40o8kjeHaKQ+8h3SmZkSm/5R+ii/Zdp4YtOVP68i9QZTRariSYQeKZwYxjkd8CbMxBAQN50z84Xys/LHdSCsbljkcgl/5sQDuWfcnsbWvBa69/Su62zfo0Yd3WymCQ+q/BnGLpKpEAEoEhh2q5st/9RMt+ydSkrVoQ4jGdHMgI1vs4OOQLG5fehysZqiTFIokEGtBqnTVaTqQeP33jWPKtLQM4anWpUREp+6GSRx3RJhdHrKpRFJxzFTHKRaQ+l5asBY6wxreOpWwzbvYboRxojfgWeG1eEfIYk50q4dDACG6tLg8YQEodmNvponQspRXX0s11Tju6obv1UASEmQJ2FICl1jnt1qdxI3SKsxk69JiohIKb7ug3lXn2iSZPAUdwwZHpmhmWabdc98mFZntOanLg8iSUxVeG4CAGx323cLnBbS6Io+3s0Qialk+oTvZHnuCsDyaI3Mc5zB8PBdppsVHlIcYcA/wZiRAOmYZx4yV+o6j6CNf+5jht/ZXJ9opOcZXFPKs843MpUXmoVIks72KotkTJ6dAMAd9HwrejJyNawVwPSJBCOHWz/HeN4pFAexvLFnhEj23JLEt8csWgigcwxPGQtNMWNGAgw3c45h72KfmKtrzEgAkMblM8yMlsg5ZcLInhNeG9AwNLtKBs+mVjjelP8uNsWwW8bVzS7X3t/iX3x7o5//aSXaM7zz84aWeeYGw+9K/NrxWnMDks5sap+dzX17OtkYw50/yoTpnluSd9zTLJozeJZXMJFi3uo6zSIAoVXLgmkg1HVOuolyhO6pQBWRmPVknavm7olyGU5zTrRgL+EB3azRzXJgI/V/G494PqqBmS+frr1JaE5IKo6ZSjz8zg0v5e42wz8RHGJwiSYZ7zOiP/VKurGlvZTtrTwDwNd4xBv/VLOcMUgstkvXD4+Qf8bgFEY+0RgA0z1ucfyDJNT1FFXOwwozpNwnQDVCMxrut4NeQ+Jua6FHI57yYN5SyVJvtmNhocmssiJyL9nGiMm7fjUqObNzdc8t0M24s5VF0mqmD0l2q7laIwZbHvGoaNYznhtJtBlvSAwPV4sUc+oXxiQaBkmGNfjm7OpzbbeCwHMOprZN6mMDBv8dAEjtojAMFTfOy+tozDBJdOojGYyRH580uu1j3/C/E4OBGfcnF2/8uAPDVZ8gOTzKM0X/2elGsjlNuBjuvg8juRjcfn4a+qdgaJ6jv1mfuAfPsewWox4r4F3JU/Kri8euAGCh+V39O4M/Pfi2W2FXaP50h6fgmGmqd3ETPW3X3UiMkI7LPVKI/lkfaK+ftnb3mui6OVxzV5Ar3uaw28HqT/P4+QJgilw/Vg3zP8gC06n5KlU1Bm4fIFKB013PmMzB0xvPJlWuv+zlGb5xosRIgVTwUfFekkyvRaf18TS6JCJ/AbiGUh91dD+5AAAAAElFTkSuQmCC" preserveAspectRatio="none" x="0" y="0" width="1" height="1" result="map"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="0.2" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
 </svg>

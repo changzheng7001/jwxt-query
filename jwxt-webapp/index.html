@@ -357,10 +357,10 @@ main { padding-bottom: 86px; }
 .seg button.on { background: var(--green); color: var(--cream); }
 html[data-theme="dark"] .seg button.on { color: #0f120c; }
 .set-btn { font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.switch { position: relative; width: 44px; height: 25px; border-radius: 999px; background: rgba(139,116,85,0.35); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
-.switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+.switch { position: relative; width: 40px; height: 20px; border-radius: 999px; background: rgba(139,116,85,0.35); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
+.switch::after { content: ''; position: absolute; top: 2.5px; left: 2.5px; width: 15px; height: 15px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
 .switch.on { background: var(--green); }
-.switch.on::after { transform: translateX(19px); }
+.switch.on::after { transform: translateX(20px); }
 html[data-style="classic"] .settings-panel { background: var(--cream); }
 </style>
 </head>
@@ -370,7 +370,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
   <div class="topbar-left">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.8</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.9</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -523,7 +523,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 设置面板 -->
 <section id="settingsSection" class="hidden settings-panel">
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.8</span></div>
+    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.9</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -547,7 +547,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.8（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.9（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>

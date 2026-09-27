@@ -167,5 +167,61 @@
     invoke-virtual {v1, v2}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
 
     .line 135
+    # 请求通知权限(Android 13+/API33+)
+    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v3, 0x21
+    if-lt v2, v3, :perm_done
+    const/4 v2, 0x1
+    new-array v2, v2, [Ljava/lang/String;
+    const/4 v3, 0x0
+    const-string v4, "android.permission.POST_NOTIFICATIONS"
+    aput-object v4, v2, v3
+    const/16 v3, 0x7d1
+    invoke-virtual {p0, v2, v3}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
+    :perm_done
+
+    return-void
+.end method
+
+.method protected onResume()V
+    .locals 3
+
+    invoke-super {p0}, Landroid/app/Activity;->onResume()V
+
+    invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+
+    move-result-object v0
+
+    const-string v1, "goto"
+
+    invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v1
+
+    const-string v2, "schedule"
+
+    invoke-virtual {v1, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v1
+
+    if-eqz v1, :cond_done
+
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
+
+    const/4 v0, 0x0
+
+    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
+    invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+
+    move-result-object v1
+
+    const-string v2, "goto"
+
+    invoke-virtual {v1, v2}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+
+    :cond_done
     return-void
 .end method

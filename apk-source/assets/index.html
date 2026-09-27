@@ -242,6 +242,14 @@ tr:nth-child(even) td { background: var(--row); }
 .class-chip { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform .1s; }
 .class-chip:active { transform: scale(0.95); }
 .grade-group { margin-bottom: 14px; }
+/* 今日课程横向滚动 */
+.today-course-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
+.today-course-chip { flex: 0 0 auto; min-width: 150px; max-width: 220px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 8px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.10); }
+.today-course-chip.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
+html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
+.today-course-chip .tc-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.today-course-chip .tc-meta { font-size: 10px; opacity: 0.9; margin-top: 3px; }
+.today-course-empty { color: var(--ink-light); font-size: 12px; padding: 4px 0; }
 /* 折叠三角形 */
 .caret { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .6s; }
 .open .caret, .caret.open { transform: rotate(180deg); }
@@ -302,7 +310,7 @@ tr:nth-child(even) td { background: var(--row); }
   <div class="topbar-left">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.4</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.5</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -335,6 +343,17 @@ tr:nth-child(even) td { background: var(--row); }
   </section>
 
   <!-- 查询表单 -->
+  <!-- 今日课程（滚动） -->
+  <section id="todaySection" class="hidden">
+    <div class="card card-green">
+      <div class="card-header">
+        <span class="mono">今日课程</span>
+        <span class="mono" id="todayCount" style="font-size:9px; color:var(--ink-light);"></span>
+      </div>
+      <div id="todayCourses"></div>
+    </div>
+  </section>
+
   <section id="querySection">
     <div class="card card-pink">
       <div class="card-header"><span class="mono">查询参数</span></div>
@@ -1071,6 +1090,96 @@ function init() {
 
   // 检查缓存
   checkCacheStatus();
+
+  // 今日课程
+  renderTodayCourses();
+  maybeNotifyToday();
+}
+
+// 打开 App 时若有今日课程，发一条系统通知（每天最多一次）
+function maybeNotifyToday() {
+  try {
+    if (!(window.Android && Android.showNotification)) return;
+    const last = localStorage.getItem('jwxt_notify_date');
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (last === todayStr) return;
+    const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
+    const names = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      const obj = JSON.parse(localStorage.getItem(k) || 'null');
+      const data = obj && obj.data;
+      if (!data || !data.courses) continue;
+      data.courses.forEach(c => { if (c.weekday === wd && c.name) names.push(c.name); });
+    }
+    if (!names.length) return;
+    const uniq = names.filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
+    const text = '今日' + names.length + '门课：' + uniq.join('、') + (names.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
+    Android.showNotification('今日课程', text);
+    localStorage.setItem('jwxt_notify_date', todayStr);
+  } catch (e) {}
+}
+
+// 通知点击跳转：进入本人课表本周表格
+window.__gotoSchedule = function() {
+  try {
+    let best = null, bestT = -1;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      const raw = localStorage.getItem(k);
+      const obj = raw ? JSON.parse(raw) : null;
+      if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
+    }
+    if (!best) { showView('main'); return; }
+    S.queryType = 'self'; S.scheduleForm = 'table'; S.scheduleView = 'week';
+    const qw = document.getElementById('queryWeek'); if (qw) qw.value = '';
+    const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = '';
+    document.getElementById('cacheNotice').classList.remove('hidden');
+    showView('result', true);
+    document.getElementById('resultLabel').textContent = '我的课表 (本周)';
+    renderResult('self', best);
+  } catch (e) {}
+};
+
+// 首页"今日课程"横向滚动（读本人课表各周缓存中今天(weekday)的课）
+function todaySpan(c) {
+  let n = (c.period || '').match(/\d{2}/g); if (!n) n = (c.periodLabel || '').match(/\d+/g);
+  if (n && n.length) return parseInt(n[0], 10); return 99;
+}
+function renderTodayCourses() {
+  const el = document.getElementById('todayCourses');
+  const sec = document.getElementById('todaySection');
+  if (!el || !sec) return;
+  const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
+  const list = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      const obj = JSON.parse(localStorage.getItem(k) || 'null');
+      const data = obj && obj.data;
+      if (!data || !data.courses) continue;
+      data.courses.forEach(c => {
+        if (c.weekday !== wd) return;
+        const key = c.name + '|' + (c.period || c.periodLabel || '') + '|' + (c.classroom || '');
+        if (!list.some(x => x._k === key)) { c._k = key; list.push(c); }
+      });
+    }
+  } catch (e) {}
+  if (!list.length) { sec.classList.add('hidden'); return; }
+  list.sort((a, b) => todaySpan(a) - todaySpan(b));
+  let h = '<div class="today-course-scroll">';
+  list.forEach(c => {
+    const sp = todaySpan(c);
+    h += '<div class="today-course-chip' + (sp % 2 === 0 ? ' pink' : '') + '"><div class="tc-name">' + esc(c.name || '') + '</div><div class="tc-meta">第' + sp + '节 · ' + esc(c.classroom || '') + '</div></div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+  const cnt = document.getElementById('todayCount');
+  if (cnt) cnt.textContent = list.length + '门';
+  sec.classList.remove('hidden');
 }
 
 function selectType(v) {
@@ -1302,15 +1411,18 @@ function renderResult(type, data) {
     const courses = data.courses || [];
     if (!courses.length) { el.innerHTML = '<div class="empty-text">未查询到课程</div>'; return; }
     S.lastCourses = courses;
-    const SEGMENTS = [
-      {code:'0102', label:'1-2'}, {code:'0304', label:'3-4'},
-      {code:'0506', label:'5-6'}, {code:'0708', label:'7-8'},
-      {code:'0910', label:'9-10'}, {code:'11', label:'11'}, {code:'12', label:'12'}
-    ];
-    const slotColor = {};
-    (function(){ let n=0; SEGMENTS.forEach(s=>{ slotColor[s.code]=n++; }); })();
-    function courseCell(c, colorIdx) {
-      const cls = (colorIdx % 2 === 0) ? '' : 'pink';
+    // 表格行 = 小节 1..12
+    const SLOTS = [1,2,3,4,5,6,7,8,9,10,11,12];
+    // 课程起止小节（跨节课程覆盖多个小节）
+    function courseSpan(c) {
+      let nums = (c.period || '').match(/\d{2}/g);
+      if (!nums) nums = (c.periodLabel || '').match(/\d+/g);
+      if (nums && nums.length) { const v = nums.map(x => parseInt(x, 10)); return {s: v[0], e: v[v.length - 1]}; }
+      return null;
+    }
+    function courseCell(c) {
+      const sp = courseSpan(c);
+      const cls = (sp && sp.s % 2 === 0) ? 'pink' : '';
       return '<div class="sched-course '+cls+'" onclick="showCourseByIndex('+courses.indexOf(c)+')">'
         + '<span class="cn">'+esc(c.name||'')+'</span>'
         + '<span class="cr">'+esc(c.classroom||'')+'</span></div>';
@@ -1326,23 +1438,28 @@ function renderResult(type, data) {
     function buildTable(daySet) {
       // daySet: 若为 null 表示周视图(7列)；否则 [dayIdx] 表示仅今天
       const single = daySet && daySet.length === 1;
+      const days = single ? daySet : [1,2,3,4,5,6,7];
       let h = '<div class="table-wrap"><table class="sched-table"><thead><tr>';
       // 表头
       h += '<th>节次</th>';
-      if (single) h += '<th>'+esc(WEEKDAYS[daySet[0]-1])+' · 今天</th>';
-      else WEEKDAYS.forEach(w => { h += '<th>'+esc(w)+'</th>'; });
+      if (single) h += '<th>'+esc(WEEKDAYS[days[0]-1])+' · 今天</th>';
+      else days.forEach(d => { h += '<th>'+esc(WEEKDAYS[d-1])+'</th>'; });
       h += '</tr></thead><tbody>';
-      // 行
-      SEGMENTS.forEach(seg => {
-        h += '<tr><td class="seg">'+esc(seg.label)+'</td>';
-        const cell = (list) => list.length ? '<td>'+list.map(c=>courseCell(c, slotColor[seg.code])).join('')+'</td>' : '<td class="empty"><span class="e">—</span></td>';
-        if (single) {
-          h += cell(courses.filter(c => c.weekday === daySet[0] && periodKey(c) === seg.code));
-        } else {
-          for (let d = 1; d <= 7; d++) {
-            h += cell(courses.filter(c => c.weekday === d && periodKey(c) === seg.code));
+      // 小节行：跨节课程用 rowspan 合并，保证不遗漏
+      const occupied = {};
+      SLOTS.forEach(p => {
+        h += '<tr><td class="seg">'+p+'</td>';
+        days.forEach(d => {
+          if (occupied[p+'|'+d]) return;  // 已被上方跨节课程 rowspan 占用
+          const slot = courses.filter(c => { const s = courseSpan(c); return c.weekday === d && s && s.s === p; });
+          if (slot.length) {
+            const maxSpan = Math.max.apply(null, slot.map(c => courseSpan(c).e - courseSpan(c).s + 1));
+            for (let r = 0; r < maxSpan; r++) occupied[(p+r)+'|'+d] = true;
+            h += '<td rowspan="'+maxSpan+'">'+slot.map(c => courseCell(c)).join('')+'</td>';
+          } else {
+            h += '<td class="empty"><span class="e">—</span></td>';
           }
-        }
+        });
         h += '</tr>';
       });
       h += '</tbody></table></div>';
@@ -1371,11 +1488,24 @@ function renderResult(type, data) {
     h += '<button class="small" style="flex:1;'+(S.scheduleForm==='table'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'table\')">表格</button>';
     h += '<button class="small" style="flex:1;'+(S.scheduleForm==='list'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'list\')">列表</button>';
     h += '</div>';
+    // 结果界面内切换周次/星期 + 打开官网课表
+    h += '<div style="display:flex; gap:6px; margin-bottom:12px; align-items:center;">';
+    h += '<input type="number" id="resWeek" min="1" max="30" placeholder="周次" style="flex:1; margin-bottom:0;" value="'+esc((document.getElementById('queryWeek')||{}).value||'')+'"/>';
+    h += '<select id="resWeekday" style="flex:1; margin-bottom:0;"><option value="">星期</option>';
+    for (var _d = 1; _d <= 7; _d++) { var _sel = ((document.getElementById('queryWeekday')||{}).value === String(_d)) ? ' selected' : ''; h += '<option value="'+_d+'"'+_sel+'>'+WEEKDAYS[_d-1].replace('星期','')+'</option>'; }
+    h += '</select>';
+    h += '<button class="small" onclick="applyResParam()" style="flex-shrink:0;">应用</button>';
+    h += '<button class="small outline" onclick="openWebSchedule()" style="flex-shrink:0;">官网</button>';
+    h += '</div>';
     let dayArg = null;
     if (S.scheduleView === 'today') {
       const now = new Date();
       const today = now.getDay();
       dayArg = [today === 0 ? 7 : today];
+    } else if (NEEDS_WEEK.indexOf(type) >= 0) {
+      // 若在界面里选了具体星期，则只显示该天
+      const wd = (document.getElementById('queryWeekday') || {}).value;
+      if (wd) dayArg = [parseInt(wd, 10)];
     }
     let bodyHtml;
     if (S.scheduleForm === 'list') {
@@ -1423,6 +1553,33 @@ function setScheduleForm(v) {
   const cached = getCache(ck);
   if (cached) renderResult(type, cached.data);
   else alert('无缓存数据，请先查询');
+}
+
+// 在结果界面切换周次/星期（写回主查询参数，按参数读缓存或提示）
+function applyResParam() {
+  const type = S.queryType;
+  const week = (document.getElementById('resWeek') || {}).value || '';
+  const weekday = (document.getElementById('resWeekday') || {}).value || '';
+  const qw = document.getElementById('queryWeek');
+  const qwd = document.getElementById('queryWeekday');
+  if (qw) qw.value = week;
+  if (qwd) qwd.value = weekday;
+  const params = {};
+  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
+  if (NEEDS_WEEK.indexOf(type) >= 0) { params.week = week; params.weekday = weekday; }
+  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+  const ck = cacheKey(type, params);
+  const cached = getCache(ck);
+  if (cached) renderResult(type, cached.data);
+  else alert('该周次/星期无缓存，请先登录查询一次');
+}
+
+// 用外部浏览器打开教务系统课表官网
+function openWebSchedule() {
+  try {
+    if (window.Android && Android.openBrowser) { Android.openBrowser(BASE); }
+    else { window.open(BASE, '_blank'); }
+  } catch (e) {}
 }
 
 function courseCard(idx, cls) {

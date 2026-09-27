@@ -733,3 +733,102 @@
 
     return-object v1
 .end method
+.method public openBrowser(Ljava/lang/String;)V
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    .locals 3
+
+    :try_start_0
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v1, Landroid/content/Intent;
+
+    const-string v2, "android.intent.action.VIEW"
+
+    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
+
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->startActivity(Landroid/content/Intent;)V
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    goto :goto_0
+
+    :catch_0
+    move-exception v3
+    :goto_0
+    return-void
+.end method
+.method public showNotification(Ljava/lang/String;Ljava/lang/String;)V
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    .locals 9
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    :try_start_0
+    const-string v1, "notification"
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+    move-result-object v1
+    check-cast v1, Landroid/app/NotificationManager;
+
+    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v3, 0x1a
+    if-lt v2, v3, :cond_nochan
+    const-string v2, "jwxt_chan"
+    const-string v3, "CICP\u6559\u52a1\u63d0\u9192"
+    const/4 v4, 0x3
+    new-instance v5, Landroid/app/NotificationChannel;
+    invoke-direct {v5, v2, v3, v4}, Landroid/app/NotificationChannel;-><init>(Ljava/lang/String;Ljava/lang/CharSequence;I)V
+    invoke-virtual {v1, v5}, Landroid/app/NotificationManager;->createNotificationChannel(Landroid/app/NotificationChannel;)V
+    :cond_nochan
+
+    const-class v2, Lcom/cicp/jwxt/MainActivity;
+    new-instance v3, Landroid/content/Intent;
+    invoke-direct {v3, v0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+    const-string v2, "goto"
+    const-string v4, "schedule"
+    invoke-virtual {v3, v2, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+    const/4 v2, 0x0
+    const/4 v4, 0x0
+    invoke-static {v0, v2, v3, v4}, Landroid/app/PendingIntent;->getActivity(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+    move-result-object v2
+
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v4, 0x1a
+    if-lt v3, v4, :cond_oldbuilder
+    const-string v3, "jwxt_chan"
+    new-instance v5, Landroid/app/Notification$Builder;
+    invoke-direct {v5, v0, v3}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;Ljava/lang/String;)V
+    goto :goto_builder
+    :cond_oldbuilder
+    new-instance v5, Landroid/app/Notification$Builder;
+    invoke-direct {v5, v0}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;)V
+    :goto_builder
+
+    sget v3, Landroid/R$drawable;->ic_menu_agenda:I
+    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setSmallIcon(I)Landroid/app/Notification$Builder;
+    invoke-virtual {v5, p1}, Landroid/app/Notification$Builder;->setContentTitle(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
+    invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
+    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
+    const/4 v3, 0x1
+    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setAutoCancel(Z)Landroid/app/Notification$Builder;
+    invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
+    move-result-object v3
+    const/4 v4, 0x1
+    invoke-virtual {v1, v4, v3}, Landroid/app/NotificationManager;->notify(ILandroid/app/Notification;)V
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+    goto :goto_ret
+    :catch_0
+    move-exception v2
+    :goto_ret
+    return-void
+.end method

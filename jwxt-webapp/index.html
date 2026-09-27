@@ -6,57 +6,41 @@
 <title>教务查询</title>
 <style>
 :root {
-  /* ===== 液态玻璃 · 深色（默认） ===== */
-  --cream: #0c1e17; --cream-2: #12291f;
-  --green: #46d9a6; --green-lite: #7aecbc; --green-deep: #2b8f6d;
-  --pink: #f06ba4; --pink-deep: #ff7fb5;
-  --ink: #eefaf4; --ink-light: #9fcbb9;
-  --line: #26463a; --row: #142a21;
+  /* ===== 液态玻璃 · 浅色（默认，清爽克制） ===== */
+  --cream: #f4f6f8; --cream-2: #e9edf1;
+  --green: #0ea5a4; --green-lite: #14b8a6; --green-deep: #0d9488;
+  --pink: #f472b6; --pink-deep: #ec4899;
+  --ink: #1f2937; --ink-light: #64748b;
+  --line: #dbe2e8; --row: #fbfcfd;
   --font: -apple-system, 'PingFang SC', 'HarmonyOS Sans', 'MiSans', 'system-ui', 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
   --serif: var(--font);
   --mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
-  --glass: rgba(255,255,255,0.08);
-  --glass-2: rgba(255,255,255,0.05);
-  --glass-border: rgba(255,255,255,0.16);
-  --glass-hi: rgba(255,255,255,0.18);
-  --blur: 22px;
-  --grad-a: rgba(70,217,166,0.30);
-  --grad-b: rgba(70,160,217,0.26);
-  --grad-c: rgba(240,107,164,0.20);
-  --sheet-bg: rgba(13,25,20,0.88);
-}
-html[data-theme="light"] {
-  /* ===== 液态玻璃 · 浅色 ===== */
-  --cream: #eef6f1; --cream-2: #e2efe7;
-  --green: #19a97c; --green-lite: #2ec99a; --green-deep: #0f7a58;
-  --pink: #e05a92; --pink-deep: #d6417e;
-  --ink: #12352a; --ink-light: #5f8a76;
-  --line: #c9e0d4; --row: #f3faf6;
-  --glass: rgba(255,255,255,0.55);
-  --glass-2: rgba(255,255,255,0.38);
-  --glass-border: rgba(18,53,42,0.14);
-  --glass-hi: rgba(255,255,255,0.7);
-  --blur: 18px;
-  --grad-a: rgba(70,217,166,0.25);
-  --grad-b: rgba(70,160,217,0.18);
-  --grad-c: rgba(240,107,164,0.14);
-  --sheet-bg: rgba(238,246,241,0.92);
+  --glass: rgba(255,255,255,0.62);
+  --glass-2: rgba(255,255,255,0.40);
+  --glass-border: rgba(15,23,42,0.10);
+  --glass-hi: rgba(255,255,255,0.75);
+  --blur: 20px;
+  --grad-a: rgba(14,165,164,0.16);
+  --grad-b: rgba(59,130,246,0.11);
+  --grad-c: rgba(244,114,182,0.07);
+  --sheet-bg: rgba(244,246,248,0.94);
 }
 html[data-theme="dark"] {
-  --cream: #0c1e17; --cream-2: #12291f;
-  --green: #46d9a6; --green-lite: #7aecbc; --green-deep: #2b8f6d;
-  --pink: #f06ba4; --pink-deep: #ff7fb5;
-  --ink: #eefaf4; --ink-light: #9fcbb9;
-  --line: #26463a; --row: #142a21;
-  --glass: rgba(255,255,255,0.08);
-  --glass-2: rgba(255,255,255,0.05);
-  --glass-border: rgba(255,255,255,0.16);
-  --glass-hi: rgba(255,255,255,0.18);
+  /* ===== 液态玻璃 · 深色（克制，深蓝灰而非墨绿） ===== */
+  --cream: #0d1117; --cream-2: #151b23;
+  --green: #2dd4bf; --green-lite: #5eead4; --green-deep: #14b8a6;
+  --pink: #f472b6; --pink-deep: #f9a8d4;
+  --ink: #e6edf3; --ink-light: #8b98a5;
+  --line: #28323d; --row: #131a22;
+  --glass: rgba(255,255,255,0.06);
+  --glass-2: rgba(255,255,255,0.045);
+  --glass-border: rgba(255,255,255,0.13);
+  --glass-hi: rgba(255,255,255,0.12);
   --blur: 22px;
-  --grad-a: rgba(70,217,166,0.30);
-  --grad-b: rgba(70,160,217,0.26);
-  --grad-c: rgba(240,107,164,0.20);
-  --sheet-bg: rgba(13,25,20,0.88);
+  --grad-a: rgba(45,212,191,0.16);
+  --grad-b: rgba(96,165,250,0.12);
+  --grad-c: rgba(244,114,182,0.07);
+  --sheet-bg: rgba(13,17,23,0.90);
 }
 /* 经典主题：关闭玻璃效果，恢复不透明白底 + 绿边框 */
 html[data-style="classic"] {
@@ -78,38 +62,28 @@ html[data-style="classic"] input[type="text"], html[data-style="classic"] input[
 html[data-style="classic"] button { border-width: 2px; border-radius: 6px; box-shadow: none; }
 html[data-style="classic"] button.outline { background: transparent; }
 html[data-style="classic"] .sheet { box-shadow: none; }
-/* 梦幻光斑背景（深色液态默认），供毛玻璃模糊透出 */
+/* 淡雅光斑背景（浅色默认），克制的 teal/蓝 氛围，供毛玻璃透出 */
 html::before {
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(480px 480px at 10% 4%, rgba(70,217,166,0.38), transparent 62%),
-    radial-gradient(560px 560px at 92% 16%, rgba(70,160,217,0.32), transparent 66%),
-    radial-gradient(520px 520px at 48% 96%, rgba(240,107,164,0.24), transparent 62%),
-    radial-gradient(720px 720px at 72% 42%, rgba(70,217,166,0.14), transparent 72%),
-    linear-gradient(165deg, #071410, #0e2119 45%, #0a1a13);
-  animation: glassDrift 22s ease-in-out infinite alternate;
+    radial-gradient(520px 520px at 8% 3%, rgba(14,165,164,0.13), transparent 62%),
+    radial-gradient(600px 600px at 94% 12%, rgba(59,130,246,0.10), transparent 66%),
+    radial-gradient(560px 560px at 50% 98%, rgba(244,114,182,0.06), transparent 62%),
+    linear-gradient(170deg, #f6f8fa, #eef2f5 55%, #f1f4f7);
+  animation: glassDrift 26s ease-in-out infinite alternate;
 }
-html[data-theme="light"] html::before {
-  background:
-    radial-gradient(480px 480px at 10% 4%, rgba(70,217,166,0.30), transparent 62%),
-    radial-gradient(560px 560px at 92% 16%, rgba(70,160,217,0.26), transparent 66%),
-    radial-gradient(520px 520px at 48% 96%, rgba(240,107,164,0.18), transparent 62%),
-    radial-gradient(720px 720px at 72% 42%, rgba(70,217,166,0.10), transparent 72%),
-    linear-gradient(165deg, #eef6f1, #ddede4 45%, #e2efe7);
-}
-@keyframes glassDrift {
-  0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0, 0 0; }
-  100% { background-position: 18% 9%, 72% 24%, 38% 82%, 30% 20%, 0 0; }
-}
-html[data-theme="dark"] body { background: transparent; }
 html[data-theme="dark"] html::before {
   background:
-    radial-gradient(480px 480px at 10% 4%, rgba(70,217,166,0.38), transparent 62%),
-    radial-gradient(560px 560px at 92% 16%, rgba(70,160,217,0.32), transparent 66%),
-    radial-gradient(520px 520px at 48% 96%, rgba(240,107,164,0.24), transparent 62%),
-    radial-gradient(720px 720px at 72% 42%, rgba(70,217,166,0.14), transparent 72%),
-    linear-gradient(165deg, #071410, #0e2119 45%, #0a1a13);
+    radial-gradient(520px 520px at 8% 3%, rgba(45,212,191,0.16), transparent 62%),
+    radial-gradient(600px 600px at 94% 12%, rgba(96,165,250,0.13), transparent 66%),
+    radial-gradient(560px 560px at 50% 98%, rgba(244,114,182,0.07), transparent 62%),
+    linear-gradient(170deg, #0b0f14, #0f141b 55%, #0d1117);
 }
+@keyframes glassDrift {
+  0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
+  100% { background-position: 16% 8%, 74% 22%, 42% 84%, 0 0; }
+}
+html[data-theme="dark"] body { background: transparent; }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; min-height: 100%; }
 body { background: transparent; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
@@ -341,37 +315,36 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
   position: fixed; left: 50%; transform: translateX(-50%); bottom: 18px;
   display: flex; align-items: center; gap: 4px; padding: 6px;
   border-radius: 999px; z-index: 160;
-  background: rgba(255,255,255,0.07);
-  -webkit-backdrop-filter: blur(32px) saturate(180%); backdrop-filter: blur(32px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 14px 46px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.24);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 36px rgba(15,23,42,0.14), inset 0 1px 0 var(--glass-hi);
   transition: background .3s ease;
 }
 .bottomnav .nav-item {
   position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   padding: 9px 20px; border: none; background: transparent;
-  color: rgba(255,255,255,0.55); font-family: var(--font); font-size: 11px; cursor: pointer;
+  color: var(--ink-light); font-family: var(--font); font-size: 11px; cursor: pointer;
   border-radius: 999px; transition: color .25s, transform .2s; min-width: 66px; overflow: hidden;
 }
 .bottomnav .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s; }
 .bottomnav .nav-item.active {
   color: #fff;
-  background: linear-gradient(120deg, rgba(70,217,166,0.60), rgba(70,160,217,0.55), rgba(240,107,164,0.45), rgba(70,217,166,0.60));
+  background: linear-gradient(120deg, var(--green-lite), var(--green), var(--green-deep), var(--green-lite));
   background-size: 300% 100%;
-  animation: navFlow 4.5s linear infinite;
-  box-shadow: 0 6px 22px rgba(70,217,166,0.40), inset 0 1px 0 rgba(255,255,255,0.50);
-  transform: translateY(-3px);
+  animation: navFlow 5s linear infinite;
+  box-shadow: 0 6px 18px rgba(14,165,164,0.35), inset 0 1px 0 rgba(255,255,255,0.45);
+  transform: translateY(-2px);
 }
 .bottomnav .nav-item.active::after {
   content: ''; position: absolute; top: 0; bottom: 0; left: -35%; width: 36%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
-  animation: ripple 2.6s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: ripple 3s ease-in-out infinite;
 }
 @keyframes navFlow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
 @keyframes ripple { 0% { left: -35%; } 55%, 100% { left: 135%; } }
-html[data-theme="light"] .bottomnav { background: rgba(255,255,255,0.55); box-shadow: 0 12px 40px rgba(18,53,42,0.18), inset 0 1px 0 rgba(255,255,255,0.8); }
-html[data-theme="light"] .bottomnav .nav-item { color: rgba(18,53,42,0.6); }
-html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+html[data-theme="dark"] .bottomnav { box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.16); }
+html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav .nav-item.active { background: var(--cream-2); animation: none; box-shadow: none; transform: none; }
 html[data-style="classic"] .bottomnav .nav-item.active::after { display: none; }
 main { padding-bottom: 88px; }
@@ -651,7 +624,8 @@ function toggleCacheInfo() {
 
 function setThemeMode(v) {
   const dark = v === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
+  if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+  else document.documentElement.removeAttribute('data-theme');
   try { localStorage.setItem('jwxt_theme', dark ? 'dark' : 'light'); } catch(e) {}
   const b = document.getElementById('themeBtn'); if (b) b.textContent = dark ? '浅色' : '深色';
   const b2 = document.getElementById('themeBtn2'); if (b2) { b2.textContent = dark ? '浅色' : '深色'; b2.classList.toggle('on', dark); }
@@ -678,7 +652,7 @@ function toggleStyleClassic() {
 
 function restoreTheme() {
   var t = 'light';
-  try { t = localStorage.getItem('jwxt_theme') || 'dark'; } catch(e) {}
+  try { t = localStorage.getItem('jwxt_theme') || 'light'; } catch(e) {}
   setThemeMode(t);
   var s = 'glass';
   try { s = localStorage.getItem('jwxt_style') || 'glass'; } catch(e) {}
@@ -692,20 +666,22 @@ function showTab(which) {
   const nav = document.getElementById('bottomNav');
   if (nav) nav.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === which));
 }
-// 触摸左右滑动切换底部 tab（水流切换）
+// 触摸左右滑动切换底部 tab（仅绑定在底部导航栏上，不影响页面滚动）
 (function() {
-  let _sx = 0, _sy = 0, _st = 0;
-  document.addEventListener('touchstart', function(e) {
+  var nav = document.getElementById('bottomNav');
+  if (!nav) return;
+  var _sx = 0, _sy = 0, _st = 0;
+  nav.addEventListener('touchstart', function(e) {
     _sx = e.touches[0].clientX; _sy = e.touches[0].clientY; _st = Date.now();
   }, {passive: true});
-  document.addEventListener('touchend', function(e) {
-    const dx = e.changedTouches[0].clientX - _sx;
-    const dy = e.changedTouches[0].clientY - _sy;
-    const dt = Date.now() - _st;
-    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6 && dt < 420) {
-      const cur = document.querySelector('.nav-item.active');
+  nav.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - _sx;
+    var dy = e.changedTouches[0].clientY - _sy;
+    var dt = Date.now() - _st;
+    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.6 && dt < 420) {
+      var cur = nav.querySelector('.nav-item.active');
       if (!cur) return;
-      const tab = cur.dataset.tab;
+      var tab = cur.dataset.tab;
       if (dx > 0 && tab !== 'home') showTab('home');
       else if (dx < 0 && tab !== 'settings') showTab('settings');
     }
@@ -1323,6 +1299,7 @@ window.__retryNotif = function() { refreshOngoing(); };
 // 通知点击跳转：进入本人课表本周表格
 window.__gotoSchedule = function() {
   try {
+    showTab('home'); // 通知点开时先回到首页视图，避免被设置面板盖住
     let best = null, bestT = -1;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -1331,7 +1308,7 @@ window.__gotoSchedule = function() {
       const obj = raw ? JSON.parse(raw) : null;
       if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
     }
-    if (!best) { showView('main'); return; }
+    if (!best) { showView('main'); alert('还没有我的课表缓存，请先在首页查询一次我的课表，之后点击通知即可直达。'); return; }
     S.queryType = 'self'; S.scheduleForm = 'table'; S.scheduleView = 'week';
     const qw = document.getElementById('queryWeek'); if (qw) qw.value = '';
     const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = '';

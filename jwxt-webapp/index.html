@@ -393,6 +393,100 @@ html[data-theme="dark"] .seg button.on { color: #0f120c; }
 .switch.on { background: var(--green); }
 .switch.on::after { transform: translateX(20px); }
 html[data-style="classic"] .settings-panel { background: var(--cream); }
+
+/* ================= v0.9.8 高级化精修：白卡中性底 · teal 克制强调 · 加大留白 ================= */
+main { padding: 16px 14px 96px; max-width: 680px; }
+
+/* 卡片：中性浅底 + 细边框 + 柔和阴影，去满屏渐变 */
+.card {
+  border-radius: 16px; padding: 16px; margin-bottom: 14px;
+  background: var(--glass);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.05), 0 8px 28px rgba(15,23,42,0.06);
+  border: 1px solid var(--glass-border);
+}
+.card-green, .card-pink { background: var(--glass); border-color: var(--glass-border); }
+.card-header { border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px; }
+.card-header .mono { color: var(--green-deep); }
+.card-pink .card-header .mono { color: var(--pink-deep); }
+
+/* 输入 / 选择 */
+input[type="text"], input[type="password"], select {
+  min-height: 46px; border-radius: 12px; border: 1px solid var(--glass-border);
+  background: var(--glass-2); padding: 0 14px; font-size: 15px;
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(14,165,164,0.15); }
+
+/* 按钮 */
+button {
+  min-height: 46px; border-radius: 12px; padding: 0 18px;
+  background: linear-gradient(180deg, var(--green-lite), var(--green-deep));
+  box-shadow: 0 1px 2px rgba(15,23,42,0.08), 0 6px 18px rgba(14,165,164,0.22);
+  color: #fff; font-weight: 600; letter-spacing: .01em;
+}
+button.outline { background: transparent; color: var(--green-deep); box-shadow: none; border: 1.5px solid var(--green); }
+button.small { min-height: 38px; border-radius: 10px; padding: 0 12px; font-size: 12px; }
+.btn-chip { min-height: 36px; border-radius: 999px; background: var(--glass-2); color: var(--green-deep); border: 1.5px solid var(--glass-border); }
+
+/* 查询类型按钮：中性卡，选中才 teal 填充 */
+.type-btn {
+  min-height: 56px; border-radius: 14px; background: var(--glass); color: var(--ink);
+  border: 1px solid var(--glass-border); box-shadow: 0 1px 2px rgba(15,23,42,0.04); font-size: 14px;
+}
+.type-btn.active {
+  background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; font-weight: 600;
+  box-shadow: 0 6px 20px rgba(14,165,164,0.28);
+}
+
+/* 课程卡片：白卡 + 左侧强调条，去整块渐变 */
+.course-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+.course-card.green { background: var(--glass); border-left: 4px solid var(--green); color: var(--ink); }
+.course-card.pink { background: var(--glass); border-left: 4px solid var(--pink); color: var(--ink); }
+.course-card.green .period { color: var(--green-deep); }
+.course-card.pink .period { color: var(--pink-deep); }
+html[data-theme="dark"] .course-card.green, html[data-theme="dark"] .course-card.pink { background: var(--glass); color: var(--ink); }
+
+/* 课表列表行 */
+.course-row { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; }
+.course-row.green { background: var(--glass); color: var(--ink); border-left: 4px solid var(--green); }
+.course-row.pink { background: var(--glass); color: var(--ink); border-left: 4px solid var(--pink); }
+html[data-theme="dark"] .course-row.green, html[data-theme="dark"] .course-row.pink { background: var(--glass); color: var(--ink); }
+
+/* 教师 / 班级 / 教室 / 今日课程 chips：白卡 + teal 文字 */
+.teacher-item, .class-chip, .room-item, .today-course-chip {
+  background: var(--glass); color: var(--green-deep); border: 1px solid var(--glass-border);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.04); border-radius: 12px;
+}
+.today-course-chip { min-width: 160px; }
+html[data-theme="dark"] .teacher-item, html[data-theme="dark"] .class-chip,
+html[data-theme="dark"] .room-item, html[data-theme="dark"] .today-course-chip { color: var(--green-lite); }
+
+/* GPA hero */
+.gpa-hero { background: linear-gradient(160deg, var(--green-deep), #0b6b6a); border-radius: 18px; }
+.gpa-hero .label { color: rgba(255,255,255,0.8); }
+.gpa-hero .value { color: #fff; }
+
+/* 统计框 */
+.stat-box { border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass); }
+.stat-box.pink, .stat-box.green, .stat-box.cream { background: var(--glass); border-color: var(--glass-border); color: var(--ink); }
+.stat-box.green .value, .stat-box.cream .value { color: var(--green-deep); }
+.stat-box.pink .value { color: var(--pink-deep); }
+
+/* 字母导航 / 楼栋 */
+.letter-nav { border-radius: 14px; padding: 6px; background: var(--glass); }
+.letter-nav span { width: 30px; height: 30px; border-radius: 9px; color: var(--ink); }
+.letter-nav span.inactive { color: var(--ink-light); background: var(--glass-2); }
+.letter-nav span.active { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; }
+.building-head { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); border-radius: 10px; }
+
+/* 学籍 / 进度 */
+.profile-item { background: var(--glass); border-left: 3px solid var(--green); }
+.progress-bar-wrap { background: var(--cream-2); }
+.progress-bar { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); }
+
+/* 侧边栏卡片扁平化 */
+#querySection .card, #browseNav .card { border-radius: 14px; padding: 14px; background: transparent; border: 1px solid var(--glass-border); }
+#querySection .card-header, #browseNav .card-header { margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -404,7 +498,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     </button>
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.7</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.8</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -566,7 +660,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
 <!-- 设置面板 -->
 <section id="settingsSection" class="hidden settings-panel">
   <div class="card">
-    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.7</span></div>
+    <div class="card-header"><span class="mono">设置</span><span class="mono" style="color:var(--ink-light);">v0.9.8</span></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">外观</span></div>
     <div class="set-row"><div class="set-label">主题风格</div>
@@ -590,7 +684,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.7（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.8（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>

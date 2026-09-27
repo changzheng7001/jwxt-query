@@ -277,7 +277,8 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 .profile-item .v { font-size: 14px; font-weight: 500; margin-top: 2px; word-break: break-all; }
 
 /* 查询类型卡片按钮组 */
-.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+.type-list { display: flex; flex-direction: column; gap: 4px; }
+.type-list .type-btn { min-height: 44px; border-radius: 10px; padding: 0 14px; text-align: left; display: flex; align-items: center; }
 .type-btn {
   min-height: 52px; padding: 10px 8px; border: 1px solid var(--glass-border); border-radius: 12px;
   background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -308,9 +309,10 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 
 /* ==== 底部液态玻璃导航栏 ==== */
 .bottomnav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px;
-  display: flex; align-items: center; gap: 6px; padding: 7px;
-  border-radius: 999px; z-index: 160;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px;
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  width: calc(100% - 24px); max-width: 560px; box-sizing: border-box;
+  border-radius: 20px; z-index: 160;
   background: var(--glass);
   -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
   border: 1px solid var(--glass-border);
@@ -319,17 +321,17 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 }
 .bottomnav .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  padding: 9px 20px; border: none; background: transparent;
+  padding: 6px 12px; border: none; background: transparent;
   color: var(--ink-light); font-family: var(--serif); font-size: 11px; cursor: pointer;
-  border-radius: 999px; transition: background .25s ease, color .25s ease, transform .15s ease;
-  min-width: 64px;
+  border-radius: 14px; transition: background .25s ease, color .25s ease;
+  min-width: 60px; flex-shrink: 0;
 }
 .bottomnav .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.bottomnav .nav-item.active { background: rgba(46,74,42,0.15); color: var(--green); transform: translateY(-2px); }
+.bottomnav .nav-item.active { background: rgba(46,74,42,0.15); color: var(--green); }
 html[data-theme="dark"] .bottomnav .nav-item.active { background: rgba(143,174,110,0.22); }
 html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 html[data-style="classic"] .bottomnav .nav-item.active { background: var(--cream-2); }
-main { padding-bottom: 86px; }
+main { padding-bottom: 112px; }
 
 /* ==== 设置面板 ==== */
 .settings-panel {
@@ -346,7 +348,7 @@ main { padding-bottom: 86px; }
 .seg button.on { background: var(--green); color: var(--cream); }
 html[data-theme="dark"] .seg button.on { color: #0f120c; }
 .set-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.switch { position: relative; width: 46px; height: 26px; border-radius: 999px; background: rgba(139,116,85,0.35); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
+.switch { position: relative; width: 46px; height: 26px; border-radius: 999px; background: #cdd3da; transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; }
 .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .switch.on { background: var(--green); }
 .switch.on::after { transform: translateX(20px); }
@@ -473,9 +475,9 @@ html[data-style="classic"] .building-head { background: var(--green); }
 .back-btn { display:none; }
 .back-btn.show { display:inline-block; }
 
-.sidebar-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.35); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:150; opacity:0; visibility:hidden; transition:opacity .28s, visibility .28s; }
+.sidebar-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.35); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:165; opacity:0; visibility:hidden; transition:opacity .28s, visibility .28s; }
 .sidebar-backdrop.show { opacity:1; visibility:visible; }
-.sidebar { position:fixed; top:0; left:0; bottom:0; width:min(320px, 86vw); z-index:151; display:flex; flex-direction:column;
+.sidebar { position:fixed; top:0; left:0; bottom:0; width:min(320px, 86vw); z-index:166; display:flex; flex-direction:column;
   background:var(--sheet-bg); -webkit-backdrop-filter:blur(28px) saturate(170%); backdrop-filter:blur(28px) saturate(170%);
   border-right:1px solid var(--glass-border); box-shadow:16px 0 40px rgba(15,23,42,0.16);
   transform:translateX(-105%); transition:transform .32s cubic-bezier(.32,.72,.35,1); }
@@ -504,17 +506,13 @@ html[data-style="classic"] .menu-btn, html[data-style="classic"] .page-back { co
 .sidebar-foot { border-top:1px solid var(--line); padding:14px; flex-shrink:0; background:var(--sheet-bg); }
 .sidebar-foot .sidebar-item { margin:0; }
 
-/* ===== 结果标签栏（浏览器式多标签）===== */
-.result-tabs { position:sticky; top:52px; z-index:90; display:flex; gap:6px; overflow-x:auto; padding:8px 12px; background:var(--bg); border-bottom:1px solid var(--line); }
-.result-tabs::-webkit-scrollbar { display:none; }
-.result-tab { display:flex; align-items:center; gap:6px; min-height:32px; padding:0 10px; border-radius:9px; background:var(--row); border:1px solid var(--line); color:var(--ink); font-size:12px; white-space:nowrap; cursor:pointer; flex-shrink:0; }
-.result-tab.active { background:linear-gradient(180deg,var(--green-lite),var(--green-deep)); color:#fff; border-color:transparent; }
-.result-tab .tab-x { color:inherit; opacity:.7; padding:0 2px; font-size:14px; }
-.result-tab.active .tab-x { color:#fff; }
-
-/* ===== 底栏单 tab 居中 ===== */
-.bottomnav { justify-content:center; }
-.bottomnav .nav-item { min-width:96px; }
+/* ===== 结果标签栏（并入底部导航，同一玻璃条）===== */
+.result-tabs { flex: 1; display: flex; gap: 6px; overflow-x: auto; padding: 2px; -ms-overflow-style: none; scrollbar-width: none; }
+.result-tabs::-webkit-scrollbar { display: none; }
+.result-tab { display: flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 11px; border-radius: 12px; background: var(--row); border: 1px solid var(--line); color: var(--ink); font-size: 11px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+.result-tab.active { background: linear-gradient(180deg, var(--green-lite), var(--green-deep)); color: #fff; border-color: transparent; }
+.result-tab .tab-x { color: inherit; opacity: .7; padding: 0 2px; font-size: 14px; }
+.result-tab.active .tab-x { color: #fff; }
 
 /* ===== 设置页整洁：行内 label/控件两端对齐 ===== */
 .set-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 2px; border-bottom:1px solid var(--line); }
@@ -538,7 +536,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
     </button>
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
-    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.11</span></h1>
+    <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.12</span></h1>
   </div>
   <div style="display:flex; align-items:center; gap:8px;">
     <span class="status-dot" id="statusDot"></span>
@@ -559,32 +557,11 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
   </div>
   <div class="sidebar-body">
 
-    <!-- 查询参数 -->
+    <!-- 查询参数（单列，点击直接查询） -->
     <section id="querySection">
       <div class="card card-pink">
         <div class="card-header"><span class="mono">查询参数</span></div>
-        <div class="type-grid" id="typeGrid"></div>
-        <div id="nameRow" class="hidden">
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="queryName" placeholder="名称" style="flex:1; margin-bottom:0;" />
-            <button class="small outline" onclick="openPicker()" style="flex-shrink:0;">选择</button>
-          </div>
-        </div>
-        <div id="weekRow" class="hidden" style="display:flex; gap:6px; margin-bottom:16px;">
-          <input type="text" id="queryWeek" placeholder="周次" style="flex:1; margin-bottom:0;" />
-          <select id="queryWeekday" style="flex:1; margin-bottom:0;">
-            <option value="">星期</option>
-            <option value="1">一</option><option value="2">二</option><option value="3">三</option>
-            <option value="4">四</option><option value="5">五</option><option value="6">六</option><option value="7">日</option>
-          </select>
-        </div>
-        <div id="semesterRow" class="hidden">
-          <select id="querySemester"></select>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button style="flex:1;" onclick="runQuery()">查询</button>
-          <button style="flex:1;" onclick="runQuery(true)">刷新</button>
-        </div>
+        <div class="type-list" id="typeGrid"></div>
       </div>
     </section>
 
@@ -686,8 +663,13 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
 
 </main>
 
-<!-- 结果标签栏（浏览器式多标签查询结果） -->
-<div id="resultTabs" class="result-tabs hidden"></div>
+<!-- 隐藏的查询参数（单列侧边栏已不展示，供 runQuery 等读取） -->
+<div style="display:none;">
+  <input type="text" id="queryName" />
+  <input type="text" id="queryWeek" />
+  <input type="text" id="queryWeekday" />
+  <select id="querySemester"><option>2026-2027-1</option></select>
+</div>
 
 <!-- 底部弹出弹窗遮罩（body 级，任何页面均可弹出） -->
 <div id="browseOverlay" class="overlay" onclick="closeBrowse()" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
@@ -722,7 +704,7 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
   <div class="page-head">
     <button class="page-back" onclick="closeSettings()">← 返回</button>
     <span class="mono" style="color:var(--green);">设置</span>
-    <span class="mono" style="color:var(--ink-light);">v0.9.11</span>
+    <span class="mono" style="color:var(--ink-light);">v0.9.12</span>
   </div>
   <div class="card">
 
@@ -748,17 +730,18 @@ html[data-style="classic"] .result-tabs, html[data-style="classic"] .sidebar-foo
     <div class="set-row"><div class="set-label">清空全部缓存<button class="set-btn" onclick="clearAllCache(); refreshSettingsCache()">清空</button></div></div>
 
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">关于</span></div>
-    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.11（1.0 为正式版）</span></div></div>
+    <div class="set-row"><div class="set-label">版本号<span class="set-desc">v0.9.12（1.0 为正式版）</span></div></div>
     <div class="set-row"><div class="set-label">源码仓库<button class="set-btn" onclick="openRepo()">GitHub</button></div></div>
     <div class="set-hint">本项目由 <b>豆包工作</b> 辅助开发。数据来自中央司法警官学院教务系统（CICP），仅供个人学习使用。</div>
   </div>
 </section>
 
-<!-- 底部液态玻璃导航栏：首页（长按可自定义图标） -->
+<!-- 底部液态玻璃导航栏：首页 + 查询结果标签（同一部分） -->
 <nav id="bottomNav" class="bottomnav">
   <button class="nav-item active" data-tab="home" id="navHome" onclick="showTab('home')">
     <svg id="navHomeIcon" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span id="navHomeLabel">首页</span>
   </button>
+  <div id="resultTabs" class="result-tabs"></div>
 </nav>
 
 <script>
@@ -884,12 +867,16 @@ function closeSidebar() {
 // 手势：左侧边缘向右滑打开侧边栏；侧边栏内向左滑收起
 (function initSidebarSwipe() {
   var sb = document.getElementById('sidebar');
-  var ex = -1, sx = 0;
-  document.addEventListener('touchstart', function(e){ if (e.touches[0].clientX < 24) ex = e.touches[0].clientX; else ex = -1; }, {passive:true});
-  document.addEventListener('touchend', function(e){ if (ex < 0) return; if (e.changedTouches[0].clientX - ex > 70) openSidebar(); }, {passive:true});
+  var ex = -1, sx = 0, edge = 40, TH = 64;
+  // 从屏幕左边缘向右滑打开侧边栏（放宽边缘、touchmove 实时触发）
+  document.addEventListener('touchstart', function(e){ ex = (e.touches[0].clientX < edge) ? e.touches[0].clientX : -1; }, {passive:true});
+  document.addEventListener('touchmove', function(e){ if (ex < 0 || !e.touches[0]) return; if (e.touches[0].clientX - ex > TH) { ex = -1; openSidebar(); } }, {passive:true});
+  document.addEventListener('touchend', function(e){ if (ex < 0) return; if (e.changedTouches[0].clientX - ex > TH) openSidebar(); }, {passive:true});
+  // 侧边栏内向左滑收起
   if (sb) {
     sb.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
-    sb.addEventListener('touchend', function(e){ if (e.changedTouches[0].clientX - sx < -60) closeSidebar(); }, {passive:true});
+    sb.addEventListener('touchmove', function(e){ if (sx > 0 && e.touches[0] && e.touches[0].clientX - sx < -60) { sx = 0; closeSidebar(); } }, {passive:true});
+    sb.addEventListener('touchend', function(e){ if (sx > 0 && e.changedTouches[0].clientX - sx < -60) closeSidebar(); }, {passive:true});
   }
 })();
 function toggleNotify() {
@@ -1441,24 +1428,16 @@ function init() {
 
   restoreTheme();
 
-  // 查询类型：卡片式按钮组
+  // 查询类型：单列菜单（点击直接查询）
   const typeGrid = document.getElementById('typeGrid');
   TYPES.forEach(t => {
     const btn = document.createElement('div');
     btn.className = 'type-btn' + (t.v === 'self' ? ' active' : '');
     btn.dataset.v = t.v;
     btn.textContent = t.l;
-    btn.onclick = function() { selectType(t.v); };
+    btn.onclick = function() { onQueryTypeClick(t.v); };
     typeGrid.appendChild(btn);
   });
-
-  const semSel = document.getElementById('querySemester');
-  SEMESTERS.forEach(s => {
-    const o = document.createElement('option');
-    o.value = s; o.textContent = s;
-    semSel.appendChild(o);
-  });
-  semSel.value = '2026-2027-1';
 
   // 检查缓存
   checkCacheStatus();
@@ -1574,7 +1553,36 @@ function selectType(v) {
     if (btns[i].dataset.v === v) btns[i].classList.add('active');
     else btns[i].classList.remove('active');
   }
-  onTypeChange();
+}
+// 点击查询类型：不需名称直接查询并跳结果；需名称则弹输入
+function onQueryTypeClick(v) {
+  S.queryType = v;
+  var btns = document.querySelectorAll('.type-btn');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].dataset.v === v) btns[i].classList.add('active');
+    else btns[i].classList.remove('active');
+  }
+  if (NEEDS_NAME.includes(v)) { openNamePrompt(); }
+  else { closeSidebar(); runQuery(); }
+}
+function openNamePrompt() {
+  var qi = document.getElementById('queryName');
+  document.getElementById('nameSheetInput').value = (qi && qi.value) ? qi.value : '';
+  document.getElementById('nameSheet').classList.remove('hidden');
+  document.getElementById('nameOverlay').style.display = '';
+  setTimeout(function(){ var i = document.getElementById('nameSheetInput'); if (i) i.focus(); }, 120);
+}
+function closeNamePrompt() {
+  document.getElementById('nameSheet').classList.add('hidden');
+  document.getElementById('nameOverlay').style.display = 'none';
+}
+function confirmNameQuery() {
+  var nm = document.getElementById('nameSheetInput').value.trim();
+  var qi = document.getElementById('queryName'); if (qi) qi.value = nm;
+  S.pickForQuery = false;
+  closeNamePrompt();
+  closeSidebar();
+  runQuery();
 }
 
 function checkCacheStatus() {
@@ -1617,10 +1625,7 @@ function clearAllCache() {
 }
 
 function onTypeChange() {
-  var t = S.queryType;
-  document.getElementById('nameRow').classList.toggle('hidden', !NEEDS_NAME.includes(t));
-  document.getElementById('weekRow').classList.toggle('hidden', !NEEDS_WEEK.includes(t));
-  document.getElementById('semesterRow').classList.toggle('hidden', !NEEDS_SEM.includes(t));
+  // 查询参数已改为单列点击直接查询，无需显隐周次/学期等控件
 }
 
 // ============ 查询（多标签结果栏） ============
@@ -2111,6 +2116,8 @@ function closeDetail() {
 
 // ============ 浏览列表 ============
 async function openPicker() {
+  var ns = document.getElementById('nameSheet');
+  if (ns && !ns.classList.contains('hidden')) { S.pickForQuery = true; closeNamePrompt(); }
   const map = {teacher: 'teacher', class: 'class', classroom: 'classroom'};
   const b = map[S.queryType];
   if (b) openBrowse(b);
@@ -2284,8 +2291,10 @@ function filterBrowse() {
 }
 
 function pickValue(v) {
-  document.getElementById('queryName').value = v;
+  var qi = document.getElementById('queryName'); if (qi) qi.value = v;
+  var ni = document.getElementById('nameSheetInput'); if (ni) ni.value = v;
   goBack();
+  if (S.pickForQuery) { S.pickForQuery = false; closeSidebar(); runQuery(); }
 }
 function scrollToGroup(l) {
   var el = document.getElementById('group_'+l);
@@ -2447,6 +2456,22 @@ onTypeChange();
     <input type="text" id="navLabelInput" placeholder="首页" maxlength="4" style="width:100%; padding:10px; border:2px solid var(--green); border-radius:8px; background:var(--cream); font-size:14px; color:var(--ink);" />
   </div>
   <button style="width:100%;" onclick="saveNavCustom()">保存</button>
+</section>
+
+<!-- 输入名称弹窗（需名称的查询类型） -->
+<div id="nameOverlay" class="overlay" onclick="closeNamePrompt()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:400;"></div>
+<section id="nameSheet" class="hidden sheet" style="position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto; z-index:401; border-radius:18px 18px 0 0; border:1px solid var(--glass-border); border-bottom:none; padding:18px; background:var(--sheet-bg);">
+  <div class="card-header" style="border-bottom:2px solid var(--pink); padding-bottom:10px;">
+    <span class="mono" style="color:var(--pink-deep);">输入名称</span>
+    <button onclick="closeNamePrompt()" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">关闭</button>
+  </div>
+  <div style="margin:14px 0;">
+    <input type="text" id="nameSheetInput" placeholder="请输入名称" style="width:100%; padding:10px; border:2px solid var(--green); border-radius:8px; background:var(--cream); font-size:14px; color:var(--ink);" />
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button class="small outline" onclick="openPicker()" style="flex:1;">从缓存选择</button>
+    <button style="flex:2;" onclick="confirmNameQuery()">查询</button>
+  </div>
 </section>
 </body>
 </html>

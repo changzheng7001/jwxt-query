@@ -253,3 +253,35 @@
     :cond_done
     return-void
 .end method
+.method protected onNewIntent(Landroid/content/Intent;)V
+    .locals 3
+
+    invoke-virtual {p0, p1}, Landroid/app/Activity;->setIntent(Landroid/content/Intent;)V
+
+    const-string v0, "goto"
+
+    invoke-virtual {p1, v0}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_done
+
+    const-string v1, "schedule"
+
+    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_done
+
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
+
+    const/4 v0, 0x0
+
+    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
+    :cond_done
+    return-void
+.end method

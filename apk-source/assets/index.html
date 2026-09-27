@@ -22,6 +22,7 @@
   --grad-a: rgba(232,156,177,0.35);
   --grad-b: rgba(46,74,42,0.30);
   --grad-c: rgba(214,203,176,0.30);
+  --sheet-bg: rgba(250,244,228,0.97);
 }
 html[data-theme="dark"] {
   --cream: #161b17; --cream-2: #1d231e;
@@ -36,6 +37,7 @@ html[data-theme="dark"] {
   --grad-a: rgba(176,117,138,0.28);
   --grad-b: rgba(143,174,110,0.26);
   --grad-c: rgba(164,154,130,0.18);
+  --sheet-bg: rgba(23,28,24,0.97);
 }
 /* 经典主题：关闭玻璃效果，恢复不透明白底 + 绿边框 */
 html[data-style="classic"] {
@@ -45,10 +47,12 @@ html[data-style="classic"] {
   --glass-hi: transparent;
   --blur: 0px;
   --grad-a: transparent; --grad-b: transparent; --grad-c: transparent;
+  --sheet-bg: var(--cream);
 }
 html[data-style="classic"] html::before { background: var(--cream); animation: none; }
 html[data-style="classic"] body { background: var(--cream); }
 html[data-style="classic"] .topbar { -webkit-mask-image: none; box-shadow: none; }
+html[data-style="classic"] .sheet { background: var(--cream); }
 html[data-style="classic"] .card { border-width: 2px; border-radius: 8px; box-shadow: none; }
 html[data-style="classic"] .type-btn { border-width: 2px; border-radius: 8px; box-shadow: none; }
 html[data-style="classic"] input[type="text"], html[data-style="classic"] input[type="password"], html[data-style="classic"] select { border-width: 2px; border-radius: 6px; }
@@ -141,17 +145,12 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--green); padding-bottom: 4px; margin-bottom: 8px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
-/* 课表网格表格 */
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.sched-grid { display: grid; gap: 3px; font-size: 10px; min-width: 640px; }
-.sched-grid.week { grid-template-columns: 46px repeat(7, minmax(0,1fr)); }
-.sched-grid.today { grid-template-columns: 46px minmax(0,1fr); }
-.sched-head { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--green); font-weight: 600;
-  display: flex; align-items: center; justify-content: center; padding: 6px 2px;
-  background: var(--glass-2); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  border-radius: 6px; border: 1px solid var(--glass-border); }
-.sched-cell { min-height: 52px; border: 1px solid var(--glass-border); border-radius: 6px; padding: 3px; background: var(--glass); }
-.sched-cell.empty { background: transparent; border-style: dashed; border-color: var(--line); opacity: 0.5; }
+/* 课表表格（原生 table，兼容性最好） */
+.sched-table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 640px; }
+.sched-table th { padding: 7px 4px; background: var(--glass-2); color: var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; font-weight: 600; border: 1px solid var(--glass-border); white-space: nowrap; }
+.sched-table td { border: 1px solid var(--glass-border); padding: 4px; vertical-align: top; min-height: 44px; }
+.sched-table td.seg { width: 44px; text-align: center; color: var(--ink-light); font-family: var(--mono); font-size: 9px; white-space: nowrap; }
+.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.6; }
 .sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 5px; padding: 4px 5px; margin-bottom: 3px; line-height: 1.35; cursor: pointer; }
 .sched-course .cn { font-weight: 600; font-size: 10px; display: block; word-break: break-all; }
 .sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; }
@@ -285,7 +284,7 @@ tr:nth-child(even) td { background: var(--row); }
 .hidden { display: none !important; }
 @keyframes sheetUp { from { transform: translateY(34px); opacity: .4; } to { transform: none; opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.sheet { background: var(--glass); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 -6px 30px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); animation: sheetUp .22s ease-out; }
+.sheet { background: var(--sheet-bg); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 -6px 30px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); animation: sheetUp .22s ease-out; }
 .overlay { animation: fadeIn .18s ease-out; }
 </style>
 </head>
@@ -1289,25 +1288,27 @@ function renderResult(type, data) {
     function buildTable(daySet) {
       // daySet: 若为 null 表示周视图(7列)；否则 [dayIdx] 表示仅今天
       const single = daySet && daySet.length === 1;
-      let h = '<div class="table-scroll"><div class="sched-grid '+(single?'today':'week')+'">';
+      let h = '<div class="table-wrap"><table class="sched-table"><thead><tr>';
       // 表头
-      h += '<div class="sched-head">节次</div>';
-      if (single) h += '<div class="sched-head">'+esc(WEEKDAYS[daySet[0]-1])+' · 今天</div>';
-      else WEEKDAYS.forEach(w => { h += '<div class="sched-head">'+esc(w)+'</div>'; });
+      h += '<th>节次</th>';
+      if (single) h += '<th>'+esc(WEEKDAYS[daySet[0]-1])+' · 今天</th>';
+      else WEEKDAYS.forEach(w => { h += '<th>'+esc(w)+'</th>'; });
+      h += '</tr></thead><tbody>';
       // 行
       SEGMENTS.forEach(seg => {
-        h += '<div class="sched-head" style="color:var(--ink-light); background:transparent;">'+esc(seg.label)+'</div>';
+        h += '<tr><td class="seg">'+esc(seg.label)+'</td>';
         if (single) {
           const list = courses.filter(c => c.weekday === daySet[0] && c.period === seg.code);
-          h += '<div class="sched-cell'+(list.length?'':' empty')+'">'+list.map(c=>courseCell(c, slotColor[seg.code])).join('')+'</div>';
+          h += '<td>'+(list.length ? list.map(c=>courseCell(c, slotColor[seg.code])).join('') : '<span class="e">—</span>')+'</td>';
         } else {
           for (let d = 1; d <= 7; d++) {
             const list = courses.filter(c => c.weekday === d && c.period === seg.code);
-            h += '<div class="sched-cell'+(list.length?'':' empty')+'">'+list.map(c=>courseCell(c, slotColor[seg.code])).join('')+'</div>';
+            h += '<td>'+(list.length ? list.map(c=>courseCell(c, slotColor[seg.code])).join('') : '<span class="e">—</span>')+'</td>';
           }
         }
+        h += '</tr>';
       });
-      h += '</div></div>';
+      h += '</tbody></table></div>';
       return h;
     }
     // 列表形式：按天分组，每门课一行
@@ -1510,7 +1511,7 @@ async function openBrowse(type, forceRefresh) {
 
   if (!S.loggedIn) {
     if (!cached) {
-      document.getElementById('browseContent').innerHTML = '<div class="error-box">未登录且无缓存数据</div>';
+      document.getElementById('browseContent').innerHTML = '<div class="error-box">未登录且无缓存数据<br><br>点右上角「登录」查询一次后，即可离线查看全校列表</div>';
     }
     return;
   }

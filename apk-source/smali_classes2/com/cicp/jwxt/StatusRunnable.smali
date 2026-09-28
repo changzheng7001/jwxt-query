@@ -40,7 +40,8 @@
 
     if-eqz v2, :cond_light
 
-    const v3, 0xff161b17
+    # 深色：状态栏透明 + 内容延伸到状态栏（沉浸一体）+ 浅色图标
+    const v3, 0x00000000
 
     invoke-virtual {v1, v3}, Landroid/view/Window;->setStatusBarColor(I)V
 
@@ -51,6 +52,10 @@
     invoke-virtual {v2}, Landroid/view/View;->getSystemUiVisibility()I
 
     move-result v3
+
+    const/16 v4, 0x0500
+
+    or-int/2addr v3, v4
 
     const/16 v4, 0x2000
 
@@ -64,7 +69,8 @@
 
     :cond_light
 
-    const v3, 0xffefe7d4
+    # 浅色：状态栏透明 + 内容延伸到状态栏（沉浸一体）+ 深色图标
+    const v3, 0x00000000
 
     invoke-virtual {v1, v3}, Landroid/view/Window;->setStatusBarColor(I)V
 
@@ -75,6 +81,10 @@
     invoke-virtual {v2}, Landroid/view/View;->getSystemUiVisibility()I
 
     move-result v3
+
+    const/16 v4, 0x0500
+
+    or-int/2addr v3, v4
 
     const/16 v4, 0x2000
 

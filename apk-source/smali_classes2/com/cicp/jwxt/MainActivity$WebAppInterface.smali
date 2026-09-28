@@ -884,3 +884,41 @@
 
     return-void
 .end method
+
+# 返回状态栏高度(px)，供前端给顶部 topbar 预留沉浸式 padding
+.method public getStatusBarHeight()I
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    .locals 5
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v1
+
+    const-string v2, "status_bar_height"
+
+    const-string v3, "dimen"
+
+    const-string v4, "android"
+
+    invoke-virtual {v1, v2, v3, v4}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v2
+
+    if-lez v2, :cond_zero
+
+    invoke-virtual {v1, v2}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
+
+    move-result v1
+
+    return v1
+
+    :cond_zero
+
+    const/4 v1, 0x0
+
+    return v1
+.end method

@@ -841,14 +841,19 @@
 
     sget v3, Landroid/R$drawable;->ic_menu_agenda:I
     invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setSmallIcon(I)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, p1}, Landroid/app/Notification$Builder;->setContentTitle(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
+    # 调 helper 构建收起视图（含"展开"箭头按钮，鸿蒙/安卓点击即展开）
+    invoke-direct {p0, p1, p2}, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->buildCollapsedRV(Ljava/lang/String;Ljava/lang/String;)Landroid/widget/RemoteViews;
+    move-result-object v6
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
+    const/16 v4, 0x18
+    if-lt v3, v4, :cond_setcontent
+    invoke-virtual {v5, v6}, Landroid/app/Notification$Builder;->setCustomContentView(Landroid/widget/RemoteViews;)Landroid/app/Notification$Builder;
+    goto :goto_contentdone
+    :cond_setcontent
+    invoke-virtual {v5, v6}, Landroid/app/Notification$Builder;->setContent(Landroid/widget/RemoteViews;)Landroid/app/Notification$Builder;
+    :goto_contentdone
     invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
     invoke-virtual {v5, p3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
-    new-instance v2, Landroid/app/Notification$BigTextStyle;
-    invoke-direct {v2}, Landroid/app/Notification$BigTextStyle;-><init>()V
-    invoke-virtual {v2, p2}, Landroid/app/Notification$BigTextStyle;->bigText(Ljava/lang/CharSequence;)Landroid/app/Notification$BigTextStyle;
-    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setStyle(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;
     invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
     move-result-object v3
     const/4 v4, 0x1
@@ -863,5 +868,296 @@
     const/4 v0, 0x0
     return v0
     :goto_ret
+    return-void
+.end method
+
+# 构建通知收起视图：单行标题+内容 + 右侧"展开"箭头按钮（点击发广播切换为展开视图）
+.method private buildCollapsedRV(Ljava/lang/String;Ljava/lang/String;)Landroid/widget/RemoteViews;
+    .locals 12
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v1
+
+    const-string v2, "notif_c"
+
+    const-string v3, "layout"
+
+    const-string v4, "com.cicp.jwxt"
+
+    invoke-virtual {v1, v2, v3, v4}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v1
+
+    new-instance v5, Landroid/widget/RemoteViews;
+
+    invoke-direct {v5, v0, v1}, Landroid/widget/RemoteViews;-><init>(Landroid/content/Context;I)V
+
+    sget v6, Landroid/R$id;->text1:I
+
+    invoke-virtual {v5, v6, p1}, Landroid/widget/RemoteViews;->setTextViewText(ILjava/lang/CharSequence;)V
+
+    sget v6, Landroid/R$id;->text2:I
+
+    invoke-virtual {v5, v6, p2}, Landroid/widget/RemoteViews;->setTextViewText(ILjava/lang/CharSequence;)V
+
+    sget v6, Landroid/R$id;->icon:I
+
+    sget v7, Landroid/R$drawable;->arrow_down_float:I
+
+    invoke-virtual {v5, v6, v7}, Landroid/widget/RemoteViews;->setImageViewResource(II)V
+
+    new-instance v8, Landroid/content/Intent;
+
+    invoke-direct {v8}, Landroid/content/Intent;-><init>()V
+
+    const-string v9, "cicp.jwxt.NOTIF_TOGGLE"
+
+    invoke-virtual {v8, v9}, Landroid/content/Intent;->setAction(Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "com.cicp.jwxt"
+
+    invoke-virtual {v8, v9}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "t"
+
+    invoke-virtual {v8, v9, p1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "c"
+
+    invoke-virtual {v8, v9, p2}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "x"
+
+    const/4 v10, 0x1
+
+    invoke-virtual {v8, v9, v10}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+
+    const/4 v11, 0x0
+
+    invoke-static {v0, v11, v8, v11}, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+
+    move-result-object v11
+
+    sget v6, Landroid/R$id;->icon:I
+
+    invoke-virtual {v5, v6, v11}, Landroid/widget/RemoteViews;->setOnClickPendingIntent(ILandroid/app/PendingIntent;)V
+
+    return-object v5
+.end method
+
+# 构建通知展开视图：完整多行内容 + 右侧"收起"箭头按钮（点击发广播切换回收起视图）
+.method private buildExpandedRV(Ljava/lang/String;Ljava/lang/String;)Landroid/widget/RemoteViews;
+    .locals 12
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v1
+
+    const-string v2, "notif_e"
+
+    const-string v3, "layout"
+
+    const-string v4, "com.cicp.jwxt"
+
+    invoke-virtual {v1, v2, v3, v4}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v1
+
+    new-instance v5, Landroid/widget/RemoteViews;
+
+    invoke-direct {v5, v0, v1}, Landroid/widget/RemoteViews;-><init>(Landroid/content/Context;I)V
+
+    sget v6, Landroid/R$id;->text1:I
+
+    invoke-virtual {v5, v6, p1}, Landroid/widget/RemoteViews;->setTextViewText(ILjava/lang/CharSequence;)V
+
+    sget v6, Landroid/R$id;->text2:I
+
+    invoke-virtual {v5, v6, p2}, Landroid/widget/RemoteViews;->setTextViewText(ILjava/lang/CharSequence;)V
+
+    sget v6, Landroid/R$id;->icon:I
+
+    sget v7, Landroid/R$drawable;->arrow_up_float:I
+
+    invoke-virtual {v5, v6, v7}, Landroid/widget/RemoteViews;->setImageViewResource(II)V
+
+    new-instance v8, Landroid/content/Intent;
+
+    invoke-direct {v8}, Landroid/content/Intent;-><init>()V
+
+    const-string v9, "cicp.jwxt.NOTIF_TOGGLE"
+
+    invoke-virtual {v8, v9}, Landroid/content/Intent;->setAction(Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "com.cicp.jwxt"
+
+    invoke-virtual {v8, v9}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "t"
+
+    invoke-virtual {v8, v9, p1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "c"
+
+    invoke-virtual {v8, v9, p2}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const-string v9, "x"
+
+    const/4 v10, 0x0
+
+    invoke-virtual {v8, v9, v10}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+
+    const/4 v11, 0x0
+
+    invoke-static {v0, v11, v8, v11}, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+
+    move-result-object v11
+
+    sget v6, Landroid/R$id;->icon:I
+
+    invoke-virtual {v5, v6, v11}, Landroid/widget/RemoteViews;->setOnClickPendingIntent(ILandroid/app/PendingIntent;)V
+
+    return-object v5
+.end method
+
+# 展示通知的展开视图（完整内容），由通知"展开"箭头按钮广播触发
+.method public showNotifExpanded(Ljava/lang/String;Ljava/lang/String;)Z
+    .locals 11
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    :try_start_0
+    const-string v1, "notification"
+
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+
+    move-result-object v1
+
+    check-cast v1, Landroid/app/NotificationManager;
+
+    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v3, 0x1a
+
+    if-lt v2, v3, :cond_nochan
+
+    const-string v2, "jwxt_chan"
+
+    const-string v3, "CICP\u6559\u52a1\u63d0\u9192"
+
+    const/4 v4, 0x3
+
+    new-instance v5, Landroid/app/NotificationChannel;
+
+    invoke-direct {v5, v2, v3, v4}, Landroid/app/NotificationChannel;-><init>(Ljava/lang/String;Ljava/lang/CharSequence;I)V
+
+    invoke-virtual {v1, v5}, Landroid/app/NotificationManager;->createNotificationChannel(Landroid/app/NotificationChannel;)V
+
+    :cond_nochan
+
+    const-class v2, Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v3, Landroid/content/Intent;
+
+    invoke-direct {v3, v0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+
+    const-string v2, "goto"
+
+    const-string v4, "schedule"
+
+    invoke-virtual {v3, v2, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const/4 v2, 0x0
+
+    const/4 v4, 0x0
+
+    invoke-static {v0, v2, v3, v4}, Landroid/app/PendingIntent;->getActivity(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+
+    move-result-object v2
+
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v4, 0x1a
+
+    if-lt v3, v4, :cond_oldbuilder
+
+    const-string v3, "jwxt_chan"
+
+    new-instance v5, Landroid/app/Notification$Builder;
+
+    invoke-direct {v5, v0, v3}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;Ljava/lang/String;)V
+
+    goto :goto_builder
+
+    :cond_oldbuilder
+
+    new-instance v5, Landroid/app/Notification$Builder;
+
+    invoke-direct {v5, v0}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;)V
+
+    :goto_builder
+
+    sget v3, Landroid/R$drawable;->ic_menu_agenda:I
+
+    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setSmallIcon(I)Landroid/app/Notification$Builder;
+
+    invoke-direct {p0, p1, p2}, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->buildExpandedRV(Ljava/lang/String;Ljava/lang/String;)Landroid/widget/RemoteViews;
+
+    move-result-object v6
+
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v4, 0x18
+
+    if-lt v3, v4, :cond_setcontent
+
+    invoke-virtual {v5, v6}, Landroid/app/Notification$Builder;->setCustomContentView(Landroid/widget/RemoteViews;)Landroid/app/Notification$Builder;
+
+    goto :goto_contentdone
+
+    :cond_setcontent
+
+    invoke-virtual {v5, v6}, Landroid/app/Notification$Builder;->setContent(Landroid/widget/RemoteViews;)Landroid/app/Notification$Builder;
+
+    :goto_contentdone
+
+    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
+
+    const/4 v3, 0x1
+
+    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
+
+    move-result-object v3
+
+    const/4 v4, 0x1
+
+    invoke-virtual {v1, v4, v3}, Landroid/app/NotificationManager;->notify(ILandroid/app/Notification;)V
+
+    const/4 v0, 0x1
+
+    return v0
+
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    goto :goto_ret
+
+    :catch_0
+
+    move-exception v2
+
+    const/4 v0, 0x0
+
+    return v0
+
+    :goto_ret
+
     return-void
 .end method

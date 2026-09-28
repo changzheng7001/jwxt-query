@@ -848,6 +848,7 @@ async function doLogin() {
     document.getElementById('logoutBtn').style.display = 'inline-block';
     // 只存账号方便下次回填，绝不保存明文密码；会话由原生 CookieManager 保持
     localStorage.setItem('jwxt_creds', JSON.stringify({account: acc}));
+    localStorage.setItem('jwxt_login', '1');
     return true;
   }
   throw new Error('登录失败');
@@ -888,6 +889,7 @@ function doLogout() {
   document.getElementById('loginBtn').style.display = '';
   // 退出登录：清除本地凭证（无明文密码）并通知原生清除会话 cookie
   try { localStorage.removeItem('jwxt_creds'); } catch(e) {}
+  try { localStorage.removeItem('jwxt_login'); } catch(e) {}
   if (window.Android && Android.clearSession) { try { Android.clearSession(); } catch(e){} }
 }
 
@@ -1365,6 +1367,18 @@ function init() {
     // 只回填账号；密码从不落盘，需重新登录时手动输入
     if (c.account) document.getElementById('account').value = c.account;
   } catch {}
+
+  // 恢复登录状态（原生已从持久化 cookie 恢复会话）：重启后直接显示已登录
+  try {
+    if (localStorage.getItem('jwxt_login') === '1') {
+      S.loggedIn = true;
+      const txt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      txt('loginHint', '已登录');
+      const sd = document.getElementById('statusDot'); if (sd) sd.className = 'status-dot ok';
+      txt('statusText', '已登录');
+      const lb = document.getElementById('logoutBtn'); if (lb) lb.style.display = 'inline-block';
+    }
+  } catch (e) {}
 
   restoreTheme();
 

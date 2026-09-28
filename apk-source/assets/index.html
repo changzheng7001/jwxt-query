@@ -1347,10 +1347,12 @@ window.addEventListener('popstate', function(e) {
 // ============ 初始化 ============
 function init() {
   try {
-    // 沉浸式状态栏：读取状态栏高度，给顶部 topbar 预留 padding，使内容上延与状态栏融为一体
+    // 沉浸式状态栏：读取状态栏高度(物理px)，除以density换算为CSS px(dp)，给顶部topbar预留padding
     if (window.Android && Android.getStatusBarHeight) {
-      const sbh = parseInt(Android.getStatusBarHeight(), 10) || 0;
-      if (sbh > 0) document.documentElement.style.setProperty('--sb', sbh + 'px');
+      const sbPx = parseInt(Android.getStatusBarHeight(), 10) || 0;
+      const dpr = window.devicePixelRatio || 1;
+      const sbDp = Math.round(sbPx / dpr);
+      if (sbDp > 0) document.documentElement.style.setProperty('--sb', sbDp + 'px');
     }
   } catch (e) {}
 

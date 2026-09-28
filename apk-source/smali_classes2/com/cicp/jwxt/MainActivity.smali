@@ -91,6 +91,29 @@
 
     invoke-virtual {p0, v0}, Lcom/cicp/jwxt/MainActivity;->setContentView(I)V
 
+    # 初始状态栏着色（UI 线程）：默认浅色主题深绿底 + 深色图标，避免灰色
+    invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+
+    move-result-object v1
+
+    const v2, 0xff2e4a2a
+
+    invoke-virtual {v1, v2}, Landroid/view/Window;->setStatusBarColor(I)V
+
+    invoke-virtual {v1}, Landroid/view/Window;->getDecorView()Landroid/view/View;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Landroid/view/View;->getSystemUiVisibility()I
+
+    move-result v2
+
+    const/16 v3, 0x2000
+
+    or-int/2addr v2, v3
+
+    invoke-virtual {v1, v2}, Landroid/view/View;->setSystemUiVisibility(I)V
+
     .line 122
     sget v0, Lcom/cicp/jwxt/R$id;->webview:I
 

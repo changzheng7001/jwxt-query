@@ -867,62 +867,20 @@
 .end method
 
 # 状态栏配色跟随前端主题，使状态栏与 App 一致（不显示灰色）
+# @JavascriptInterface 在 JS 线程执行，View 操作需切到 UI 线程（runOnUiThread）
 .method public setStatusTheme(Z)V
     .annotation runtime Landroid/webkit/JavascriptInterface;
     .end annotation
 
-    .locals 5
+    .locals 2
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
 
-    invoke-virtual {v0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+    new-instance v1, Lcom/cicp/jwxt/StatusRunnable;
 
-    move-result-object v1
+    invoke-direct {v1, v0, p1}, Lcom/cicp/jwxt/StatusRunnable;-><init>(Landroid/app/Activity;Z)V
 
-    if-eqz p1, :cond_light
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->runOnUiThread(Ljava/lang/Runnable;)V
 
-    const v2, 0xff161b17
-
-    invoke-virtual {v1, v2}, Landroid/view/Window;->setStatusBarColor(I)V
-
-    invoke-virtual {v1}, Landroid/view/Window;->getDecorView()Landroid/view/View;
-
-    move-result-object v2
-
-    invoke-virtual {v2}, Landroid/view/View;->getSystemUiVisibility()I
-
-    move-result v3
-
-    const/16 v4, 0x2000
-
-    not-int v4, v4
-
-    and-int/2addr v3, v4
-
-    invoke-virtual {v2, v3}, Landroid/view/View;->setSystemUiVisibility(I)V
-
-    goto :goto_done
-
-    :cond_light
-
-    const v2, 0xff2e4a2a
-
-    invoke-virtual {v1, v2}, Landroid/view/Window;->setStatusBarColor(I)V
-
-    invoke-virtual {v1}, Landroid/view/Window;->getDecorView()Landroid/view/View;
-
-    move-result-object v2
-
-    invoke-virtual {v2}, Landroid/view/View;->getSystemUiVisibility()I
-
-    move-result v3
-
-    const/16 v4, 0x2000
-
-    or-int/2addr v3, v4
-
-    invoke-virtual {v2, v3}, Landroid/view/View;->setSystemUiVisibility(I)V
-
-    :goto_done
     return-void
 .end method

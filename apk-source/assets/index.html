@@ -100,6 +100,16 @@ body { background: transparent; color: var(--ink); font-family: var(--serif); fo
 .status-dot.ok { background: var(--green); }
 .status-dot.cached { background: var(--pink); }
 
+/* 周次/星期框对称统一 */
+#weekRow input, #weekRow select {
+  height: 40px; box-sizing: border-box; padding: 0 10px;
+  border: 1px solid var(--glass-border); border-radius: 8px;
+  background: var(--sheet-bg); color: var(--ink); font-size: 14px;
+  margin-bottom: 0;
+}
+#weekRow select { padding-right: 8px; }
+#weekRow input::placeholder { color: var(--ink-light); }
+
 main { max-width: 600px; margin: 0 auto; padding: 12px; }
 
 .card { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px; margin-bottom: 14px;
@@ -668,6 +678,8 @@ function setThemeMode(v) {
   try { localStorage.setItem('jwxt_theme', dark ? 'dark' : 'light'); } catch(e) {}
   const b = document.getElementById('themeBtn'); if (b) b.textContent = dark ? '浅色' : '深色';
   const b2 = document.getElementById('themeBtn2'); if (b2) { b2.textContent = dark ? '浅色' : '深色'; b2.classList.toggle('on', dark); }
+  // 同步原生状态栏配色，使状态栏与 App 一致（不显示灰色）
+  if (window.Android && Android.setStatusTheme) { try { Android.setStatusTheme(dark); } catch(e){} }
 }
 function toggleTheme() {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -1553,7 +1565,10 @@ async function runQuery(forceRefresh) {
   var params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
   if (NEEDS_WEEK.indexOf(type) >= 0) {
-    params.week = document.getElementById('queryWeek').value.trim();
+    const wkEl = document.getElementById('queryWeek');
+    let wk = wkEl.value.trim();
+    if (!wk) wk = String(currentWeek());   // 默认查询本周
+    params.week = wk;
     params.weekday = document.getElementById('queryWeekday').value;
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
@@ -1838,7 +1853,10 @@ function setScheduleView(v) {
   const params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
   if (NEEDS_WEEK.indexOf(type) >= 0) {
-    params.week = document.getElementById('queryWeek').value.trim();
+    const wkEl = document.getElementById('queryWeek');
+    let wk = wkEl.value.trim();
+    if (!wk) wk = String(currentWeek());   // 默认查询本周
+    params.week = wk;
     params.weekday = document.getElementById('queryWeekday').value;
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
@@ -1854,7 +1872,10 @@ function setScheduleForm(v) {
   const params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
   if (NEEDS_WEEK.indexOf(type) >= 0) {
-    params.week = document.getElementById('queryWeek').value.trim();
+    const wkEl = document.getElementById('queryWeek');
+    let wk = wkEl.value.trim();
+    if (!wk) wk = String(currentWeek());   // 默认查询本周
+    params.week = wk;
     params.weekday = document.getElementById('queryWeekday').value;
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;

@@ -16,8 +16,6 @@
 
 .field private webView:Landroid/webkit/WebView;
 
-.field private notifReceiver:Lcom/cicp/jwxt/MainActivity$NotifReceiver;
-
 
 # direct methods
 .method static bridge synthetic -$$Nest$fgetcookieStore(Lcom/cicp/jwxt/MainActivity;)Ljava/lang/StringBuilder;
@@ -230,37 +228,6 @@
     const-string v2, "goto"
 
     invoke-virtual {v1, v2}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
-
-    :cond_done
-    # 注册通知展开/收起广播接收器（先注销旧的，避免重复注册）
-    iget-object v3, p0, Lcom/cicp/jwxt/MainActivity;->notifReceiver:Lcom/cicp/jwxt/MainActivity$NotifReceiver;
-    if-eqz v3, :cond_reg
-    invoke-virtual {p0, v3}, Landroid/app/Activity;->unregisterReceiver(Landroid/content/BroadcastReceiver;)V
-    :cond_reg
-    new-instance v3, Landroid/content/IntentFilter;
-    const-string v4, "cicp.jwxt.NOTIF_TOGGLE"
-    invoke-direct {v3, v4}, Landroid/content/IntentFilter;-><init>(Ljava/lang/String;)V
-    new-instance v4, Lcom/cicp/jwxt/MainActivity$NotifReceiver;
-    invoke-direct {v4, p0}, Lcom/cicp/jwxt/MainActivity$NotifReceiver;-><init>(Lcom/cicp/jwxt/MainActivity;)V
-    iput-object v4, p0, Lcom/cicp/jwxt/MainActivity;->notifReceiver:Lcom/cicp/jwxt/MainActivity$NotifReceiver;
-    invoke-virtual {p0, v4, v3}, Landroid/app/Activity;->registerReceiver(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;
-    return-void
-.end method
-
-.method protected onPause()V
-    .locals 1
-
-    invoke-super {p0}, Landroid/app/Activity;->onPause()V
-
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->notifReceiver:Lcom/cicp/jwxt/MainActivity$NotifReceiver;
-
-    if-eqz v0, :cond_done
-
-    invoke-virtual {p0, v0}, Landroid/app/Activity;->unregisterReceiver(Landroid/content/BroadcastReceiver;)V
-
-    const/4 v0, 0x0
-
-    iput-object v0, p0, Lcom/cicp/jwxt/MainActivity;->notifReceiver:Lcom/cicp/jwxt/MainActivity$NotifReceiver;
 
     :cond_done
     return-void

@@ -1378,6 +1378,16 @@ function currentWeek() {
   var diff = Math.floor((new Date() - SEMESTER_START) / 86400000);
   return Math.max(1, Math.floor(diff / 7) + 1);
 }
+// 判断当前周 cw 是否命中课程的周次表达式（支持范围"1-15周"、列表"2,4,6周"、单周"第5周"；无周次信息视为本周课）
+function weekInRange(expr, cw) {
+  if (!expr) return true;
+  var s = '' + expr;
+  var r = s.match(/(\d+)\s*[-~至]\s*(\d+)/);
+  if (r) { var a = parseInt(r[1], 10), b = parseInt(r[2], 10); return cw >= a && cw <= b; }
+  var nums = s.match(/\d+/g);
+  if (nums) return nums.some(function (n) { return parseInt(n, 10) === cw; });
+  return true;
+}
 function refreshOngoing() {
   try {
     if (!(window.Android && Android.showNotification)) return;
@@ -1394,11 +1404,8 @@ function refreshOngoing() {
       if (!data || !data.courses) continue;
       data.courses.forEach(c => {
         if (c.weekday !== wd || !c.name) return;
-        // 周过滤：课程实际周次应含当前周；旧缓存无周次信息则视为本周课
-        if (c.week) {
-          const m = ('' + c.week).match(/第?\s*(\d+)\s*周/);
-          if (m && parseInt(m[1], 10) !== cw) return;
-        }
+        // 周过滤：课程实际周次应含当前周（支持范围"1-15周"/列表/单周）；无周次信息则视为本周课
+        if (c.week && !weekInRange(c.week, cw)) return;
         const key = c.name + '|' + (c.teacher || '') + '|' + (c.classroom || '');
         if (seen.has(key)) return; seen.add(key);
         const label = c.name + (c.teacher ? ' ' + c.teacher : '') + (c.classroom ? '·' + c.classroom : '');
@@ -1458,6 +1465,7 @@ function renderTodayCourses() {
       if (!data || !data.courses) continue;
       data.courses.forEach(c => {
         if (c.weekday !== wd) return;
+        if (c.week && !weekInRange(c.week, currentWeek())) return;
         const key = c.name + '|' + (c.period || c.periodLabel || '') + '|' + (c.classroom || '');
         if (!list.some(x => x._k === key)) { c._k = key; list.push(c); }
       });

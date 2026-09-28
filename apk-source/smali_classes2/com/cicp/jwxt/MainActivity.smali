@@ -52,6 +52,86 @@
 
 
 # virtual methods
+# 持久化保存会话cookie(写入SharedPreferences,App重启后可恢复)
+.method public saveCookies()V
+    .locals 4
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
+
+    if-eqz v0, :done
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->length()I
+
+    move-result v1
+
+    if-lez v1, :done
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    const-string v1, "jwxt"
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v1, v2}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+
+    move-result-object v1
+
+    invoke-interface {v1}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v1
+
+    const-string v2, "cookies"
+
+    invoke-interface {v1, v2, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v1
+
+    invoke-interface {v1}, Landroid/content/SharedPreferences$Editor;->apply()V
+
+    :done
+    return-void
+.end method
+
+# 启动时恢复持久化会话cookie
+.method public restoreCookies()V
+    .locals 4
+
+    const-string v0, "jwxt"
+
+    const/4 v1, 0x0
+
+    invoke-virtual {p0, v0, v1}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+
+    move-result-object v0
+
+    const-string v1, "cookies"
+
+    const-string v2, ""
+
+    invoke-interface {v0, v1, v2}, Landroid/content/SharedPreferences;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    if-eqz v0, :done
+
+    invoke-virtual {v0}, Ljava/lang/String;->isEmpty()Z
+
+    move-result v1
+
+    if-nez v1, :done
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    iput-object v1, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
+
+    :done
+    return-void
+.end method
+
 .method public onBackPressed()V
     .locals 1
 
@@ -196,6 +276,9 @@
     invoke-virtual {v1, v2}, Landroid/webkit/WebView;->setWebChromeClient(Landroid/webkit/WebChromeClient;)V
 
     .line 134
+    # 恢复持久化会话cookie(重启免登录)
+    invoke-virtual {p0}, Lcom/cicp/jwxt/MainActivity;->restoreCookies()V
+
     iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
 
     const-string v2, "file:///android_asset/index.html"

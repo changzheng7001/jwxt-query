@@ -163,6 +163,11 @@
 
     invoke-static {v1, v3}, Lcom/cicp/jwxt/MainActivity;->-$$Nest$fputcookieStore(Lcom/cicp/jwxt/MainActivity;Ljava/lang/StringBuilder;)V
 
+    # 持久化保存会话cookie
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v1}, Lcom/cicp/jwxt/MainActivity;->saveCookies()V
+
     .line 114
     return-void
 .end method
@@ -921,4 +926,44 @@
     const/4 v1, 0x0
 
     return v1
+.end method
+
+# 退出登录:清空内存与持久化会话cookie
+.method public clearSession()V
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    .locals 3
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    invoke-static {v0, v1}, Lcom/cicp/jwxt/MainActivity;->-$$Nest$fputcookieStore(Lcom/cicp/jwxt/MainActivity;Ljava/lang/StringBuilder;)V
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    const-string v1, "jwxt"
+
+    const/4 v2, 0x0
+
+    invoke-virtual {v0, v1, v2}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+
+    move-result-object v0
+
+    invoke-interface {v0}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v0
+
+    const-string v1, "cookies"
+
+    invoke-interface {v0, v1}, Landroid/content/SharedPreferences$Editor;->remove(Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v0
+
+    invoke-interface {v0}, Landroid/content/SharedPreferences$Editor;->apply()V
+
+    return-void
 .end method

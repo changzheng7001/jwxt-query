@@ -64,7 +64,7 @@
 
     :cond_light
 
-    const v3, 0xff2e4a2a
+    const v3, 0xffefe7d4
 
     invoke-virtual {v1, v3}, Landroid/view/Window;->setStatusBarColor(I)V
 

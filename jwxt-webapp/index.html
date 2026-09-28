@@ -100,13 +100,13 @@ body { background: transparent; color: var(--ink); font-family: var(--serif); fo
 .status-dot.ok { background: var(--green); }
 .status-dot.cached { background: var(--pink); }
 
-/* 周次/星期框对称统一 */
-#weekRow { display: flex; align-items: center; justify-content: center; gap: 10px; }
+/* 周次/星期框对称统一：grid 两列严格等分，绝对等宽居中 */
+#weekRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
 #weekRow input, #weekRow select {
-  height: 40px; box-sizing: border-box; padding: 0 10px;
+  height: 40px; box-sizing: border-box; padding: 0 10px; width: 100%;
   border: 1px solid var(--glass-border); border-radius: 8px;
   background: var(--sheet-bg); color: var(--ink); font-size: 14px;
-  margin-bottom: 0; flex: 1 1 0; width: 0; min-width: 0;
+  margin-bottom: 0;
 }
 #weekRow select { appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 26px;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b7355' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -484,9 +484,9 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
           <button class="small outline" onclick="openPicker()" style="flex-shrink:0;">选择</button>
         </div>
       </div>
-      <div id="weekRow" class="hidden" style="display:flex; gap:6px; margin-bottom:16px;">
-        <input type="text" id="queryWeek" placeholder="周次" style="flex:1; margin-bottom:0;" />
-        <select id="queryWeekday" style="flex:1; margin-bottom:0;">
+      <div id="weekRow" class="hidden" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        <input type="text" id="queryWeek" placeholder="周次" style="width:100%; margin-bottom:0;" />
+        <select id="queryWeekday" style="width:100%; margin-bottom:0;">
           <option value="">星期</option>
           <option value="1">一</option><option value="2">二</option><option value="3">三</option>
           <option value="4">四</option><option value="5">五</option><option value="6">六</option><option value="7">日</option>

@@ -27,6 +27,15 @@
 
     move-result-object v1
 
+    # 关键：清除 FLAG_TRANSLUCENT_STATUS 并设置 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS，setStatusBarColor 才生效
+    const v3, 0x04000000
+
+    invoke-virtual {v1, v3}, Landroid/view/Window;->clearFlags(I)V
+
+    const/high16 v3, 0x80000000
+
+    invoke-virtual {v1, v3}, Landroid/view/Window;->addFlags(I)V
+
     iget-boolean v2, p0, Lcom/cicp/jwxt/StatusRunnable;->dark:Z
 
     if-eqz v2, :cond_light

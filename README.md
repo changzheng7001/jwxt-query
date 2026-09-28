@@ -61,18 +61,15 @@
 └── README.md
 ```
 
+## 维护与代码链说明（重要）
+
+- **日常迭代走 smali 链**：改动集中在 `jwxt-webapp/index.html`（前端，九成改动都在这里）+ `apk-source/`（原生 smali、Manifest、资源），用 apktool 打包即可出可安装 APK，无需 Android SDK。
+- **标准工程 `cicp-jwxt-android/` 不动**：它仅作为"正式构建 / 上架 / 换正式签名"时的源码参考与备选，**不参与日常迭代同步**。前端源 `index.html` 与之内容一致，但日常只维护 `jwxt-webapp/` 一份。
+- 如需切换到标准工程链（在装有 Android Studio 的机器上构建），另行迁移，日常不改。
+
 ## 如何构建
 
-### 方式一：标准 Android Studio 工程（推荐）
-
-用 Android Studio（Giraffe / Hedgehog 或更新）打开 `cicp-jwxt-android/`，配置 Android SDK Platform 34 后直接 Build → Generate APK。
-
-```bash
-cd cicp-jwxt-android
-./gradlew assembleRelease   # 或用 Android Studio 构建
-```
-
-### 方式二：apktool 快速打包（无需 Android SDK）
+### 方式一：apktool 快速打包（日常迭代，无需 Android SDK）
 
 前端在 `jwxt-webapp/index.html` 修改后，同步到 `apk-source/assets/index.html`，然后：
 
@@ -82,6 +79,15 @@ java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
 ```
 
 签名后的 APK 可直接安装。
+
+### 方式二：标准 Android Studio 工程（正式构建 / 上架备选）
+
+日常不维护 `cicp-jwxt-android/`；如需正式签名、上架，再在装有 Android Studio（Giraffe / Hedgehog 或更新）的机器上打开构建：
+
+```bash
+cd cicp-jwxt-android
+./gradlew assembleRelease
+```
 
 ## 使用
 

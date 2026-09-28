@@ -1407,8 +1407,8 @@ function refreshOngoing() {
     }
     const uniq = items.slice(0, 3);
     let text;
-    if (items.length) text = '今日(第' + cw + '周) ' + items.length + '门课：' + uniq.join('、') + (items.length > 3 ? ' 等' : '') + '\n（点此查看本周课表）';
-    else text = '今日(第' + cw + '周)无课，好好休息\n（点此查看本周课表）';
+    if (items.length) text = '今日(第' + cw + '周) ' + items.length + '门课：' + uniq.join('、');
+    else text = '今日(第' + cw + '周)无课';
     Android.showNotification('今日课程', text, true);
   } catch (e) {}
 }

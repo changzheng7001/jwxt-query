@@ -105,7 +105,7 @@
 
     invoke-virtual {v1, v2}, Landroid/view/Window;->addFlags(I)V
 
-    const v2, 0xff2e4a2a
+    const v2, 0xffefe7d4
 
     invoke-virtual {v1, v2}, Landroid/view/Window;->setStatusBarColor(I)V
 

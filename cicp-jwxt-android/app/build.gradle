@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.cicp.jwxt'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.cicp.jwxt"
+        minSdk 21
+        targetSdk 34
+        versionCode 97
+        versionName "0.9.7"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // 纯系统 WebView 应用，无第三方依赖
+}

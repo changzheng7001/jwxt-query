@@ -845,6 +845,10 @@
     invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
     invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
     invoke-virtual {v5, p3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
+    new-instance v2, Landroid/app/Notification$BigTextStyle;
+    invoke-direct {v2}, Landroid/app/Notification$BigTextStyle;-><init>()V
+    invoke-virtual {v2, p2}, Landroid/app/Notification$BigTextStyle;->bigText(Ljava/lang/CharSequence;)Landroid/app/Notification$BigTextStyle;
+    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setStyle(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;
     invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
     move-result-object v3
     const/4 v4, 0x1

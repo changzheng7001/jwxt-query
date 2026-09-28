@@ -1372,11 +1372,18 @@ function init() {
 }
 
 // 每次打开 App 刷新"今日课程"常驻通知（ongoing，一直显示在通知栏，点击跳本周课表）
+// 校历第1周周一（用于计算当前教学周）；新学期开学需更新此日期
+var SEMESTER_START = new Date('2026-08-31T00:00:00');
+function currentWeek() {
+  var diff = Math.floor((new Date() - SEMESTER_START) / 86400000);
+  return Math.max(1, Math.floor(diff / 7) + 1);
+}
 function refreshOngoing() {
   try {
     if (!(window.Android && Android.showNotification)) return;
     if ((localStorage.getItem('jwxt_notify_on') || '1') === '0') return;
     const today = new Date().getDay(); const wd = today === 0 ? 7 : today;
+    const cw = currentWeek();
     const items = [];
     const seen = new Set();
     for (let i = 0; i < localStorage.length; i++) {
@@ -1387,6 +1394,11 @@ function refreshOngoing() {
       if (!data || !data.courses) continue;
       data.courses.forEach(c => {
         if (c.weekday !== wd || !c.name) return;
+        // 周过滤：课程实际周次应含当前周；旧缓存无周次信息则视为本周课
+        if (c.week) {
+          const m = ('' + c.week).match(/第?\s*(\d+)\s*周/);
+          if (m && parseInt(m[1], 10) !== cw) return;
+        }
         const key = c.name + '|' + (c.teacher || '') + '|' + (c.classroom || '');
         if (seen.has(key)) return; seen.add(key);
         const label = c.name + (c.teacher ? ' ' + c.teacher : '') + (c.classroom ? '·' + c.classroom : '');
@@ -1395,8 +1407,8 @@ function refreshOngoing() {
     }
     const uniq = items.slice(0, 3);
     let text;
-    if (items.length) text = '今日' + items.length + '门课：' + uniq.join('、') + (items.length > 3 ? ' 等' : '') + '（点此查看本周课表）';
-    else text = '今日无课，好好休息（点此查看本周课表）';
+    if (items.length) text = '今日(第' + cw + '周) ' + items.length + '门课：' + uniq.join('、') + (items.length > 3 ? ' 等' : '') + '\n（点此查看本周课表）';
+    else text = '今日(第' + cw + '周)无课，好好休息\n（点此查看本周课表）';
     Android.showNotification('今日课程', text, true);
   } catch (e) {}
 }

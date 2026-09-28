@@ -868,6 +868,9 @@
 
 # 状态栏配色跟随前端主题，使状态栏与 App 一致（不显示灰色）
 .method public setStatusTheme(Z)V
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
     .locals 5
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;

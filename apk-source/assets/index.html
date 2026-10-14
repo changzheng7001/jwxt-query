@@ -1324,28 +1324,67 @@ async function doQuery(type, params) {
       return {electives: list, count: list.length, debug: debug};
     }
     case 'empty': {
-      // 空教室：一次拉全校教室该周课表，反推每栋楼每大节的空教室
+      // 空教室：一次拉全校教室该周课表矩阵，直接读格子有无内容判断占用
       const sem = params.semester || '2026-2027-1';
       const wk = params.week || currentWeek();
       const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1='+wk+'&zc2='+wk+'&jc1=&jc2=';
-      const data = parseSchedule(httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body), 'classroom');
+      const html = httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body);
+      const matrix = parseEmptyMatrix(html);
+      if (matrix.error) return {error: matrix.error};
       // 教室全集：优先用缓存的全校教室名单
       let allRooms = [];
       try { const bc = getCache('browse_classroom'); if (bc && bc.data && bc.data.classrooms) allRooms = bc.data.classrooms.slice(); } catch(e) {}
-      // 课表里出现的教室补进来，防止缓存缺失
-      (data.courses||[]).forEach(c => { if (c.classroom && allRooms.indexOf(c.classroom)<0) allRooms.push(c.classroom); });
-      return buildEmptyRooms(data.courses||[], allRooms, wk);
+      (matrix.rooms||[]).forEach(r => { if (allRooms.indexOf(r.name)<0) allRooms.push(r.name); });
+      return buildEmptyRooms(matrix.rooms||[], allRooms, wk);
     }
     default: throw new Error('未知查询类型');
   }
 }
 
-// 空教室计算：courses=该周全校教室课表；allRooms=全校教室全集；week=当前周次
-function buildEmptyRooms(courses, allRooms, week) {
+// 直接读全校教室课表矩阵：行=教室名，列=星期×节次，格子有内容=有课
+function parseEmptyMatrix(html) {
+  const doc = parseHTML(html);
+  const table = firstTable(doc);
+  if (!table) return {rooms: [], error: '未找到课表矩阵'};
+  const rows = table.querySelectorAll('tr');
+  if (rows.length < 2) return {rooms: [], error: '课表为空'};
+  // 检测表头行数：第二行全是节次编号(0102/0304...)则跳过
+  let dataStart = 1;
+  if (rows.length > 1) {
+    const c2 = rows[1].querySelectorAll('td, th');
+    let allNum = true;
+    for (let i = 1; i < c2.length; i++) { if (!/^\d{2,4}$/.test(c2[i].textContent.trim())) { allNum = false; break; } }
+    if (allNum) dataStart = 2;
+  }
+  const rooms = [];
+  for (let ri = dataStart; ri < rows.length; ri++) {
+    const cells = rows[ri].querySelectorAll('td');
+    if (!cells.length) continue;
+    const roomName = cells[0].textContent.trim();
+    if (!roomName || roomName === '\u00a0') continue;
+    const occupied = {}; // occupied[dayIdx0based][perIdx0based] = true
+    for (let ci = 1; ci < cells.length; ci++) {
+      const txt = cells[ci].textContent.trim();
+      const dayIdx = Math.floor((ci-1)/7);
+      const perIdx = (ci-1)%7;
+      if (dayIdx >= 7) continue;
+      if (txt && txt !== '\u00a0') {
+        if (!occupied[dayIdx]) occupied[dayIdx] = {};
+        occupied[dayIdx][perIdx] = true;
+      }
+    }
+    rooms.push({name: roomName, occupied: occupied});
+  }
+  return {rooms: rooms};
+}
+
+// 空教室计算：rooms=矩阵直接读取的占用信息；allRooms=全校教室全集；week=当前周次
+function buildEmptyRooms(rooms, allRooms, week) {
   var w = parseInt(week, 10) || currentWeek();
   function buildingOf(room) { var m = (room||'').match(/^\s*(\d+)/); return m ? m[1] : '其他'; }
   function shortName(room) { return (room||'').split(/[(（]/)[0].trim(); }
-  var SLOTS = 6; // 六大节
+  // perIdx(0-6) → 大节(1-6)：0102→1, 0304→2, 0506→3, 0708→4, 0910→5, 11/12→6
+  function perToSlot(perIdx) { return perIdx < 5 ? perIdx+1 : 6; }
   // 全集按楼分组
   var byBuilding = {};
   allRooms.forEach(function(r) {
@@ -1353,26 +1392,19 @@ function buildEmptyRooms(courses, allRooms, week) {
     if (!byBuilding[b]) byBuilding[b] = {};
     byBuilding[b][sn] = true;
   });
-  // 占用矩阵 occ[building][day][slot] = {shortRoom:true}
+  // 从矩阵占用构建 occ[building][day1based][slot1based] = {shortRoom:true}
   var occ = {};
-  function slotsOf(period) {
-    var nums = (period||'').match(/\d{2}/g);
-    if (!nums) nums = (period||'').match(/\d+/g);
-    if (!nums || nums.length < 1) return [];
-    var s = parseInt(nums[0],10), e = nums.length>1 ? parseInt(nums[nums.length-1],10) : s;
-    var set = {};
-    for (var n = s; n <= e; n++) set[Math.ceil(n/2)] = true;
-    return Object.keys(set).map(Number);
-  }
-  courses.forEach(function(c) {
-    if (!c.classroom) return;
-    if (c.week && !weekInRange(c.week, w)) return; // 该课程本周不上
-    var b = buildingOf(c.classroom), sn = shortName(c.classroom);
-    slotsOf(c.period || c.periodLabel).forEach(function(sl) {
-      if (!occ[b]) occ[b] = {};
-      if (!occ[b][c.weekday]) occ[b][c.weekday] = {};
-      if (!occ[b][c.weekday][sl]) occ[b][c.weekday][sl] = {};
-      occ[b][c.weekday][sl][sn] = true;
+  rooms.forEach(function(rm) {
+    var b = buildingOf(rm.name), sn = shortName(rm.name);
+    Object.keys(rm.occupied).forEach(function(dayIdx) {
+      Object.keys(rm.occupied[dayIdx]).forEach(function(perIdx) {
+        var day = parseInt(dayIdx,10)+1;
+        var slot = perToSlot(parseInt(perIdx,10));
+        if (!occ[b]) occ[b] = {};
+        if (!occ[b][day]) occ[b][day] = {};
+        if (!occ[b][day][slot]) occ[b][day][slot] = {};
+        occ[b][day][slot][sn] = true;
+      });
     });
   });
   var buildings = [];
@@ -1382,7 +1414,7 @@ function buildEmptyRooms(courses, allRooms, week) {
   }).forEach(function(b) {
     var all = Object.keys(byBuilding[b]).sort();
     var grid = [];
-    for (var sl=1; sl<=SLOTS; sl++) {
+    for (var sl=1; sl<=6; sl++) {
       var row = [];
       for (var day=1; day<=5; day++) {
         var busy = (occ[b] && occ[b][day] && occ[b][day][sl]) ? occ[b][day][sl] : {};
@@ -1758,8 +1790,13 @@ async function runQuery(forceRefresh) {
 }
 
 // ============ 渲染结果 ============
+function selectEmptyBuilding(b) {
+  S.emptyBuilding = b;
+  if (S.lastType && S.lastData) renderResult(S.lastType, S.lastData);
+}
 function renderResult(type, data) {
   const el = document.getElementById('resultContent');
+  S.lastType = type; S.lastData = data;
 
   if (type === 'score') {
     if (!data.courses || !data.courses.length) { el.innerHTML = '<div class="empty-text">无成绩</div>'; return; }
@@ -1874,9 +1911,21 @@ function renderResult(type, data) {
       return;
     }
     var SLOT_LABEL = ['第1-2节','第3-4节','第5-6节','第7-8节','第9-10节','第11-12节'];
-    var h = '<div style="padding:4px 2px 10px; font-size:12px; color:var(--ink-light);">第'+data.week+'周 · 周一至周五 · 格子内为空教室</div>';
+    if (S.emptyBuilding === undefined || !data.buildings.find(function(b){return b.building===S.emptyBuilding;})) {
+      S.emptyBuilding = data.buildings[0].building;
+    }
+    var h = '<div style="padding:4px 2px 8px; font-size:12px; color:var(--ink-light);">第'+data.week+'周 · 周一至周五 · 格子内为空教室</div>';
+    // 教学楼选择器（横向标签）
+    h += '<div style="display:flex; gap:6px; overflow-x:auto; padding:4px 0 12px; -webkit-overflow-scrolling:touch;">';
     data.buildings.forEach(function(bd) {
-      h += '<div style="margin:12px 0 18px;">';
+      var active = bd.building === S.emptyBuilding;
+      h += '<button onclick="selectEmptyBuilding(\''+bd.building+'\')" style="flex-shrink:0; padding:6px 14px; border-radius:16px; border:1px solid '+(active?'var(--accent)':'var(--border)')+'; background:'+(active?'var(--accent)':'transparent')+'; color:'+(active?'#fff':'var(--ink)')+'; font-size:13px; font-weight:600;">'+esc(bd.label)+'</button>';
+    });
+    h += '</div>';
+    // 只显示选中教学楼的矩阵
+    var bd = data.buildings.find(function(b){return b.building===S.emptyBuilding;});
+    if (bd) {
+      h += '<div style="margin:4px 0;">';
       h += '<div style="font-weight:700; font-size:15px; margin:4px 0 6px;">'+esc(bd.label)+' <span style="font-size:11px; font-weight:400; color:var(--ink-light);">（共'+bd.rooms.length+'间）</span></div>';
       h += '<div class="table-wrap"><table style="font-size:11px;"><thead><tr><th style="white-space:nowrap;">节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr></thead><tbody>';
       bd.grid.forEach(function(row, i) {
@@ -1887,7 +1936,7 @@ function renderResult(type, data) {
         h += '</tr>';
       });
       h += '</tbody></table></div></div>';
-    });
+    }
     el.innerHTML = h;
 
   } else {

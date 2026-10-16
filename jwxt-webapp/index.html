@@ -1385,10 +1385,11 @@ function buildEmptyRooms(rooms, allRooms, week) {
   function shortName(room) { return (room||'').split(/[(（]/)[0].trim(); }
   // perIdx(0-6) → 大节(1-6)：0102→1, 0304→2, 0506→3, 0708→4, 0910→5, 11/12→6
   function perToSlot(perIdx) { return perIdx < 5 ? perIdx+1 : 6; }
-  // 全集按楼分组
+  // 全集按楼分组（只保留数字开头的教学楼，过滤"其他"）
   var byBuilding = {};
   allRooms.forEach(function(r) {
     var b = buildingOf(r), sn = shortName(r);
+    if (b === '其他') return;
     if (!byBuilding[b]) byBuilding[b] = {};
     byBuilding[b][sn] = true;
   });
@@ -1396,6 +1397,7 @@ function buildEmptyRooms(rooms, allRooms, week) {
   var occ = {};
   rooms.forEach(function(rm) {
     var b = buildingOf(rm.name), sn = shortName(rm.name);
+    if (b === '其他') return;
     Object.keys(rm.occupied).forEach(function(dayIdx) {
       Object.keys(rm.occupied[dayIdx]).forEach(function(perIdx) {
         var day = parseInt(dayIdx,10)+1;
@@ -1409,7 +1411,6 @@ function buildEmptyRooms(rooms, allRooms, week) {
   });
   var buildings = [];
   Object.keys(byBuilding).sort(function(a,b){
-    if (a==='其他') return 1; if (b==='其他') return -1;
     return parseInt(a,10)-parseInt(b,10);
   }).forEach(function(b) {
     var all = Object.keys(byBuilding[b]).sort();
@@ -1422,7 +1423,7 @@ function buildEmptyRooms(rooms, allRooms, week) {
       }
       grid.push(row);
     }
-    buildings.push({building: b, label: (b==='其他'?'其他楼':b+'教'), rooms: all, grid: grid});
+    buildings.push({building: b, label: b+'教', rooms: all, grid: grid});
   });
   return {buildings: buildings, week: w};
 }
@@ -1794,6 +1795,33 @@ function selectEmptyBuilding(b) {
   S.emptyBuilding = b;
   if (S.lastType && S.lastData) renderResult(S.lastType, S.lastData);
 }
+function showEmptyDetail(building, dayIdx, slotIdx) {
+  if (!S.lastData || !S.lastData.buildings) return;
+  var bd = S.lastData.buildings.find(function(b){return b.building===building;});
+  if (!bd) return;
+  var free = (bd.grid[slotIdx] && bd.grid[slotIdx][dayIdx]) || [];
+  var DAY_LABELS = ['周一','周二','周三','周四','周五'];
+  var SLOT_LABEL = ['第1-2节','第3-4节','第5-6节','第7-8节','第9-10节','第11-12节'];
+  // 按楼层分组：教室名如 "2-101" → 短横线后第一个数字=楼层
+  var byFloor = {};
+  free.forEach(function(r) {
+    var m = r.match(/-\s*(\d)/);
+    var fl = m ? parseInt(m[1],10) : 0;
+    if (!byFloor[fl]) byFloor[fl] = [];
+    byFloor[fl].push(r);
+  });
+  var floors = Object.keys(byFloor).sort(function(a,b){return parseInt(a,10)-parseInt(b,10);});
+  var body = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'
+    + '<b style="font-size:16px;">'+bd.label+' · '+DAY_LABELS[dayIdx]+' · '+SLOT_LABEL[slotIdx]+'</b>'
+    + '<span style="cursor:pointer; font-size:18px; color:var(--ink-light);" onclick="document.getElementById(\'emptyModal\').style.display=\'none\';">✕</span></div>';
+  body += '<div style="font-size:12px; color:var(--ink-light); margin-bottom:12px;">共 '+free.length+' 间空教室</div>';
+  floors.forEach(function(fl) {
+    body += '<div style="margin-bottom:12px;"><div style="font-weight:700; font-size:13px; color:var(--accent); margin-bottom:4px;">'+fl+'楼</div>';
+    body += '<div style="font-size:14px; line-height:1.8; word-break:keep-all;">'+esc(byFloor[fl].join('、'))+'</div></div>';
+  });
+  var modal = document.getElementById('emptyModal');
+  if (modal) { modal.firstElementChild.innerHTML = body; modal.style.display = 'block'; }
+}
 function renderResult(type, data) {
   const el = document.getElementById('resultContent');
   S.lastType = type; S.lastData = data;
@@ -1911,10 +1939,11 @@ function renderResult(type, data) {
       return;
     }
     var SLOT_LABEL = ['第1-2节','第3-4节','第5-6节','第7-8节','第9-10节','第11-12节'];
+    var DAY_LABELS = ['周一','周二','周三','周四','周五'];
     if (S.emptyBuilding === undefined || !data.buildings.find(function(b){return b.building===S.emptyBuilding;})) {
       S.emptyBuilding = data.buildings[0].building;
     }
-    var h = '<div style="padding:4px 2px 8px; font-size:12px; color:var(--ink-light);">第'+data.week+'周 · 周一至周五 · 格子内为空教室</div>';
+    var h = '<div style="padding:4px 2px 8px; font-size:12px; color:var(--ink-light);">第'+data.week+'周 · 周一至周五 · 点击格子查看具体空教室</div>';
     // 教学楼选择器（横向标签）
     h += '<div style="display:flex; gap:6px; overflow-x:auto; padding:4px 0 12px; -webkit-overflow-scrolling:touch;">';
     data.buildings.forEach(function(bd) {
@@ -1922,22 +1951,36 @@ function renderResult(type, data) {
       h += '<button onclick="selectEmptyBuilding(\''+bd.building+'\')" style="flex-shrink:0; padding:6px 14px; border-radius:16px; border:1px solid '+(active?'var(--accent)':'var(--border)')+'; background:'+(active?'var(--accent)':'transparent')+'; color:'+(active?'#fff':'var(--ink)')+'; font-size:13px; font-weight:600;">'+esc(bd.label)+'</button>';
     });
     h += '</div>';
-    // 只显示选中教学楼的矩阵
+    // 只显示选中教学楼的矩阵：格子显示数量，点击弹出详情
     var bd = data.buildings.find(function(b){return b.building===S.emptyBuilding;});
     if (bd) {
       h += '<div style="margin:4px 0;">';
       h += '<div style="font-weight:700; font-size:15px; margin:4px 0 6px;">'+esc(bd.label)+' <span style="font-size:11px; font-weight:400; color:var(--ink-light);">（共'+bd.rooms.length+'间）</span></div>';
-      h += '<div class="table-wrap"><table style="font-size:11px;"><thead><tr><th style="white-space:nowrap;">节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr></thead><tbody>';
+      h += '<div class="table-wrap"><table style="font-size:12px;"><thead><tr><th style="white-space:nowrap;">节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr></thead><tbody>';
       bd.grid.forEach(function(row, i) {
-        h += '<tr><td style="white-space:nowrap; font-weight:600; vertical-align:top;">'+SLOT_LABEL[i]+'</td>';
-        row.forEach(function(free) {
-          h += '<td style="line-height:1.6; vertical-align:top;">' + (free.length ? esc(free.join('、')) : '<span style="color:var(--ink-light);">—</span>') + '</td>';
+        h += '<tr><td style="white-space:nowrap; font-weight:600; vertical-align:middle;">'+SLOT_LABEL[i]+'</td>';
+        row.forEach(function(free, di) {
+          var n = free.length;
+          if (n > 0) {
+            h += '<td style="text-align:center; vertical-align:middle; cursor:pointer; padding:10px 4px; word-break:keep-all;" onclick="showEmptyDetail(\''+bd.building+'\','+di+','+i+')"><b style="font-size:14px; color:var(--accent);">'+n+'</b><span style="font-size:10px; color:var(--ink-light);"> 间</span></td>';
+          } else {
+            h += '<td style="text-align:center; vertical-align:middle; color:var(--ink-light);">—</td>';
+          }
         });
         h += '</tr>';
       });
       h += '</tbody></table></div></div>';
     }
     el.innerHTML = h;
+    // 弹窗容器
+    if (!document.getElementById('emptyModal')) {
+      var m = document.createElement('div');
+      m.id = 'emptyModal';
+      m.style.cssText = 'display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999; background:rgba(0,0,0,.4);';
+      m.onclick = function(e){ if(e.target===m) m.style.display='none'; };
+      m.innerHTML = '<div style="position:absolute; bottom:0; left:0; right:0; max-height:70vh; overflow-y:auto; background:var(--sheet-bg); border-radius:16px 16px 0 0; padding:16px; box-sizing:border-box; border-top:1px solid var(--line);;"></div>';
+      document.body.appendChild(m);
+    }
 
   } else {
     // 课表类 - 林间刊页卡片风格，支持周/日视图切换 + 点击详情 + 长按复制

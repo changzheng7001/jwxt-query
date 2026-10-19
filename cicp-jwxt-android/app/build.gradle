@@ -2,6 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
+def signingValues = new Properties()
+def signingFile = rootProject.file('signing.properties')
+if (signingFile.exists()) signingFile.withInputStream { signingValues.load(it) }
+def signingValue = { key, environment -> signingValues.getProperty(key) ?: System.getenv(environment) }
+def originalStore = signingValue('storeFile', 'JWXT_RELEASE_STORE_FILE')
+def originalStorePassword = signingValue('storePassword', 'JWXT_RELEASE_STORE_PASSWORD')
+def originalAlias = signingValue('keyAlias', 'JWXT_RELEASE_KEY_ALIAS')
+def originalKeyPassword = signingValue('keyPassword', 'JWXT_RELEASE_KEY_PASSWORD')
+def originalSigningReady = originalStore && originalStorePassword && originalAlias && originalKeyPassword
+def expectedCertificate = '18b6264d0d50c604fe70de23ff4a97e270d442ae6249819f2f092cfaedac69c6'
+
 android {
     namespace 'com.cicp.jwxt'
     compileSdk 34
@@ -14,8 +25,19 @@ android {
         versionName "0.9.8"
     }
 
+    signingConfigs {
+        originalRelease {
+            if (originalSigningReady) {
+                storeFile rootProject.file(originalStore)
+                storePassword originalStorePassword
+                keyAlias originalAlias
+                keyPassword originalKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.originalRelease
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -24,6 +46,18 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// Never silently substitute a new/debug key for an installable release.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name.matches('(?i).*(assemble|bundle|package|sign).*release.*') }) {
+        if (!originalSigningReady) throw new GradleException('Original GitHub APK signing key required. Configure signing.properties; see docs/DOUBAO-HANDOFF.md.')
+        def keyStore = java.security.KeyStore.getInstance(rootProject.file(originalStore), originalStorePassword.toCharArray())
+        def certificate = keyStore.getCertificate(originalAlias)
+        if (certificate == null) throw new GradleException('Original signing alias not found.')
+        def digest = java.security.MessageDigest.getInstance('SHA-256').digest(certificate.encoded).encodeHex().toString()
+        if (digest != expectedCertificate) throw new GradleException('Signing certificate does not match the previous GitHub APK. Do not generate a replacement key.')
     }
 }
 

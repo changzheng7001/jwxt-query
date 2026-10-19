@@ -7,6 +7,17 @@ var floatingLayoutFrame = 0;
 function experienceIcon(name) {
   var paths = {
     book:'<path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Z"/><path d="M12 6v14M6 8h3M15 8h3M6 11h3M15 11h3"/>',
+    self:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18"/><circle cx="12" cy="15" r="2"/>',
+    teacher:'<path d="M10 4h11v12H10M14 8h4M14 11h3M15 16v5M12 21h6"/><circle cx="5" cy="7" r="2"/><path d="M2 20v-7a3 3 0 0 1 6 0v7M8 13l4-3"/>',
+    classroom:'<path d="M4 21h16M6 21V4l12-2v19M14 12h.01M9 6v15"/>',
+    class:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 5"/>',
+    course:'<path d="M6 3h13v18H6a3 3 0 0 1 0-6h13M6 3a3 3 0 0 0-3 3v12M8 7h7M8 10h4"/>',
+    score:'<path d="m8 3 4 5 4-5M7 3h10M8 16l-2 6 6-3 6 3-2-6"/><circle cx="12" cy="12" r="5"/><path d="m10 12 1.5 1.5L14 11"/>',
+    gpa:'<path d="M3 3v18h18M7 16v-4M12 16V8M17 16V5"/>',
+    progress:'<path d="M12 3a9 9 0 1 1-6.4 2.6M12 3v9l-6.4-6.4"/><path d="m8 16 2 2 5-5"/>',
+    exam:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 2h6v4H9zM8 11h8M8 15h4M8 18h6"/>',
+    electives:'<path d="m3 6 2 2 3-4M11 6h10M3 13h5M11 13h10M3 20h5M11 20h10"/>',
+    empty:'<path d="M6 3h12v10H6zM4 13h16v4H4zM6 17v4M18 17v4M3 10v3M21 10v3"/>',
     light:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
     dark:'<path d="M20.5 14A8.7 8.7 0 0 1 10 3.5 8.7 8.7 0 1 0 20.5 14Z"/>',
     system:'<rect x="3" y="4" width="18" height="13" rx="3"/><path d="M8 21h8M12 17v4M12 7v7"/><path d="M12 7a3.5 3.5 0 0 1 0 7" fill="currentColor" stroke="none"/>',
@@ -116,7 +127,7 @@ function initExperience() {
     var hint=document.createElement('div');hint.className='panel-hint';hint.innerHTML='<span>双击面板标题可收起贴边，展开后再次双击可还原。</span><button type="button" id="restoreHomePanels" hidden>还原全部面板</button>';hint.querySelector('button').onclick=restoreHomePanels;dashboard.appendChild(hint);
   }
   var grid=document.getElementById('typeGrid'),buttons={};grid.querySelectorAll('.type-btn').forEach(function(b){buttons[b.dataset.v]=b;});grid.replaceChildren();
-  [['常用课表',['self','teacher','classroom','class','course']],['学习与教务',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='claude-entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id]){var icon=document.createElement('span');icon.className='entry-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=experienceIcon(id==='teacher'||id==='class'?'system':'book');buttons[id].prepend(icon);grid.appendChild(buttons[id]);}});});
+  [['常用课表',['self','teacher','classroom','class','course']],['学习与教务',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='claude-entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id]){var icon=document.createElement('span');icon.className='entry-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=experienceIcon(id);buttons[id].prepend(icon);grid.appendChild(buttons[id]);}});});
   try{JSON.parse(localStorage.getItem('jwxt_home_panels')||'[]').forEach(function(id){if(FLOAT_PANEL_IDS.indexOf(id)>=0)homeDockedPanels.add(id);});}catch(e){}
   FLOAT_PANEL_IDS.forEach(function(id){
     var el=document.getElementById(id),header=el.querySelector('.card-header'),tab=el.querySelector('.fd-tab');

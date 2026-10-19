@@ -1,0 +1,9 @@
+{
+  "release": "v0.9.7",
+  "asset": "cicp-jwxt-v0.9.7.apk",
+  "url": "https://github.com/changzheng7001/jwxt-query/releases/download/v0.9.7/cicp-jwxt-v0.9.7.apk",
+  "apk_sha256": "76dde22c8715916544c32c5478d6e113a0ca913335150a8190e320c8f8c05382",
+  "certificate_sha256": "18b6264d0d50c604fe70de23ff4a97e270d442ae6249819f2f092cfaedac69c6",
+  "subject": "C=US, O=Android, CN=Android Debug",
+  "verified_schemes": ["v2", "v3"]
+}

@@ -1335,7 +1335,11 @@ function accountScope(account) {
   return (h >>> 0).toString(36);
 }
 function activeAccountScope() {
-  try { return localStorage.getItem('jwxt_active_account') || ''; } catch(e) { return ''; }
+  try {
+    var scope=localStorage.getItem('jwxt_active_account');if(scope)return scope;
+    var saved=JSON.parse(localStorage.getItem('jwxt_creds')||'{}');
+    if(saved.account){scope=accountScope(saved.account);localStorage.setItem('jwxt_active_account',scope);return scope;}
+  }catch(e){}return '';
 }
 function semesterStartDate() {
   var saved = '';
@@ -1898,11 +1902,21 @@ function buildEmptyRooms(rooms, allRooms, week) {
 // ============ 缓存 ============
 const CK = 'jwxt_cache_';
 function activePersonalCachePrefix() { return CK + 'self_u' + (activeAccountScope() || 'guest') + '_' + currentSemester() + '_'; }
+function isActivePersonalCacheKey(key) {
+  if(!key)return false;if(key.indexOf(activePersonalCachePrefix())===0)return true;
+  var prefix=CK+'self_u'+(activeAccountScope()||'guest')+'_';
+  if(key.indexOf(prefix)!==0||!/^w\d+(?:_d[1-7])?$/.test(key.slice(prefix.length)))return false;
+  try{var item=JSON.parse(localStorage.getItem(key)||'null');return !!(item&&item.t&&semesterForDate(new Date(item.t))===currentSemester());}catch(e){return false;}
+}
 function hasCachePrefix(prefix) {
   for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(prefix) === 0) return true; }
   return false;
 }
 function cacheKey(type, params) {
+  params=Object.assign({},params||{});
+  // The same normalization applies to query, reload, week swipe and day view.
+  if(type==='self'&&!params.semester&&typeof currentSemester==='function')params.semester=currentSemester();
+  if(params.week)params.week=String(parseInt(params.week,10)||params.week);
   var k = type;
   if (['self','score','gpa','progress','exam','electives'].indexOf(type) >= 0 && typeof activeAccountScope === 'function') k += '_u' + (activeAccountScope() || 'guest');
   if (params && params.name) k += '_' + params.name;
@@ -1912,10 +1926,24 @@ function cacheKey(type, params) {
   return k;
 }
 function getCache(k) {
-  try { const r = localStorage.getItem(CK+k); return r ? JSON.parse(r) : null; } catch { return null; }
+  function read(key){try{var item=JSON.parse(localStorage.getItem(CK+key)||'null');return item&&item.data!=null&&!item.data.error?item:null;}catch(e){return null;}}
+  var cached=read(k);if(cached)return cached;
+  // Whole-week caches can satisfy a day filter without a new network request.
+  var day=k.match(/_d([1-7])$/);
+  if(day){cached=getCache(k.replace(/_d[1-7]$/,''));if(cached&&Array.isArray(cached.data.courses))return Object.assign({},cached,{data:Object.assign({},cached.data,{courses:cached.data.courses.filter(function(c){return Number(c.weekday)===Number(day[1]);})})});}
+  // Recover only account-scoped, current-semester caches from the old key format.
+  var old=k.match(/^self_u([^_]+)_(\d{4}-\d{4}-[12])(_w\d+(?:_d\d)?)$/);
+  if(old&&old[1]===(activeAccountScope()||'guest')&&old[2]===currentSemester()){
+    cached=read('self_u'+old[1]+old[3]);
+    if(cached&&cached.t&&semesterForDate(new Date(cached.t))===old[2])return cached;
+  }
+  return null;
 }
+function semesterForDate(date){var y=date.getMonth()>=7?date.getFullYear():date.getFullYear()-1;return y+'-'+(y+1)+'-'+(date.getMonth()>=7?'1':'2');}
 function setCache(k, v) {
-  try { localStorage.setItem(CK+k, JSON.stringify({data: v, t: Date.now()})); } catch {}
+  if(v==null||v.error)return false;
+  try {localStorage.setItem(CK+k,JSON.stringify({data:v,t:Date.now()}));return true;}
+  catch(e){scheduleTip('查询成功，但离线缓存保存失败。请检查存储空间或清理不需要的缓存。');return false;}
 }
 
 // ============ 页面切换 ============
@@ -2085,7 +2113,7 @@ function refreshOngoing() {
     const seen = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -2116,7 +2144,7 @@ window.__gotoSchedule = function() {
     let best = null, bestT = -1;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const raw = localStorage.getItem(k);
       const obj = raw ? JSON.parse(raw) : null;
       if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
@@ -2146,7 +2174,7 @@ function renderTodayCourses() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -2233,6 +2261,7 @@ function onTypeChange() {
 
 // ============ 查询 ============
 async function runQuery(forceRefresh) {
+  document.getElementById('cacheNotice').textContent='离线缓存 · 刷新可获取最新数据';
   var type = S.queryType;
   var params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
@@ -2280,13 +2309,17 @@ async function runQuery(forceRefresh) {
 
   try {
     const data = await doQuery(type, params);
-    setCache(ck, data);
+    if(data&&data.error)throw new Error(data.error);
+    const saved=setCache(ck, data);
     document.getElementById('cacheNotice').classList.add('hidden');
     var typeName2 = '';
     for (var ti = 0; ti < TYPES.length; ti++) { if (TYPES[ti].v === type) { typeName2 = TYPES[ti].l; break; } }
     document.getElementById('resultLabel').textContent = typeName2;
     renderResult(type, data);
+    if(!saved){document.getElementById('cacheNotice').textContent='本次查询未能保存离线缓存';document.getElementById('cacheNotice').classList.remove('hidden');}
+    checkCacheStatus();renderTodayCourses();
   } catch(e) {
+    if(cached){document.getElementById('cacheNotice').classList.remove('hidden');renderResult(type,cached.data);scheduleTip('刷新失败，已保留并显示离线缓存');return;}
     // 出错时，先显示错误信息，不管有没有缓存
     document.getElementById('cacheNotice').classList.remove('hidden');
     document.getElementById('resultContent').innerHTML = '<div class="error-box" style="padding:20px;">查询出错: '+esc(e.message)+'<br><br>类型: '+type+'<br>参数: '+esc(JSON.stringify(params))+'</div>';

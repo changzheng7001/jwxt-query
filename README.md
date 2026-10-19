@@ -73,6 +73,8 @@
 
 ## 如何构建
 
+本次交接只更新 `codex/demo-schedule` 分支，不生成安装包。豆包构建前请先阅读 [签名与构建交接](docs/DOUBAO-HANDOFF.md)：必须复用原 GitHub APK 的原密钥，不能使用此前 Codex 测试包的签名。
+
 ### 方式一：apktool 快速打包（日常迭代，无需 Android SDK）
 
 前端修改后先同步页面和图片，然后：
@@ -80,10 +82,11 @@
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts/sync-web-assets.ps1
 java -jar apktool.jar b apk-source -o cicp-jwxt_new.apk
-java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
+java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --ks ORIGINAL_KEYSTORE.jks --ksAlias ORIGINAL_ALIAS --out signed
+powershell -ExecutionPolicy Bypass -File scripts/verify-apk-signature.ps1 -Apk signed/NEW_SIGNED_APK.apk -SignerJar uber-apk-signer.jar
 ```
 
-签名后的 APK 可直接安装。
+必须提供之前 GitHub APK 的原 keystore；不要省略 `--ks` 后回退到内置调试密钥。上述文件名和 alias 为本地替换项，证书指纹校验通过后才可作为原版更新包交付。
 
 ### 方式二：标准 Android Studio 工程
 

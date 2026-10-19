@@ -1,0 +1,6 @@
+# Copy to signing.properties locally. Use the EXISTING release keystore, not a new key.
+# Prefer forward slashes for Windows paths. Never commit the actual file or keystore.
+storeFile=/path/to/original-keystore.jks
+storePassword=REPLACE_LOCALLY
+keyAlias=ORIGINAL_ALIAS
+keyPassword=REPLACE_LOCALLY

@@ -30,3 +30,8 @@ Thumbs.db
 
 # apktool 构建目录
 apk-source/build/
+
+# Original signing material is supplied locally by the release owner.
+**/signing.properties
+*.jks
+*.keystore

@@ -169,3 +169,10 @@ html body #themeBtn{width:44px!important;height:44px!important;min-height:44px!i
 html body #settingsSection .settings-hero,html[data-theme=dark] body #settingsSection .settings-hero{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body #settingsSection .settings-hero h2{font-family:var(--font-heading)!important;font-weight:500!important}
 .claude-hero-action svg{width:19px;height:19px}.claude-hero-action{color:var(--on-accent)}
+/* Result artwork sits beneath transparent content instead of opaque paper layers. */
+body.schedule-result #resultSection>.card{background:transparent!important}
+body.schedule-result .demo-pane,body.schedule-result .demo-grid,body.schedule-result .demo-scroll,body.schedule-result .demo-list,body.schedule-result .today-schedule-list{background:transparent!important}
+body.schedule-result .demo-head{background:rgba(244,236,218,.62) url('../schedule-assets/tangyun-head.png') center/100% 100% no-repeat!important}
+html[data-theme=dark] body.schedule-result::before,html[data-theme=dark] body.schedule-result::after{filter:brightness(.48) saturate(.65)}
+html[data-theme=dark] body.schedule-result .demo-head{background-color:rgba(33,31,28,.76)!important;background-blend-mode:multiply}
+html[data-theme=dark] body.schedule-result .demo-periods{background:rgba(33,31,28,.65)}

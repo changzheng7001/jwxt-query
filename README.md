@@ -40,7 +40,8 @@
 ### 会话与隐私（重要）
 
 - **不存明文密码**：登录后本地只保存账号用于回填，密码从不写入存储
-- **存会话**：登录后的教务会话由原生 `java.net.CookieManager` 全局管理（登录响应中的 Set-Cookie 自动存入、后续请求自动携带），实现"登录后存会话、不存明文密码"
+- **会话状态**：登录后的教务 Cookie 由原生网络层管理；页面不把本地登录标记当成有效会话，重新打开 App 后需要重新登录验证
+- **个人缓存隔离**：课表、成绩、进度、考试和选课缓存按账户隔离；退出后保留该账户离线缓存，切换账户不会混用
 - 退出登录会同时清除本地凭证与原生会话 Cookie
 
 ## 目录结构
@@ -61,28 +62,29 @@
 └── README.md
 ```
 
-## 维护与代码链说明（重要）
+## 维护与代码链说明
 
-- **日常迭代走 smali 链**：改动集中在 `jwxt-webapp/index.html`（前端，九成改动都在这里）+ `apk-source/`（原生 smali、Manifest、资源），用 apktool 打包即可出可安装 APK，无需 Android SDK。
-- **标准工程 `cicp-jwxt-android/` 不动**：它仅作为"正式构建 / 上架 / 换正式签名"时的源码参考与备选，**不参与日常迭代同步**。前端源 `index.html` 与之内容一致，但日常只维护 `jwxt-webapp/` 一份。
-- 如需切换到标准工程链（在装有 Android Studio 的机器上构建），另行迁移，日常不改。
+- **前端唯一源文件**：日常修改 `jwxt-webapp/index.html` 和其中的 `schedule-assets/`。
+- **同步所有打包目标**：运行 `powershell -ExecutionPolicy Bypass -File scripts/sync-web-assets.ps1`，将页面与离线图片同步到 apktool 和 Android Studio 两份工程，避免 APK 与网页预览不一致。
+- **Android 原生改动**：标准工程改 `cicp-jwxt-android/`；反编译打包改 `apk-source/`，并保持 Java/Smali 行为一致。
 
 ## 如何构建
 
 ### 方式一：apktool 快速打包（日常迭代，无需 Android SDK）
 
-前端在 `jwxt-webapp/index.html` 修改后，同步到 `apk-source/assets/index.html`，然后：
+前端修改后先同步页面和图片，然后：
 
 ```bash
+powershell -ExecutionPolicy Bypass -File scripts/sync-web-assets.ps1
 java -jar apktool.jar b apk-source -o cicp-jwxt_new.apk
 java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
 ```
 
 签名后的 APK 可直接安装。
 
-### 方式二：标准 Android Studio 工程（正式构建 / 上架备选）
+### 方式二：标准 Android Studio 工程
 
-日常不维护 `cicp-jwxt-android/`；如需正式签名、上架，再在装有 Android Studio（Giraffe / Hedgehog 或更新）的机器上打开构建：
+在装有 Android Studio 的机器上打开构建：
 
 ```bash
 cd cicp-jwxt-android
@@ -97,7 +99,7 @@ cd cicp-jwxt-android
 - 左右拖动可预览相邻周的真实缓存；没有缓存时保留当前课表并提示，不会把旧课表当作新周显示。查询新周数据仍使用「查询参数」浮窗。
 - 顶栏提供列表切换、刷新与返回首页；课程详情、复制信息以及四个浮窗继续保留。成绩等非课表查询沿用原有显示方式。
 - 默认皮肤图片与动图来自用户提供的 `课表demo.html`，保存在 `jwxt-webapp/schedule-assets/`，随 APK 离线打包；未引入 demo 的演示课程、增删课程功能及完整皮肤商城。
-- 同步前端时需同时复制 `index.html` 和 `schedule-assets/` 到 `apk-source/assets/`。标准 Android 工程仍作为备选，不参与此次日常同步。
+- 学期周次可在设置中调整；缓存和今日课程提醒会按当前账户、当前学期过滤。
 - 回归检查：`node --test tests/schedule.test.cjs`（需要 Node.js）。
 
 1. 安装 APK

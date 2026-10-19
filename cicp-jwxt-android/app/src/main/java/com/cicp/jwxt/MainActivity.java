@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
  *
  * 会话说明：登录后凭证不落本地（不存明文密码）。教务会话由
  * java.net.CookieManager 全局管理，登录响应中的 Set-Cookie 自动存入，
- * 后续请求自动携带，实现"登录后存会话"；App 重启会话失效则需重新登录。
+ * 后续请求自动携带。前端每次启动仍会要求重新验证登录，避免将旧 Cookie 误报为有效。
  */
 public class MainActivity extends Activity {
 
@@ -60,8 +60,8 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
         s.setAllowFileAccess(true);
-        s.setAllowFileAccessFromFileURLs(true);
-        s.setAllowUniversalAccessFromFileURLs(true);
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.setWebViewClient(new WebViewClient());
         webView.addJavascriptInterface(new WebAppInterface(), "Android");

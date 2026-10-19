@@ -241,9 +241,11 @@
     invoke-virtual {v0, v1}, Landroid/webkit/WebSettings;->setAllowFileAccess(Z)V
 
     .line 128
+    const/4 v1, 0x0
     invoke-virtual {v0, v1}, Landroid/webkit/WebSettings;->setAllowUniversalAccessFromFileURLs(Z)V
 
     .line 129
+    const/4 v1, 0x0
     invoke-virtual {v0, v1}, Landroid/webkit/WebSettings;->setAllowFileAccessFromFileURLs(Z)V
 
     .line 131

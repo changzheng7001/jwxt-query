@@ -859,6 +859,11 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
     <div class="set-row"><div class="set-label">测试通知</div><button class="set-btn" onclick="testNotify()">发送一条</button></div>
     <div class="set-hint">如果收不到通知：安卓13+/HarmonyOS 需到 <b>系统设置 → 通知 → 应用通知</b> 中手动打开“CICP教务查询”的通知开关，并在“通知管理”里允许横幅/锁屏显示，App 内才可能发出。</div>
 
+    <div class="card-header" style="border-color:var(--pink);"><span class="mono">校历</span></div>
+    <div class="set-row"><label class="set-label" for="semesterStartInput">本学期第1周周一</label><input id="semesterStartInput" type="date" onchange="saveSemesterCalendar()" style="max-width:145px;border:1px solid var(--line);border-radius:8px;padding:7px;background:var(--surface);color:var(--ink);"></div>
+    <div class="set-row"><label class="set-label" for="semesterWeeksInput">学期周数</label><input id="semesterWeeksInput" type="number" min="1" max="30" value="20" onchange="saveSemesterCalendar()" style="width:72px;border:1px solid var(--line);border-radius:8px;padding:7px;background:var(--surface);color:var(--ink);"></div>
+    <div class="set-hint">用于计算当前教学周和今日课程。校历调整时可在这里修改。</div>
+
     <div class="card-header" style="border-color:var(--pink);"><span class="mono">缓存</span></div>
     <div class="set-row"><div class="set-label">缓存路径</div><div style="font-size:11px; color:var(--ink-light); text-align:right;">/data/data/com.cicp.jwxt/app_webview/</div></div>
     <div class="set-row"><div class="set-label">已缓存数据</div><span class="mono" id="cacheCount2" style="font-size:10px; color:var(--green);"></span></div>
@@ -910,7 +915,6 @@ const TYPES = [
 const NEEDS_NAME = ['teacher','classroom','class','course'];
 const NEEDS_WEEK = ['teacher','classroom','self','class','course','empty'];
 const NEEDS_SEM = ['score','electives','exam'];
-const SEMESTERS = ['2024-2025-1','2024-2025-2','2025-2026-1','2025-2026-2','2026-2027-1','2026-2027-2'];
 const WEEKDAYS = ['周一','周二','周三','周四','周五','周六','周日'];
 const PERIODS = [
   {n:'0102', l:'第1-2节'}, {n:'0304', l:'第3-4节'}, {n:'0506', l:'第5-6节'},
@@ -1168,8 +1172,15 @@ function refreshSettingsCache() {
   c.textContent = n + ' 项';
 }
 
-function httpGet(p) { return Android.httpRequest('GET', BASE + p, ''); }
-function httpPost(p, body) { return Android.httpRequest('POST', BASE + p, body); }
+function checkedHttpRequest(method, p, body) {
+  if (!window.Android || !Android.httpRequest) throw new Error('当前环境不支持教务系统网络请求');
+  var result = Android.httpRequest(method, BASE + p, body || '');
+  if (typeof result !== 'string') throw new Error('教务系统返回了无效响应');
+  if (result.indexOf('ERROR:') === 0) throw new Error(result.substring(6) || '网络请求失败');
+  return result;
+}
+function httpGet(p) { return checkedHttpRequest('GET', p, ''); }
+function httpPost(p, body) { return checkedHttpRequest('POST', p, body); }
 
 function encodePwd(acc, pwd, scode, sxh) {
   const code = acc + '%%%' + pwd;
@@ -1194,7 +1205,7 @@ async function doLogin() {
   const enc = encodePwd(acc, pwd, parts[0], parts[1]);
   const html = httpPost('/Logon.do?method=logon',
     'userAccount=' + encodeURIComponent(acc) + '&userPassword=&encoded=' + encodeURIComponent(enc));
-  if (html.length > 5000) {
+  if (typeof html === 'string' && html.indexOf('ERROR:') !== 0 && html.length > 0 && !looksLikeLoginPage(html)) {
     S.loggedIn = true;
     document.getElementById('loginHint').textContent = '已登录';
     var sd0 = document.getElementById('statusDot');
@@ -1211,9 +1222,17 @@ async function doLogin() {
     // 只存账号方便下次回填，绝不保存明文密码；会话由原生 CookieManager 保持
     localStorage.setItem('jwxt_creds', JSON.stringify({account: acc}));
     localStorage.setItem('jwxt_login', '1');
+    localStorage.setItem('jwxt_active_account', accountScope(acc));
     return true;
   }
   throw new Error('登录失败');
+}
+
+function looksLikeLoginPage(html) {
+  var doc = parseHTML(html);
+  var text = (doc.body && doc.body.textContent || '').replace(/\s+/g, '');
+  var hasLoginFields = !!(doc.querySelector('input[name="userAccount"],input[name="userPassword"],input[type="password"]'));
+  return hasLoginFields || /用户名或密码错误|密码错误|请登录|登录超时|重新登录/.test(text);
 }
 
 function showLogin() {
@@ -1262,9 +1281,41 @@ function doLogout() {
   if (window.Android && Android.clearSession) { try { Android.clearSession(); } catch(e){} }
 }
 
+function accountScope(account) {
+  var h = 2166136261, s = String(account || '');
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36);
+}
+function activeAccountScope() {
+  try { return localStorage.getItem('jwxt_active_account') || ''; } catch(e) { return ''; }
+}
+function semesterStartDate() {
+  var saved = '';
+  try { saved = localStorage.getItem('jwxt_semester_start') || ''; } catch(e) {}
+  var value = saved || SEM_START;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : SEM_START;
+}
+function semesterWeekCount() {
+  var n = parseInt(localStorage.getItem('jwxt_semester_weeks') || '20', 10);
+  return Math.max(1, Math.min(30, isFinite(n) ? n : 20));
+}
+function currentSemester() {
+  var now = new Date(), y = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+  return y + '-' + (y + 1) + '-' + (now.getMonth() >= 7 && now.getMonth() <= 11 ? '1' : '2');
+}
+function saveSemesterCalendar() {
+  var date = document.getElementById('semesterStartInput').value;
+  var weeks = parseInt(document.getElementById('semesterWeeksInput').value, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isFinite(weeks) || weeks < 1 || weeks > 30) { alert('请填写有效的开学周一日期和 1–30 周的学期周数'); return; }
+  localStorage.setItem('jwxt_semester_start', date);
+  localStorage.setItem('jwxt_semester_weeks', String(weeks));
+  SEMESTER_START = new Date(date + 'T00:00:00');
+  renderTodayCourses(); refreshOngoing();
+}
+
 function weekMonday(week) {
   const w = parseInt(week) || 1;
-  const d = new Date(SEM_START);
+  const d = new Date(semesterStartDate() + 'T00:00:00');
   d.setDate(d.getDate() + (w - 1) * 7);
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
@@ -1524,7 +1575,7 @@ function parseList(html, type) {
 
 // ============ 查询执行 ============
 async function doQuery(type, params) {
-  const sem = params.semester || '2026-2027-1';
+  const sem = params.semester || currentSemester();
   switch(type) {
     case 'self': {
       const rq = weekMonday(params.week||'1');
@@ -1693,7 +1744,7 @@ async function doQuery(type, params) {
     }
     case 'empty': {
       // 空教室：一次拉全校教室该周课表矩阵，直接读格子有无内容判断占用
-      const sem = params.semester || '2026-2027-1';
+      const sem = params.semester || currentSemester();
       const wk = params.week || currentWeek();
       const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1='+wk+'&zc2='+wk+'&jc1=&jc2=';
       const html = httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body);
@@ -1798,8 +1849,14 @@ function buildEmptyRooms(rooms, allRooms, week) {
 
 // ============ 缓存 ============
 const CK = 'jwxt_cache_';
+function activePersonalCachePrefix() { return CK + 'self_u' + (activeAccountScope() || 'guest') + '_' + currentSemester() + '_'; }
+function hasCachePrefix(prefix) {
+  for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(prefix) === 0) return true; }
+  return false;
+}
 function cacheKey(type, params) {
   var k = type;
+  if (['self','score','gpa','progress','exam','electives'].indexOf(type) >= 0 && typeof activeAccountScope === 'function') k += '_u' + (activeAccountScope() || 'guest');
   if (params && params.name) k += '_' + params.name;
   if (params && params.semester) k += '_' + params.semester;
   if (params && params.week) k += '_w' + params.week;
@@ -1887,19 +1944,9 @@ function init() {
     if (c.account) document.getElementById('account').value = c.account;
   } catch {}
 
-  // 恢复登录状态（原生已从持久化 cookie 恢复会话）：重启后直接显示已登录
+  // 登录标记不能证明原生 Cookie 仍有效；每次启动都要求重新登录验证。
   try {
-    if (localStorage.getItem('jwxt_login') === '1') {
-      S.loggedIn = true;
-      const txt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-      txt('loginHint', '已登录');
-      const sd = document.getElementById('statusDot'); if (sd) { sd.className = 'status-dot ok'; sd.style.background = ''; }
-      txt('statusText', '已登录');
-      const sdr = document.getElementById('statusDotResult'); if (sdr) sdr.style.background = 'var(--green)';
-      const rlb = document.getElementById('resultLogoutBtn'); if (rlb) { rlb.innerHTML=ICO_LOGOUT; rlb.onclick = doLogout; rlb.title='退出'; }
-      const lb = document.getElementById('logoutBtn'); if (lb) { lb.style.display = 'flex'; lb.innerHTML = ICO_LOGOUT; }
-      const lbn = document.getElementById('loginBtn'); if (lbn) lbn.style.display = 'none';
-    }
+    localStorage.removeItem('jwxt_login');
   } catch (e) {}
 
   // 根据登录状态设置结果页按钮
@@ -1927,17 +1974,23 @@ function init() {
   });
 
   const semSel = document.getElementById('querySemester');
-  SEMESTERS.forEach(s => {
+  const now = new Date();
+  const currentSchoolYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+  const semesterOptions = [];
+  for (let y = currentSchoolYear - 2; y <= currentSchoolYear + 1; y++) semesterOptions.push(y+'-'+(y+1)+'-1', y+'-'+(y+1)+'-2');
+  semesterOptions.forEach(s => {
     const o = document.createElement('option');
     o.value = s; o.textContent = s;
     semSel.appendChild(o);
   });
-  semSel.value = '2026-2027-1';
+  semSel.value = currentSemester();
 
   // 检查缓存
   checkCacheStatus();
 
   // 设置面板初始化
+  document.getElementById('semesterStartInput').value = semesterStartDate();
+  document.getElementById('semesterWeeksInput').value = semesterWeekCount();
   const nsw = document.getElementById('notifySwitch');
   if (nsw) nsw.classList.toggle('on', (localStorage.getItem('jwxt_notify_on') || '1') !== '0');
   refreshSettingsCache();
@@ -1963,19 +2016,23 @@ function init() {
 
 // 每次打开 App 刷新"今日课程"常驻通知（ongoing，一直显示在通知栏，点击跳本周课表）
 // 校历第1周周一（用于计算当前教学周）；新学期开学需更新此日期
-var SEMESTER_START = new Date('2026-08-31T00:00:00');
+var SEMESTER_START = new Date(semesterStartDate() + 'T00:00:00');
 function currentWeek() {
   var diff = Math.floor((new Date() - SEMESTER_START) / 86400000);
-  return Math.max(1, Math.floor(diff / 7) + 1);
+  return Math.min(semesterWeekCount(), Math.max(1, Math.floor(diff / 7) + 1));
 }
-// 判断当前周 cw 是否命中课程的周次表达式（支持范围"1-15周"、列表"2,4,6周"、单周"第5周"；无周次信息视为本周课）
+// 支持范围、列表、多段范围以及单/双周标记。
 function weekInRange(expr, cw) {
   if (!expr) return true;
-  var s = '' + expr;
-  var r = s.match(/(\d+)\s*[-~至]\s*(\d+)/);
-  if (r) { var a = parseInt(r[1], 10), b = parseInt(r[2], 10); return cw >= a && cw <= b; }
-  var nums = s.match(/\d+/g);
-  if (nums) return nums.some(function (n) { return parseInt(n, 10) === cw; });
+  var s = String(expr).replace(/[，、；;]/g, ',').replace(/第/g, '');
+  var both = /单双/.test(s), odd = !both && /单周?|奇数周?/.test(s), even = !both && /双周?|偶数周?/.test(s);
+  if (odd && cw % 2 === 0 || even && cw % 2 === 1) return false;
+  var ranges = [], re = /(\d+)\s*(?:-|~|至|到)\s*(\d+)/g, m;
+  while ((m = re.exec(s))) ranges.push([parseInt(m[1],10), parseInt(m[2],10)]);
+  var remainder = s.replace(re, ' ').replace(/单周?|双周?|奇数周?|偶数周?|周/g, ' ');
+  var nums = (remainder.match(/\d+/g) || []).map(function(n){return parseInt(n,10);});
+  if (ranges.length) return ranges.some(function(r){return cw >= Math.min(r[0],r[1]) && cw <= Math.max(r[0],r[1]);}) || nums.indexOf(cw) >= 0;
+  if (nums.length) return nums.indexOf(cw) >= 0;
   return true;
 }
 function refreshOngoing() {
@@ -1988,7 +2045,7 @@ function refreshOngoing() {
     const seen = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -1996,7 +2053,7 @@ function refreshOngoing() {
         if (c.weekday !== wd || !c.name) return;
         // 周过滤：课程实际周次应含当前周（支持范围"1-15周"/列表/单周）；无周次信息则视为本周课
         if (c.week && !weekInRange(c.week, cw)) return;
-        const key = c.name + '|' + (c.teacher || '') + '|' + (c.classroom || '');
+        const key = c.name + '|' + (c.period || c.periodLabel || '') + '|' + (c.teacher || '') + '|' + (c.classroom || '');
         if (seen.has(key)) return; seen.add(key);
         const label = c.name + (c.teacher ? ' ' + c.teacher : '') + (c.classroom ? '·' + c.classroom : '');
         items.push(label);
@@ -2019,7 +2076,7 @@ window.__gotoSchedule = function() {
     let best = null, bestT = -1;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
       const raw = localStorage.getItem(k);
       const obj = raw ? JSON.parse(raw) : null;
       if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
@@ -2049,7 +2106,7 @@ function renderTodayCourses() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(CK + 'self') !== 0) continue;
+      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -2093,7 +2150,8 @@ function selectType(v) {
 
 function checkCacheStatus() {
   refreshCacheList();
-  const hasCache = localStorage.getItem(CK+'self') || localStorage.getItem(CK+'score');
+  const scope = activeAccountScope() || 'guest';
+  const hasCache = hasCachePrefix(CK+'self_u'+scope+'_'+currentSemester()+'_') || hasCachePrefix(CK+'score_u'+scope+'_');
   var sdr = document.getElementById('statusDotResult');
   var sd = document.getElementById('statusDot');
   if (S.loggedIn) {
@@ -2158,6 +2216,7 @@ async function runQuery(forceRefresh) {
     params.weekday = document.getElementById('queryWeekday').value;
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+  else if (type === 'self') params.semester = currentSemester();
 
   var ck = cacheKey(type, params);
   var cached = getCache(ck);
@@ -2244,7 +2303,7 @@ function renderResult(type, data) {
   document.body.classList.add('in-result');
   const isSchedule = ['self','teacher','classroom','class','course'].indexOf(type) >= 0;
   document.body.classList.toggle('schedule-result', isSchedule);
-  document.getElementById('resultLogoutBtn').style.display = isSchedule ? 'none' : '';
+  document.getElementById('resultLogoutBtn').style.display = '';
   document.getElementById('backCurrentWeek').hidden = !isSchedule;
   ['tbToggleForm','tbRefreshResult','tbReturnHome'].forEach(id => document.getElementById(id).style.display = isSchedule ? '' : 'none');
   collapseFloats();
@@ -2743,7 +2802,8 @@ async function openBrowse(type, forceRefresh) {
   document.getElementById('browseTitle').textContent = {teacher:'全校教师', class:'全校班级', classroom:'全校教室'}[type];
 
   // 先读缓存（仅当缓存里确有内容才直接用，空/失败缓存不拦截刷新）
-  const cached = getCache('browse_'+type);
+  const browseCacheKey = 'browse_'+type+'_'+currentSemester();
+  const cached = getCache(browseCacheKey);
   const cacheList = cached && (cached.data.teachers || cached.data.classes || cached.data.classrooms);
   if (cacheList && cacheList.length && !forceRefresh) {
     S.browseData = cached.data;
@@ -2762,19 +2822,19 @@ async function openBrowse(type, forceRefresh) {
   try {
     let data;
     if (type === 'teacher') {
-      const body = 'xnxqh=2026-2027-1&kbjcmsid='+KBJCMSID+'&skyx=&jszc=&skjsid=&skjs=&zc1=1&zc2=20&jc1=&jc2=';
+      const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&jszc=&skjsid=&skjs=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_teacher_ifr', body), 'teacher');
     } else if (type === 'class') {
-      const body = 'xnxqh=2026-2027-1&kbjcmsid='+KBJCMSID+'&skyx=&sknj=&skzy=&skbjid=&skbj=&zc1=1&zc2=20&jc1=&jc2=';
+      const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&sknj=&skzy=&skbjid=&skbj=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', body), 'class');
     } else {
-      const body = 'xnxqh=2026-2027-1&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1=1&zc2=20&jc1=&jc2=';
+      const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body), 'classroom');
     }
     // 只在实际解析到内容时才写入缓存，避免把空/失败结果污染缓存
     const list = data && (data.teachers || data.classes || data.classrooms);
     if (list && list.length) {
-      setCache('browse_'+type, data);
+      setCache(browseCacheKey, data);
       S.browseData = data;
       S.browseFiltered = data;
       renderBrowse();
@@ -3070,7 +3130,7 @@ function renderScheduleResult(type, data) {
   document.getElementById('tbWeekText').textContent = '第 '+w+' 周';
   document.getElementById('tbWeekText').parentElement.classList.toggle('other-week',w !== currentWeek());
   document.getElementById('backCurrentWeek').hidden = w === currentWeek();
-  const sem = document.getElementById('querySemester').value || '2026-2027-1';
+  const sem = document.getElementById('querySemester').value || currentSemester();
   document.getElementById('tbSemText').textContent = sem.replace(/-(\d+)$/, ' 第$1学期');
   document.getElementById('tbIconGrid').style.display = S.scheduleForm === 'list' ? 'none' : '';
   document.getElementById('tbIconList').style.display = S.scheduleForm === 'list' ? '' : 'none';

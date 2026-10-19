@@ -688,6 +688,27 @@
 
 
 # virtual methods
+.method public getSystemDarkMode()Z
+    .locals 2
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+    move-result-object v0
+    invoke-virtual {v0}, Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;
+    move-result-object v0
+    iget v0, v0, Landroid/content/res/Configuration;->uiMode:I
+    and-int/lit8 v0, v0, 0x30
+    const/16 v1, 0x20
+    if-ne v0, v1, :system_light
+    const/4 v0, 0x1
+    return v0
+    :system_light
+    const/4 v0, 0x0
+    return v0
+.end method
+
 .method public httpRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .locals 3
     .param p1, "method"    # Ljava/lang/String;

@@ -1,0 +1,246 @@
+
+:root { --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif; --cream:#f5f5f0; --cream-2:#ecece6; --glass:rgba(255,255,252,.90); --glass-2:rgba(248,248,243,.88); --glass-border:rgba(60,65,58,.14); --glass-hi:rgba(255,255,255,.62); --line:rgba(60,65,58,.14); --ink:#20231f; --ink-light:#73776f; --sheet-bg:rgba(250,250,246,.97); --grad-a:rgba(232,156,177,.12); --grad-b:rgba(74,111,79,.10); --grad-c:rgba(214,203,176,.10); --apple-accent:#3e6946; --apple-focus:0 0 0 3px rgba(62,105,70,.22); }
+body { font-family:var(--sans); color:var(--ink); line-height:1.52; }
+.topbar { background:rgba(248,248,244,.90); border-bottom-color:var(--line); box-shadow:0 2px 10px rgba(24,32,24,.035); }
+.topbar-title,.tb-r-title { font-family:var(--sans); letter-spacing:-.025em; }
+.topbar .mono,.card-header .mono,.settings-kicker { font-family:var(--sans); letter-spacing:.05em; text-transform:none; }
+main { max-width:620px; padding-top:16px; }
+.card { border-color:var(--line); border-radius:16px; background:rgba(255,255,252,.84); box-shadow:0 2px 10px rgba(24,32,24,.04); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.card-green { background:rgba(255,255,252,.80); }
+.card-pink { background:rgba(255,253,250,.86); border-color:rgba(190,113,132,.18); }
+.card-header { border-bottom-color:var(--line); padding-bottom:9px; }
+.card-header .mono { color:var(--ink-light); font-size:12px; font-weight:600; }
+.card-pink .card-header .mono { color:#a55e71; }
+input,select,button { font-family:var(--sans); }
+input[type=text],input[type=password],select { min-height:44px; border-radius:10px; border-color:var(--line); background:rgba(255,255,255,.80); }
+button { min-height:44px; border-radius:10px; background:linear-gradient(180deg,#4a7350,#3a6142); box-shadow:0 2px 5px rgba(34,67,41,.10); }
+button.outline { background:rgba(255,255,255,.62); border-color:var(--line); box-shadow:none; }
+button:focus-visible,.type-btn:focus-visible,input:focus-visible,select:focus-visible,.nav-item:focus-visible { outline:none; box-shadow:var(--apple-focus); }
+.type-grid { gap:8px; }
+.type-btn { min-height:44px; border-radius:10px; border-color:var(--line); background:rgba(255,255,255,.55); box-shadow:none; }
+.type-btn.active { background:#426a49; box-shadow:0 3px 8px rgba(46,74,42,.13); }
+.btn-group { gap:8px; }
+.btn-chip { min-height:40px; border:1px solid rgba(60,65,58,.18); border-radius:9px; background:rgba(255,255,255,.5); box-shadow:none; }
+.sched-course:not(.pink),.course-card.green,.course-row.green { background:#e4ecdf; color:#304a34; border:1px solid rgba(62,105,70,.12); }
+.sched-course.pink,.course-card.pink,.course-row.pink { background:#f4e5e8; color:#62444a; border:1px solid rgba(175,102,124,.13); }
+.sched-course { min-height:44px; border-radius:8px; box-shadow:none; }
+.course-card,.course-row { border-radius:12px; box-shadow:0 1px 6px rgba(24,32,24,.045); }
+.schedule-day-title { font-family:var(--sans); }
+th { font-family:var(--sans); border-bottom:1px solid var(--line); }
+td { border-bottom-color:var(--line); }
+.settings-panel { background:rgba(246,246,241,.97); }
+.settings-hero { background:linear-gradient(145deg,#46694b,#65816a); border-radius:18px; box-shadow:0 5px 16px rgba(39,65,43,.12); }
+.settings-hero h2 { font-family:var(--sans); }
+.settings-panel .settings-group { border-radius:15px; background:rgba(255,255,252,.88); border:1px solid var(--line); box-shadow:none; }
+.settings-section-head h3 { font-family:var(--sans); }
+.settings-panel .set-row { border-bottom-color:var(--line); }
+.bottomnav { bottom:calc(14px + env(safe-area-inset-bottom,0px)); border:1px solid rgba(255,255,255,.78); background:rgba(246,246,241,.76); }
+.bottomnav .nav-item { font-family:var(--sans); min-height:60px; }
+body.in-result #todaySection.open,body.in-result #cacheInfoSection.open,body.in-result #querySection.open,body.in-result #browseNav.open { box-shadow:0 8px 22px rgba(36,47,34,.13),inset 0 1px 0 rgba(255,255,255,.78); }
+html[data-theme=dark] { --cream:#171a17; --cream-2:#222622; --glass:rgba(35,39,35,.92); --glass-2:rgba(38,43,38,.92); --glass-border:rgba(225,232,218,.15); --glass-hi:rgba(255,255,255,.07); --line:rgba(235,235,225,.14); --ink:#f0f1eb; --ink-light:#b4b8af; --sheet-bg:rgba(29,33,29,.98); --grad-a:rgba(176,117,138,.10); --grad-b:rgba(143,174,110,.10); --grad-c:rgba(164,154,130,.06); }
+html[data-theme=dark] .topbar { background:rgba(24,27,24,.92); }
+html[data-theme=dark] .card,html[data-theme=dark] .card-green,html[data-theme=dark] .card-pink,html[data-theme=dark] .settings-panel .settings-group { background:rgba(36,40,36,.94); }
+html[data-theme=dark] input[type=text],html[data-theme=dark] input[type=password],html[data-theme=dark] select { background:#292e29; border-color:var(--line); }
+html[data-theme=dark] .sched-course:not(.pink),html[data-theme=dark] .course-card.green,html[data-theme=dark] .course-row.green { background:#2b392d; color:#e5efe2; }
+html[data-theme=dark] .sched-course.pink,html[data-theme=dark] .course-card.pink,html[data-theme=dark] .course-row.pink { background:#402f34; color:#f3e2e5; }
+html[data-theme=dark] .settings-panel { background:rgba(22,25,22,.98); }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
+@media(prefers-reduced-transparency:reduce) { .topbar,.bottomnav,.card { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; background:#f5f5f0!important; } }
+@media(max-width:420px) { main { padding-left:16px; padding-right:16px; } }
+
+
+.apple-entry-heading{grid-column:1/-1;padding:10px 2px 1px;color:var(--ink-light);font:600 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.apple-entry-heading:first-child{padding-top:2px}#typeGrid .type-btn[data-v=self]{grid-column:1/-1;min-height:52px;justify-content:flex-start;padding:0 16px;text-align:left;font-size:15px;font-weight:650;background:linear-gradient(110deg,rgba(62,105,70,.09),rgba(255,255,255,.75));box-shadow:inset 3px 0 0 var(--apple-accent),0 3px 10px rgba(46,74,42,.06)}#typeGrid .type-btn[data-v=self]::after{content:"常用";margin-left:auto;padding:4px 8px;border-radius:999px;background:rgba(62,105,70,.09);font-size:10px}#typeGrid .type-btn[data-v=self].active{background:linear-gradient(110deg,#416849,#35563b);color:#fff}
+
+
+/* Apple HIG layout pass: dashboard columns and a conventional two-tab bar */
+body.in-result #main { max-width:100%; padding:0 0 calc(112px + env(safe-area-inset-bottom,0px)); }
+body.in-result .apple-welcome { display:none; }
+#main { max-width:1120px; padding:22px 28px calc(112px + env(safe-area-inset-bottom,0px)); }
+.apple-dashboard { display:grid; gap:16px; }
+.apple-welcome { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:132px; padding:22px 24px; border:1px solid var(--glass-border); border-radius:20px; background:linear-gradient(125deg,rgba(255,255,255,.92),rgba(239,244,233,.9)); box-shadow:0 7px 22px rgba(39,57,40,.07); }
+.apple-welcome .eyebrow { color:var(--ink-light); font:600 11px var(--sans); letter-spacing:.08em; }
+.apple-welcome h2 { margin-top:5px; color:var(--green-deep); font:650 clamp(22px,3vw,30px)/1.2 var(--sans); letter-spacing:-.035em; }
+.apple-welcome p { margin-top:6px; color:var(--ink-light); font:13px var(--sans); }
+.apple-welcome .welcome-action { flex:0 0 auto; min-height:46px; padding:0 17px; border:0; border-radius:12px; background:#3e6946; color:#fff; font:600 13px var(--sans); box-shadow:0 3px 9px rgba(40,76,47,.16); }
+.apple-dashboard-grid { display:grid; grid-template-areas:'welcome today' 'query today' 'browse cache'; grid-template-columns:minmax(0,1.18fr) minmax(280px,.82fr); align-items:start; gap:16px; }
+#todaySection { grid-area:today; }
+#querySection { grid-area:query; }
+#browseNav { grid-area:browse; }
+#cacheInfoSection { grid-area:cache; }
+.apple-dashboard-grid > section { min-width:0; margin:0; }
+.apple-dashboard-grid > #todaySection .card { min-height:180px; }
+#todaySection .card-header { color:var(--green); }
+#cacheInfoSection .card-header { cursor:pointer; }
+.apple-dashboard-grid .card { border-radius:17px; }
+/* 首页底栏改为标准等宽标签，取消旧的变形滑块动画 */
+#bottomNav { width:min(360px,calc(100vw - 32px)); min-height:70px; gap:4px; padding:5px; border-radius:22px; bottom:calc(12px + env(safe-area-inset-bottom,0px)); background:rgba(248,248,244,.94); border:1px solid rgba(60,65,58,.12); box-shadow:0 7px 24px rgba(20,26,20,.15); }
+#bottomNav::before,#bottomNav::after { display:none; }
+#bottomNav .glass-slide { display:none; }
+#bottomNav .nav-item { min-height:58px; flex:1 1 50%; gap:4px; border-radius:16px; color:#666d65; font:500 11px var(--sans); transform:none; box-shadow:none; }
+#bottomNav .nav-item svg { width:22px; height:22px; transform:none; }
+#bottomNav .nav-item.active { color:#315b39; background:rgba(62,105,70,.11); font-weight:650; }
+#bottomNav .nav-item.active svg { transform:none; }
+/* System dark appearance: keep text, selected controls, fields, tables and glass surfaces legible */
+html[data-theme=dark] { --cream:#171a17; --cream-2:#222622; --green:#a6c795; --green-lite:#91b47f; --green-deep:#a6c795; --pink:#d58da0; --pink-deep:#dc9aab; --ink:#f1f2ed; --ink-light:#b3b8af; --line:rgba(236,239,231,.14); --row:#222722; --glass:rgba(38,42,38,.94); --glass-2:rgba(43,48,43,.94); --glass-border:rgba(230,236,224,.15); --glass-hi:rgba(255,255,255,.07); --sheet-bg:rgba(30,34,30,.98); --grad-a:rgba(176,117,138,.10); --grad-b:rgba(143,174,110,.10); --grad-c:rgba(164,154,130,.06); }
+html[data-theme=dark] body,html[data-theme=dark] .card-header .mono,html[data-theme=dark] .settings-panel .set-label { color:var(--ink); }
+html[data-theme=dark] html::before { background:radial-gradient(420px 420px at 12% 8%,var(--grad-a),transparent 60%),radial-gradient(520px 520px at 88% 20%,var(--grad-b),transparent 65%),#111410; }
+html[data-theme=dark] .apple-welcome { background:linear-gradient(130deg,#252c26,#202820); border-color:rgba(236,239,231,.12); box-shadow:0 8px 24px rgba(0,0,0,.22); }
+html[data-theme=dark] .apple-welcome h2 { color:#e8f0e3; }
+html[data-theme=dark] .apple-welcome .welcome-action { background:#71916b; color:#111710; }
+html[data-theme=dark] .card,html[data-theme=dark] .card-green,html[data-theme=dark] .card-pink,html[data-theme=dark] .settings-panel .settings-group { background:#242924; border-color:var(--line); color:var(--ink); }
+html[data-theme=dark] .card-pink .card-header .mono { color:#e4a4b3; }
+html[data-theme=dark] input[type=text],html[data-theme=dark] input[type=password],html[data-theme=dark] select { background:#1d221e; color:var(--ink); border-color:var(--line); color-scheme:dark; }
+html[data-theme=dark] #typeGrid .type-btn { background:#303630; color:#dce5d8; border-color:rgba(230,236,224,.14); }
+html[data-theme=dark] #typeGrid .type-btn.active { background:#557451; color:#fff; }
+html[data-theme=dark] #typeGrid .type-btn[data-v=self] { background:linear-gradient(110deg,#29382b,#253127); color:#e8f0e3; }
+html[data-theme=dark] #typeGrid .type-btn[data-v=self].active { background:linear-gradient(110deg,#4e714e,#405f42); color:#fff; }
+html[data-theme=dark] .btn-chip,html[data-theme=dark] button.outline { background:#2c322c; color:#d8e5d3; border-color:rgba(230,236,224,.18); }
+html[data-theme=dark] .sched-course:not(.pink),html[data-theme=dark] .course-card.green,html[data-theme=dark] .course-row.green { background:#2b392d; border-color:#405143; color:#e3eee0; }
+html[data-theme=dark] .sched-course.pink,html[data-theme=dark] .course-card.pink,html[data-theme=dark] .course-row.pink { background:#402f34; border-color:#59404a; color:#f3e2e5; }
+html[data-theme=dark] th { background:#292f29; color:#cbdcc4; border-color:var(--line); }
+html[data-theme=dark] td,html[data-theme=dark] tr:nth-child(even) td { background:transparent; color:var(--ink); border-color:var(--line); }
+html[data-theme=dark] .settings-panel { background:rgba(20,24,20,.98); }
+html[data-theme=dark] .settings-hero { background:linear-gradient(135deg,#293b2c,#344a35); border-color:rgba(255,255,255,.12); }
+html[data-theme=dark] .settings-icon { color:#d2e2cb; background:#303a30; }
+html[data-theme=dark] #bottomNav { background:rgba(35,40,35,.96); border-color:rgba(255,255,255,.12); box-shadow:0 8px 26px rgba(0,0,0,.48); }
+html[data-theme=dark] #bottomNav .nav-item { color:#c1c7bd; }
+html[data-theme=dark] #bottomNav .nav-item.active { color:#e4f1de; background:rgba(132,171,119,.24); }
+html[data-theme=dark] body.in-result #todaySection.open,html[data-theme=dark] body.in-result #cacheInfoSection.open,html[data-theme=dark] body.in-result #querySection.open,html[data-theme=dark] body.in-result #browseNav.open { background:rgba(31,36,31,.97); border-color:rgba(235,240,231,.18); }
+@media(max-width:820px) { #main { max-width:640px; padding:16px 18px calc(108px + env(safe-area-inset-bottom,0px)); } .apple-dashboard-grid { grid-template-areas:'welcome' 'today' 'query' 'browse' 'cache'; grid-template-columns:minmax(0,1fr); gap:12px; } .apple-welcome { min-height:116px; padding:19px; } .apple-welcome .welcome-action { min-height:44px; padding:0 12px; } }
+@media(max-width:380px) { .apple-welcome { align-items:flex-start; flex-direction:column; } .apple-welcome .welcome-action { width:100%; } }
+
+
+
+:root{--ap-bg:#f4f5f0;--ap-surface:#fff;--ap-surface-2:#edf1e9;--ap-ink:#18231b;--ap-muted:#707b70;--ap-line:#e1e6dd;--ap-green:#244b32;--ap-green-2:#38664a;--ap-accent:#d8879a;--ap-shadow:0 12px 36px rgba(30,48,34,.055);--ap-radius:24px;--ap-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif}
+html,body{font-family:var(--ap-font)!important;color:var(--ap-ink)}
+body{background:var(--ap-bg)!important}
+html::before{background:radial-gradient(780px 480px at 8% 0%,rgba(216,135,154,.10),transparent 70%),radial-gradient(850px 560px at 96% 8%,rgba(94,137,92,.12),transparent 70%),var(--ap-bg)!important;animation:none!important}
+.topbar{min-height:70px;padding-inline:clamp(20px,4vw,56px);background:rgba(250,251,247,.82)!important;border-bottom:1px solid rgba(49,68,51,.08);box-shadow:0 2px 16px rgba(28,43,30,.035)!important;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.topbar .brand,.topbar h1{font-family:var(--ap-font)!important;letter-spacing:-.045em}
+#main{max-width:1180px!important;padding:30px 34px calc(116px + env(safe-area-inset-bottom,0px))!important}
+.apple-dashboard{display:flex;flex-direction:column;gap:24px}
+.apple-welcome{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:214px;padding:34px clamp(26px,4vw,48px);border:1px solid rgba(64,94,65,.09);border-radius:30px;background:linear-gradient(115deg,#eaf0e6 0%,#f0f2e9 62%,#f7eee9 100%);box-shadow:0 12px 34px rgba(47,71,49,.055)}
+.apple-welcome:after{content:"";position:absolute;z-index:-1;right:12%;top:-120px;width:350px;height:350px;border:1px solid rgba(61,98,65,.12);border-radius:50%;box-shadow:0 0 0 30px rgba(61,98,65,.025),0 0 0 74px rgba(61,98,65,.02)}
+.apple-welcome .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#607565;font:650 10px/1 var(--ap-font);letter-spacing:.15em;text-transform:uppercase}
+.apple-welcome .eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ap-green-2)}
+.apple-welcome h2{max-width:620px;margin:18px 0 0;color:#1b3825;font:650 clamp(32px,4vw,48px)/1.1 var(--ap-font);letter-spacing:-.065em}
+.apple-welcome p{margin:12px 0 0;color:#657366;font:15px/1.55 var(--ap-font);letter-spacing:-.01em}
+.apple-welcome .welcome-action{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:50px;padding:0 19px;border:0;border-radius:15px;background:var(--ap-green);color:white;font:600 14px var(--ap-font);letter-spacing:-.01em;box-shadow:0 7px 16px rgba(36,75,50,.17);transition:transform .2s,background .2s}
+.apple-welcome .welcome-action:hover{background:#183b25;transform:translateY(-1px)}
+.apple-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(300px,.82fr);align-items:start;gap:22px}
+.apple-primary-column,.apple-support-column{display:flex;min-width:0;flex-direction:column;gap:18px}
+.apple-dashboard-grid>section{min-width:0;margin:0!important}
+.apple-dashboard-grid .card{overflow:hidden;border:1px solid rgba(42,64,44,.075)!important;border-radius:var(--ap-radius)!important;background:var(--ap-surface)!important;box-shadow:var(--ap-shadow)!important;padding:22px 24px!important}
+.apple-dashboard-grid .card-header{min-height:30px;margin-bottom:16px;padding:0 0 13px!important;border-bottom:1px solid var(--ap-line)!important;color:var(--ap-ink)!important}
+.apple-dashboard-grid .card-header .mono{color:var(--ap-ink)!important;font:650 15px/1.3 var(--ap-font)!important;letter-spacing:-.025em}
+.apple-dashboard-grid #todaySection .card{min-height:166px;background:linear-gradient(145deg,#eaf1e6,#f1f4ed)!important;border-color:rgba(69,104,68,.1)!important}
+.apple-dashboard-grid #todaySection .card-header{border-color:rgba(55,86,56,.13)!important}
+#todayCount{padding:5px 9px;border-radius:999px;background:rgba(45,83,53,.08);color:#537057!important;font:600 11px var(--ap-font)!important}
+#todayCourses{font-family:var(--ap-font)}
+.apple-dashboard-grid #querySection .card{padding:24px!important}
+.apple-dashboard-grid #querySection .card-header{border-color:rgba(216,135,154,.38)!important}
+.apple-dashboard-grid #querySection .card-header .mono{color:#a85e73!important}
+.apple-entry-heading{padding:7px 2px 3px!important;color:#818a80!important;font:650 10px/1.2 var(--ap-font)!important;letter-spacing:.1em;text-transform:uppercase}
+#typeGrid{gap:9px!important}
+#typeGrid .type-btn{min-height:46px!important;padding:0 13px!important;border:1px solid #e2e7df!important;border-radius:14px!important;background:#fafbf8!important;color:#425347!important;font:550 13px var(--ap-font)!important;letter-spacing:-.015em;box-shadow:none!important;transition:background .18s,border .18s,transform .18s}
+#typeGrid .type-btn:hover{transform:translateY(-1px);border-color:#b9c8b8!important;background:#f3f6f0!important}
+#typeGrid .type-btn[data-v=self]{min-height:52px!important;padding-inline:16px!important;border:0!important;border-radius:15px!important;background:linear-gradient(110deg,#294f35,#3e6848)!important;color:#fff!important;box-shadow:0 7px 14px rgba(41,79,53,.15)!important}
+#typeGrid .type-btn[data-v=self]::after{background:rgba(255,255,255,.16)!important;color:#fff!important}
+#typeGrid .type-btn.active:not([data-v=self]){border-color:#52745a!important;background:#edf3eb!important;color:#26482f!important}
+#querySection input,#querySection select{min-height:48px!important;border:1px solid #dfe5dc!important;border-radius:13px!important;background:#fafbf9!important;color:var(--ap-ink)!important;font:14px var(--ap-font)!important;box-shadow:none!important}
+#querySection input:focus,#querySection select:focus{outline:3px solid rgba(56,102,74,.17)!important;border-color:#64836a!important}
+#querySection button:not(.type-btn){min-height:46px!important;border:1px solid var(--ap-green)!important;border-radius:13px!important;background:var(--ap-green)!important;color:#fff!important;font:600 13px var(--ap-font)!important;box-shadow:none!important}
+#querySection button.outline{background:transparent!important;color:var(--ap-green)!important}
+#browseNav .btn-group{display:flex;flex-wrap:wrap;gap:8px}
+#browseNav .btn-chip{min-height:42px!important;padding:0 14px!important;border:1px solid #e0e6dc!important;border-radius:13px!important;background:#f8faf7!important;color:#334c39!important;font:550 12px var(--ap-font)!important;box-shadow:none!important}
+#cacheInfoSection #cacheBody{font:12px/1.8 var(--ap-font)!important;color:var(--ap-muted)!important}
+#cacheList{color:var(--ap-green)!important}
+#bottomNav{position:fixed!important;z-index:800!important;left:0!important;right:0!important;bottom:0!important;transform:none!important;width:100%!important;max-width:none!important;min-height:calc(72px + env(safe-area-inset-bottom,0px))!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;gap:6px!important;padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px))!important;border:0!important;border-top:1px solid rgba(45,62,47,.11)!important;border-radius:0!important;background:rgba(250,251,248,.88)!important;box-shadow:0 -5px 24px rgba(31,45,32,.045)!important;backdrop-filter:blur(24px) saturate(1.45)!important;-webkit-backdrop-filter:blur(24px) saturate(1.45)!important}
+#bottomNav:before,#bottomNav:after,#bottomNav .glass-slide{display:none!important}
+#bottomNav .nav-item{width:min(190px,40vw)!important;min-height:50px!important;flex:0 1 190px!important;display:flex!important;flex-direction:row!important;justify-content:center!important;gap:9px!important;padding:0 15px!important;border:0!important;border-radius:14px!important;background:transparent!important;color:#707a70!important;font:550 13px var(--ap-font)!important;box-shadow:none!important;transform:none!important}
+#bottomNav .nav-item svg{width:20px!important;height:20px!important;stroke:currentColor!important}
+#bottomNav .nav-item.active{background:rgba(54,99,66,.09)!important;color:#264b32!important;font-weight:650!important}
+#bottomNav .nav-item:focus-visible,.apple-welcome button:focus-visible,#typeGrid button:focus-visible{outline:3px solid rgba(0,122,255,.42)!important;outline-offset:2px}
+#settingsSection{max-width:850px!important;margin:26px auto 0!important;padding:0 24px calc(120px + env(safe-area-inset-bottom,0px))!important;background:transparent!important}
+#settingsSection .settings-hero{padding:34px!important;border:1px solid rgba(42,64,44,.08)!important;border-radius:28px!important;background:linear-gradient(120deg,#e9f0e5,#f2f3ed)!important;box-shadow:none!important}
+#settingsSection .settings-hero h2{font:650 34px/1.15 var(--ap-font)!important;letter-spacing:-.05em}
+#settingsSection .settings-group{margin-top:16px!important;border:1px solid rgba(42,64,44,.075)!important;border-radius:22px!important;background:#fff!important;box-shadow:var(--ap-shadow)!important}
+#settingsSection .settings-icon{border-radius:12px!important;background:#edf2ea!important;color:#365c3d!important}
+#demoCompare{border:1px solid rgba(49,71,51,.14)!important;border-radius:999px!important;background:#fff!important;color:#425547!important;font:600 11px var(--ap-font)!important}
+body>div[style*="position:fixed"][style*="left:10px"]{border:1px solid rgba(49,71,51,.12)!important;border-radius:999px!important;background:rgba(250,251,248,.88)!important;color:#56685a!important;box-shadow:0 4px 18px rgba(30,48,34,.08)!important;font:600 10px var(--ap-font)!important;backdrop-filter:blur(16px)}
+body.in-result #main{max-width:100%!important;padding:0 0 calc(112px + env(safe-area-inset-bottom,0px))!important}
+body.in-result .apple-welcome{display:none}
+html[data-theme=dark]{--ap-bg:#141815;--ap-surface:#202621;--ap-surface-2:#252d26;--ap-ink:#eff2ec;--ap-muted:#aab4aa;--ap-line:rgba(226,236,226,.12);--ap-green:#9cc49f;--ap-green-2:#83ad87;--ap-accent:#d693a5;--ap-shadow:0 14px 38px rgba(0,0,0,.18)}
+html[data-theme=dark] body{background:var(--ap-bg)!important;color:var(--ap-ink)!important}
+html[data-theme=dark]::before{background:radial-gradient(800px 500px at 8% 0%,rgba(179,105,128,.09),transparent 70%),radial-gradient(850px 560px at 96% 8%,rgba(99,143,100,.11),transparent 70%),var(--ap-bg)!important}
+html[data-theme=dark] .topbar{background:rgba(24,30,25,.88)!important;border-color:rgba(232,240,231,.08)!important}
+html[data-theme=dark] .apple-welcome{border-color:rgba(230,240,228,.08);background:linear-gradient(115deg,#202b22,#242b24 64%,#30272a);box-shadow:0 14px 36px rgba(0,0,0,.14)}
+html[data-theme=dark] .apple-welcome:after{border-color:rgba(192,220,190,.12);box-shadow:0 0 0 30px rgba(192,220,190,.025),0 0 0 74px rgba(192,220,190,.02)}
+html[data-theme=dark] .apple-welcome .eyebrow,html[data-theme=dark] .apple-welcome p{color:#b2c0b2}
+html[data-theme=dark] .apple-welcome h2{color:#f1f4ed}
+html[data-theme=dark] .apple-welcome .welcome-action{background:#9bc29a;color:#142016}
+html[data-theme=dark] .apple-dashboard-grid .card,html[data-theme=dark] #settingsSection .settings-group{background:#202621!important;border-color:rgba(230,240,228,.09)!important;color:var(--ap-ink)!important}
+html[data-theme=dark] .apple-dashboard-grid #todaySection .card{background:linear-gradient(145deg,#26372a,#222c24)!important;border-color:rgba(164,202,162,.1)!important}
+html[data-theme=dark] .apple-dashboard-grid .card-header .mono{color:var(--ap-ink)!important}
+html[data-theme=dark] .apple-dashboard-grid #querySection .card-header .mono{color:#e0a6b4!important}
+html[data-theme=dark] .apple-entry-heading{color:#aab4aa!important}
+html[data-theme=dark] #typeGrid .type-btn{border-color:#374139!important;background:#282f29!important;color:#e0e8de!important}
+html[data-theme=dark] #typeGrid .type-btn[data-v=self]{border:0!important;background:linear-gradient(110deg,#355c3d,#426b49)!important;color:#fff!important}
+html[data-theme=dark] #typeGrid .type-btn.active:not([data-v=self]){border-color:#739477!important;background:#304432!important;color:#ecf5e9!important}
+html[data-theme=dark] #querySection input,html[data-theme=dark] #querySection select{border-color:#3c463d!important;background:#171d18!important;color:var(--ap-ink)!important;color-scheme:dark}
+html[data-theme=dark] #querySection button:not(.type-btn){border-color:#82ad86!important;background:#82ad86!important;color:#152017!important}
+html[data-theme=dark] #querySection button.outline{background:transparent!important;color:#b2d3b2!important}
+html[data-theme=dark] #browseNav .btn-chip{border-color:#3b463c!important;background:#252d26!important;color:#d9e7d8!important}
+html[data-theme=dark] #todayCount{background:rgba(167,207,165,.12);color:#b9d7b8!important}
+html[data-theme=dark] #bottomNav{border-color:rgba(230,240,228,.1)!important;background:rgba(25,31,26,.91)!important;box-shadow:0 -5px 24px rgba(0,0,0,.18)!important}
+html[data-theme=dark] #bottomNav .nav-item{color:#aab5aa!important}
+html[data-theme=dark] #bottomNav .nav-item.active{background:rgba(140,185,140,.13)!important;color:#b9d9b8!important}
+html[data-theme=dark] #settingsSection .settings-hero{border-color:rgba(230,240,228,.08)!important;background:linear-gradient(120deg,#202b22,#282e29)!important}
+html[data-theme=dark] #settingsSection .settings-icon{background:#2d382f!important;color:#b3d0b3!important}
+html[data-theme=dark] #demoCompare{border-color:rgba(230,240,228,.13)!important;background:#273029!important;color:#dce7da!important}
+html[data-theme=dark] body>div[style*="position:fixed"][style*="left:10px"]{border-color:rgba(230,240,228,.13)!important;background:rgba(31,38,32,.88)!important;color:#b5c5b5!important}
+@media(max-width:820px){#main{max-width:680px!important;padding:20px 18px calc(104px + env(safe-area-inset-bottom,0px))!important}.apple-dashboard{gap:18px}.apple-welcome{min-height:190px;padding:27px 25px;border-radius:25px}.apple-welcome h2{font-size:36px}.apple-dashboard-grid{grid-template-columns:minmax(0,1fr);gap:14px}.apple-primary-column,.apple-support-column{gap:14px}.apple-primary-column{display:contents}.apple-support-column{display:contents}#querySection{order:1}#todaySection{order:2}#browseNav{order:3}#cacheInfoSection{order:4}#querySection .card{padding:20px!important}.apple-dashboard-grid .card{border-radius:21px!important;padding:19px 20px!important}#settingsSection{padding-inline:18px}}
+@media(max-width:520px){.topbar{min-height:60px;padding-inline:16px}.apple-welcome{align-items:flex-start;flex-direction:column;gap:18px;min-height:0;padding:25px 22px}.apple-welcome h2{margin-top:15px;font-size:32px}.apple-welcome p{font-size:13px}.apple-welcome .welcome-action{min-height:46px;width:100%;justify-content:space-between;padding-inline:15px}.apple-welcome:after{right:-180px;top:-120px;width:300px;height:300px}#main{padding-inline:14px!important}.apple-dashboard-grid .card{padding:18px!important}#typeGrid{gap:7px!important}#typeGrid .type-btn{min-height:44px!important;padding:0 9px!important;font-size:12px!important}#bottomNav{min-height:calc(66px + env(safe-area-inset-bottom,0px))!important;padding-top:6px!important}#bottomNav .nav-item{min-height:48px!important;font-size:12px!important}}
+@media(prefers-reduced-motion:reduce){.apple-welcome .welcome-action,#typeGrid .type-btn{transition:none!important}}
+@media(prefers-reduced-transparency:reduce){#bottomNav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--ap-bg)!important}}
+
+/* Release refinements: semantic colors and acrylic surfaces. */
+body{isolation:isolate;min-height:100vh}
+:root{--label-primary:#182c21;--label-secondary:#526759;--acrylic:rgba(255,255,255,.57);--acrylic-raised:rgba(253,255,249,.69);--acrylic-border:rgba(255,255,255,.72);--book-stroke:#577d5b;--book-page:#edf3e6}
+html[data-theme=dark]{--label-primary:#f0f4ed;--label-secondary:#b9c8b8;--acrylic:rgba(31,42,33,.59);--acrylic-raised:rgba(31,42,33,.75);--acrylic-border:rgba(218,241,215,.18);--book-stroke:#99c09b;--book-page:#354637}
+html body .apple-dashboard-grid .card,html[data-theme=dark] body .apple-dashboard-grid .card,html body #settingsSection .settings-group,html[data-theme=dark] body #settingsSection .settings-group{background:var(--acrylic)!important;border:1px solid var(--acrylic-border)!important;backdrop-filter:blur(30px) saturate(155%);-webkit-backdrop-filter:blur(30px) saturate(155%);box-shadow:0 14px 40px rgba(24,50,29,.07),inset 0 1px 0 rgba(255,255,255,.3)!important}
+html body .apple-dashboard-grid #todaySection .card,html[data-theme=dark] body .apple-dashboard-grid #todaySection .card{background:var(--acrylic)!important}
+html body .apple-welcome,html[data-theme=dark] body .apple-welcome{background:var(--acrylic)!important;backdrop-filter:blur(24px) saturate(135%);-webkit-backdrop-filter:blur(24px) saturate(135%)}
+html body #settingsSection{background:var(--ap-bg)!important;margin:0 auto!important;padding-top:calc(24px + var(--sb,0px))!important}
+html body #settingsSection .settings-hero,html[data-theme=dark] body #settingsSection .settings-hero{background:var(--acrylic)!important;color:var(--label-primary)!important;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+html body #settingsSection .settings-hero h2,html[data-theme=dark] body #settingsSection .settings-hero h2{color:var(--label-primary)!important}
+html body #settingsSection .settings-hero p,html body #settingsSection .settings-kicker,html body #settingsSection .settings-version{color:var(--label-secondary)!important;opacity:1}
+.settings-hero p{font-size:14px!important;line-height:1.6}.settings-kicker{font-weight:650}.set-desc{display:block}
+.appearance-seg{display:flex;gap:3px;min-width:171px;padding:4px;background:rgba(100,125,103,.12);border-radius:12px}
+.appearance-seg button{min-height:44px;flex:1;padding:6px 10px;border:0;border-radius:9px;background:transparent;color:var(--label-secondary);font:600 12px var(--ap-font);box-shadow:none}
+.appearance-seg button.on{background:var(--ap-surface)!important;color:var(--label-primary)!important;box-shadow:0 2px 7px rgba(15,40,21,.12)}
+html[data-theme=dark] #settingsSection .setting-input{background:#1b261e!important;color:var(--label-primary)!important;border-color:var(--ap-line)!important;color-scheme:dark}
+.topbar-left.app-brand{gap:10px!important;align-items:center}.brand-symbol{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#244b32;color:#f4f8ed;box-shadow:0 5px 12px rgba(36,75,50,.12);flex-shrink:0}.brand-symbol svg{width:25px;height:25px}.app-brand .topbar-title{font:680 22px/1.2 var(--ap-font)!important;letter-spacing:-.055em}.brand-caption{display:block;margin-top:3px;color:var(--label-secondary);font:650 8px/1.2 var(--ap-font);letter-spacing:.17em}.topbar-tools{display:flex;align-items:center;gap:8px}
+html body .toolbar-action,html[data-theme=dark] body .toolbar-action{display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;padding:0;border:1px solid var(--ap-line);border-radius:14px;background:var(--acrylic);color:var(--label-primary);box-shadow:0 3px 9px rgba(22,45,27,.04)}
+.toolbar-action svg{width:21px;height:21px}.topbar-tools #statusText{font:500 10px var(--ap-font)!important;color:var(--label-secondary)}.topbar-tools #statusDot{width:6px;height:6px;margin-right:-4px}
+.welcome-action svg{width:19px;height:19px}.panel-hint{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:0 4px;color:var(--label-secondary);font:12px/1.6 var(--ap-font)}.panel-hint button{min-height:44px;padding:0 12px;border:1px solid var(--ap-line);border-radius:12px;background:var(--acrylic);color:var(--label-primary);font:600 12px var(--ap-font)}.panel-hint button[hidden]{display:none}
+body.in-result .panel-hint{display:none}.show-settings .panel-floating{display:none!important}
+html body .panel-floating{position:fixed!important;z-index:180!important;right:0!important;left:auto!important;width:23px!important;min-width:0!important;margin:0!important;padding:0!important;overflow:hidden!important;border:1px solid var(--acrylic-border)!important;border-right:0!important;border-radius:9px 0 0 9px!important;background:var(--acrylic-raised)!important;backdrop-filter:blur(32px) saturate(160%)!important;-webkit-backdrop-filter:blur(32px) saturate(160%)!important;box-shadow:0 8px 28px rgba(23,44,29,.15)!important;touch-action:none}
+html body .panel-floating.dock-left{left:0!important;right:auto!important;border-right:1px solid var(--acrylic-border)!important;border-left:0!important;border-radius:0 9px 9px 0!important}
+html body .panel-floating>.card{display:none!important}.panel-floating>.fd-tab{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;writing-mode:vertical-rl;padding:6px 1px!important;letter-spacing:1.5px;font:650 10px/1.2 var(--ap-font)!important;color:var(--label-primary)!important;background:transparent!important;cursor:pointer}
+html body .panel-floating.open{width:min(272px,calc(100vw - 44px))!important;overflow:auto!important;overscroll-behavior:contain;touch-action:pan-y;border-radius:16px 0 0 16px!important}
+html body .panel-floating.open.dock-left{border-radius:0 16px 16px 0!important}
+html body .panel-floating.open>.card,html[data-theme=dark] body .panel-floating.open>.card{display:block!important;margin:0!important;padding:13px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;min-height:0!important}
+html body .panel-floating.open>.fd-tab{display:none!important}.panel-floating .card-header{cursor:pointer;user-select:none;touch-action:none}.panel-floating #typeGrid .type-btn{font-size:11px!important;min-height:42px!important}.panel-floating .card-header .mono{font-size:13px!important}
+body.in-result .apple-dashboard-grid{display:contents!important}body.in-result .apple-primary-column,body.in-result .apple-support-column{display:contents!important}
+.cache-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}.cache-stats>div{padding:13px 12px;border-radius:13px;background:rgba(90,125,83,.08)}.cache-stats strong{display:block;color:var(--label-primary);font:650 18px var(--ap-font);letter-spacing:-.04em}.cache-stats span{display:block;margin-top:4px;color:var(--label-secondary);font-size:10px}.cache-category{border-top:1px solid var(--ap-line)}.cache-category summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;cursor:pointer;list-style:none;color:var(--label-primary);font:600 12px var(--ap-font)}.cache-category summary::-webkit-details-marker{display:none}.cache-category summary>span:last-child{font-size:10px;color:var(--label-secondary)}.cache-category summary:after{content:'+';font-size:16px;color:var(--label-secondary)}.cache-category[open] summary:after{content:'−'}.cache-entry{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px dashed var(--ap-line);font:11px/1.45 var(--ap-font)}.cache-entry b{display:block;color:var(--label-primary);font-weight:600}.cache-entry small{display:block;margin-top:3px;color:var(--label-secondary);font-size:10px;overflow-wrap:anywhere}.cache-entry-meta{text-align:right;flex-shrink:0;color:var(--label-secondary);font-size:9px}.cache-entry time{display:block;margin-top:3px}.cache-local-note{margin:12px 0 0;color:var(--label-secondary);font:10px/1.6 var(--ap-font)}.cache-empty{padding:10px 0;color:var(--label-primary);font:13px/1.6 var(--ap-font)}.cache-empty small{color:var(--label-secondary);font-size:11px}
+.about-brand{display:flex;align-items:center;gap:13px;flex-wrap:wrap}.about-symbol{display:grid;place-items:center;flex-shrink:0;width:54px;height:54px;border-radius:17px;background:linear-gradient(145deg,#234e33,#51815a);color:#f8fff0;font:600 30px var(--ap-font);box-shadow:0 8px 16px rgba(35,78,51,.13)}.about-brand h3{margin:5px 0;color:var(--label-primary);font:650 21px var(--ap-font);letter-spacing:-.04em}.about-brand p{color:var(--label-secondary);font:12px var(--ap-font)}.about-version{margin-left:auto;padding:5px 8px;border:1px solid var(--ap-line);border-radius:9px;color:var(--label-secondary);font:600 10px var(--ap-font)}.about-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px;padding:17px 0;border-top:1px solid var(--ap-line);border-bottom:1px solid var(--ap-line)}.about-features strong{display:block;color:var(--label-primary);font:600 13px var(--ap-font)}.about-features span{display:block;margin-top:6px;color:var(--label-secondary);font:11px/1.5 var(--ap-font)}.about-copy{margin:18px 0;color:var(--label-secondary);font:12px/1.8 var(--ap-font)}.about-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--label-secondary);font:11px/1.7 var(--ap-font)}.about-footer small{font-size:10px}
+body.schedule-result .demo-course{padding:5px 2px!important;display:flex;flex-direction:column;align-items:center;text-align:center!important}.demo-course .cn{display:flex;flex-direction:column;align-items:center;max-width:100%;font-size:clamp(9px,2.75vw,13px)!important;line-height:1.3!important;letter-spacing:0!important;word-break:normal!important}.demo-course .cn>span{display:block;white-space:nowrap;max-width:100%}.demo-course .cs{font-size:10px!important;line-height:1.25!important;max-width:100%;overflow-wrap:anywhere}
+.today-schedule-list{max-width:780px;margin:0 auto;padding:24px 20px 60px}.today-list-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px;color:var(--label-primary)}.today-list-head .eyebrow{font:650 10px var(--ap-font);letter-spacing:.13em;color:var(--label-secondary)}.today-list-head h2{margin:7px 0;font:650 28px var(--ap-font);letter-spacing:-.05em}.today-list-head p{font:12px/1.5 var(--ap-font);color:var(--label-secondary)}.today-list-count{padding:8px 12px;border:1px solid var(--ap-line);border-radius:12px;font:650 13px var(--ap-font)}
+body.schedule-result .today-list-course{display:flex;align-items:stretch;width:100%;gap:19px;margin:0 0 14px;padding:21px 20px;border:1px solid var(--acrylic-border);border-left:4px solid var(--course-accent);border-radius:19px;background:var(--acrylic-raised);color:var(--label-primary);text-align:left;font-family:var(--ap-font);box-shadow:0 8px 22px rgba(28,47,30,.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}.today-list-time{flex:0 0 65px;padding-right:12px;border-right:1px solid var(--ap-line)}.today-list-time strong{display:block;font-size:21px;letter-spacing:-.04em}.today-list-time span{display:block;margin-top:6px;font-size:12px;color:var(--label-secondary)}.today-list-time small{display:block;margin-top:13px;font-size:10px;color:var(--label-secondary)}.today-list-detail{flex:1;min-width:0}.today-list-detail h3{margin:0 0 14px;font:650 17px/1.4 var(--ap-font);overflow-wrap:anywhere}.today-list-detail dl{margin:0}.today-list-detail dl>div{display:flex;align-items:baseline;gap:9px;margin:6px 0;font-size:12px;line-height:1.5}.today-list-detail dt{flex-shrink:0;color:var(--label-secondary)}.today-list-detail dd{margin:0;overflow-wrap:anywhere}.today-list-week{display:inline-block;margin-top:10px;padding:4px 7px;border-radius:7px;background:rgba(95,128,88,.1);color:var(--label-secondary);font-size:10px}.today-list-empty{padding:34px 20px;border-radius:20px;background:var(--acrylic);color:var(--label-primary);font:15px/1.6 var(--ap-font);text-align:center}.today-list-empty p{margin-top:9px;font-size:12px;color:var(--label-secondary)}
+#bookBackdrop{position:fixed;z-index:-1;pointer-events:none;right:-5vw;bottom:6vh;width:min(760px,95vw);height:auto;opacity:.25;color:var(--book-stroke);filter:drop-shadow(0 14px 30px rgba(50,83,48,.08));transition:opacity .3s}body.in-result #bookBackdrop,body.show-settings #bookBackdrop{opacity:0}.book-page{fill:var(--book-page);stroke:currentColor;stroke-width:1.1}.book-lines{fill:none;stroke:currentColor;stroke-width:1;opacity:.36}.book-turn{transform-box:fill-box;transform-origin:left center;animation:bookTurn 6s linear infinite}.book-turn.page-two{animation-delay:-2s}.book-turn.page-three{animation-delay:-4s}@keyframes bookTurn{0%{transform:scaleX(1);opacity:0}8%{opacity:.9}47%{transform:scaleX(.02);opacity:1}84%{transform:scaleX(-1);opacity:.9}100%{transform:scaleX(-1);opacity:0}}
+body.in-result .book-turn,body.show-settings .book-turn,body.app-hidden .book-turn{animation-play-state:paused}
+@media(max-width:520px){.topbar-tools{gap:6px}.app-brand .topbar-title{font-size:19px!important}.brand-symbol{width:35px;height:35px;border-radius:11px}.brand-caption{font-size:7px}.topbar-tools #statusText{display:none}.topbar-tools #statusDot{margin:0 3px}.appearance-row{flex-wrap:wrap}.today-schedule-list{padding:20px 13px 40px}body.schedule-result .today-list-course{padding:18px 14px;gap:13px}.today-list-detail h3{font-size:16px}.panel-hint{font-size:11px}.about-version{margin-left:0}}
+@media(prefers-reduced-transparency:reduce){html body .apple-dashboard-grid .card,html body #settingsSection .settings-group,html body .panel-floating,html body .apple-welcome,html body .today-list-course{background:var(--ap-surface)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
+@media(prefers-reduced-motion:reduce){.book-turn{animation:none!important}#bookBackdrop{display:none}}
+@media(prefers-contrast:more){:root{--acrylic:var(--ap-surface);--acrylic-raised:var(--ap-surface)}.card{border-color:var(--label-secondary)!important}}

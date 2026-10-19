@@ -12,6 +12,9 @@ foreach ($target in $targets) {
     New-Item -ItemType Directory -Path $scheduleAssets -Force | Out-Null
     Copy-Item (Join-Path $source 'index.html') (Join-Path $target 'index.html') -Force
     Copy-Item (Join-Path $source 'schedule-assets/*') $scheduleAssets -Force
+    $uiAssets = Join-Path $target 'ui'
+    New-Item -ItemType Directory -Path $uiAssets -Force | Out-Null
+    Copy-Item (Join-Path $source 'ui/*') $uiAssets -Force
 }
 
 Write-Output 'Web page and offline schedule artwork synced to both Android packaging sources.'

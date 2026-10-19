@@ -104,19 +104,19 @@ function renderCacheInventory(info) {
 function initExperience() {
   if(!document.getElementById('bookBackdrop'))document.body.insertAdjacentHTML('afterbegin','<svg id="bookBackdrop" viewBox="0 0 620 430" aria-hidden="true" focusable="false"><ellipse cx="312" cy="354" rx="230" ry="17" fill="currentColor" opacity=".07"/><path class="book-page" d="M77 157Q190 115 310 166Q429 115 543 157L530 326Q415 298 310 347Q205 298 91 326Z"/><path class="book-lines" d="M310 166v181M104 176Q201 149 286 179M102 194Q200 167 286 197M100 212Q199 185 286 215M98 230Q198 203 286 233M96 248Q197 221 286 251M335 180Q425 149 514 176M335 198Q425 167 516 194M335 216Q425 185 518 212M335 234Q425 203 520 230M335 252Q425 221 522 248"/><g transform="translate(310 166)"><g class="book-turn page-one"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22M23 77Q110 25 197 43"/></g><g class="book-turn page-two"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22"/></g><g class="book-turn page-three"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22"/></g></g></svg>');
   var main=document.getElementById('main');
-  if(!document.getElementById('appleDashboard')){
-    var dashboard=document.createElement('div');dashboard.id='appleDashboard';dashboard.className='apple-dashboard';
-    var hero=document.createElement('section');hero.className='apple-welcome';
-    hero.innerHTML='<div class="welcome-copy"><div class="eyebrow">JWXT · CAMPUS DESK</div><h2>教务事务，<br>一眼就绪。</h2><p>把今天与本学期的安排，整理得清清楚楚。</p></div><button type="button" class="welcome-action"><span>查看我的课表</span>'+experienceIcon('arrow')+'</button>';
+  if(!document.getElementById('claudeDashboard')){
+    var dashboard=document.createElement('div');dashboard.id='claudeDashboard';dashboard.className='claude-dashboard';
+    var hero=document.createElement('section');hero.className='claude-hero';
+    hero.innerHTML='<div class="welcome-copy"><div class="claude-eyebrow"><span class="claude-mark" aria-hidden="true">✳</span> JWXT / 教务手札</div><h2>今天，安排从容。</h2><p>课表、成绩与校园信息，在这里理清。</p></div><button type="button" class="claude-hero-action"><span>查看我的课表</span>'+experienceIcon('arrow')+'</button>';
     hero.querySelector('button').onclick=function(){selectType('self');runQuery();};
-    var grid=document.createElement('div');grid.className='apple-dashboard-grid';
-    var primary=document.createElement('div');primary.className='apple-primary-column';var support=document.createElement('div');support.className='apple-support-column';
+    var grid=document.createElement('div');grid.className='claude-grid';
+    var primary=document.createElement('div');primary.className='claude-primary';var support=document.createElement('div');support.className='claude-support';
     ['todaySection','querySection','browseNav','cacheInfoSection'].forEach(function(id){var el=document.getElementById(id);if(el)(id==='querySection'||id==='browseNav'?primary:support).appendChild(el);});
     grid.append(primary,support);dashboard.append(hero,grid);var login=document.getElementById('loginSection');main.insertBefore(dashboard,login.nextSibling);
     var hint=document.createElement('div');hint.className='panel-hint';hint.innerHTML='<span>双击面板标题可收起贴边，展开后再次双击可还原。</span><button type="button" id="restoreHomePanels" hidden>还原全部面板</button>';hint.querySelector('button').onclick=restoreHomePanels;dashboard.appendChild(hint);
   }
   var grid=document.getElementById('typeGrid'),buttons={};grid.querySelectorAll('.type-btn').forEach(function(b){buttons[b.dataset.v]=b;});grid.replaceChildren();
-  [['常用课表',['self','teacher','classroom']],['其他课表',['class','course']],['成绩与教务工具',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='apple-entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id])grid.appendChild(buttons[id]);});});
+  [['常用课表',['self','teacher','classroom','class','course']],['学习与教务',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='claude-entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id]){var icon=document.createElement('span');icon.className='entry-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=experienceIcon(id==='teacher'||id==='class'?'system':'book');buttons[id].prepend(icon);grid.appendChild(buttons[id]);}});});
   try{JSON.parse(localStorage.getItem('jwxt_home_panels')||'[]').forEach(function(id){if(FLOAT_PANEL_IDS.indexOf(id)>=0)homeDockedPanels.add(id);});}catch(e){}
   FLOAT_PANEL_IDS.forEach(function(id){
     var el=document.getElementById(id),header=el.querySelector('.card-header'),tab=el.querySelector('.fd-tab');

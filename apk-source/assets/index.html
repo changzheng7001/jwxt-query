@@ -98,7 +98,7 @@ body { background: transparent; color: var(--ink); font-family: var(--serif); fo
 .back-btn.show { display: block; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #8b949e; display: inline-block; }
 .status-dot.ok { background: var(--green); }
-.status-dot.cached { background: var(--pink); }
+.status-dot.cached { background: #b5544f; }
 
 /* 周次/星期框对称统一：grid 两列严格等分，绝对等宽居中 */
 #weekRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
@@ -114,7 +114,7 @@ body { background: transparent; color: var(--ink); font-family: var(--serif); fo
 }
 #weekRow input::placeholder { color: var(--ink-light); }
 
-main { max-width: 600px; margin: 0 auto; padding: 12px; }
+main { max-width: 600px; margin: 0 auto; padding: 12px 28px; }
 
 .card { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px; margin-bottom: 14px;
   background: var(--glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
@@ -159,23 +159,155 @@ button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
 .schedule-day-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--green); padding-bottom: 4px; margin-bottom: 8px; }
 .schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
 
-/* 课表表格（美化版，玻璃主题默认） */
-.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 10px; min-width: 620px; }
-.sched-table thead th { padding: 8px 4px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.10); }
-html[data-theme="dark"] .sched-table thead th { background: linear-gradient(135deg, var(--green-lite), var(--green)); color: var(--green-deep); }
-.sched-table td { border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px; vertical-align: top; text-align: center; background: var(--glass); }
-.sched-table td.seg { font-family: var(--mono); font-size: 9px; color: var(--green); white-space: nowrap; background: var(--glass-2); border: none; }
-.sched-table td .e { color: var(--ink-light); font-style: italic; opacity: 0.5; display: block; line-height: 38px; }
-.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 7px; padding: 5px 6px; margin-bottom: 4px; line-height: 1.4; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.10); }
-.sched-course .cn { font-weight: 700; font-size: 10px; display: block; word-break: break-all; }
+/* 课表表格（易校园风格） */
+.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 11px; min-width: 620px; }
+.sched-table thead th { padding: 6px 2px; background: transparent; color: var(--ink); font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; vertical-align: bottom; }
+.sched-table thead th .wd { font-size: 11px; color: var(--ink-light); display: block; }
+.sched-table thead th .dt { font-size: 14px; display: block; margin-top: 2px; }
+.sched-table thead th.today .dt { display: inline-block; width: 26px; height: 26px; line-height: 26px; border-radius: 50%; background: var(--green); color: var(--cream); }
+.sched-table thead th.today .wd { color: var(--green); }
+.sched-table td { border: none; border-radius: 10px; padding: 3px; vertical-align: top; text-align: center; background: transparent; }
+.sched-table td.today-col { background: color-mix(in srgb, var(--green) 7%, transparent); }
+.sched-table td.seg { color: var(--ink-light); background: transparent; font-size: 11px; font-weight: 600; vertical-align: middle; }
+.sched-table td .e { color: var(--ink-light); opacity: 0.25; }
+.sched-course { border-radius: 8px; padding: 6px 6px; margin-bottom: 3px; line-height: 1.3; cursor: pointer; position: relative; overflow: hidden; }
+.sched-course::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: rgba(255,255,255,0.35); }
+.sched-course .cn { font-weight: 700; font-size: 11px; display: block; word-break: break-all; }
 .sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; margin-top: 2px; }
+.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); }
 .sched-course.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
 html[data-theme="dark"] .sched-course.pink { color: var(--cream); }
 .sched-course:active { transform: scale(0.97); }
-/* 经典主题用保守化表格 */
+/* 经典主题 */
 html[data-style="classic"] .sched-table { border-collapse: collapse; border-spacing: 0; min-width: 0; font-size: 11px; }
-html[data-style="classic"] .sched-table thead th { background: var(--green); color: var(--cream); border-radius: 0; box-shadow: none; border: 1px solid var(--green); }
+html[data-style="classic"] .sched-table thead th { background: var(--green); color: var(--cream); border-radius: 0; border: 1px solid var(--green); }
+html[data-style="classic"] .sched-table thead th.today .dt { background: transparent; color: var(--cream); }
 html[data-style="classic"] .sched-table td { border: 1px solid var(--line); border-radius: 0; background: transparent; }
+html[data-style="classic"] .sched-course::before { display: none; }
+
+/* === 易校园风格课表 CSS Grid（圆角课程格 + 分层表头） === */
+.xkb-wrap { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.06); }
+.xkb-head { display:flex; align-items:stretch; border-bottom:1px solid #E8EAEE; }
+.xkb-head .xkb-month { width:48px; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#333; background:#F5F6F8; border-right:1px solid #E8EAEE; padding:8px 2px; flex-shrink:0; }
+.xkb-head .xkb-days { flex:1; display:flex; }
+.xkb-head .xkb-day { flex:1; text-align:center; padding:7px 2px; }
+.xkb-head .xkb-day .wd { font-size:13px; font-weight:700; color:#3D4149; }
+.xkb-head .xkb-day .dt { font-size:11px; color:#8A8F98; margin-top:1px; }
+.xkb-head .xkb-day.today { background:linear-gradient(180deg,var(--green),var(--green-deep)); }
+.xkb-head .xkb-day.today .wd { color:#fff; }
+.xkb-head .xkb-day.today .dt { color:rgba(255,255,255,.85); }
+.xkb-body { display:flex; }
+.xkb-lecol { width:48px; background:#FAFBFC; border-right:1px solid #E8EAEE; flex-shrink:0; }
+.xkb-lecol .lr { height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:1px solid #EEF0F3; }
+.xkb-lecol .lr .no { font-size:13px; font-weight:800; color:#4A4F57; }
+.xkb-lecol .lr .tm { font-size:8.5px; color:#9AA0A8; white-space:nowrap; margin-top:1px; }
+.xkb-grid-wrap { flex:1; position:relative; overflow:hidden; }
+.xkb-grid { position:relative; height:936px; }
+.xkb-dline { position:absolute; left:0; right:0; height:1px; background:#F0F2F5; }
+.xkb-course { position:absolute; border-radius:10px; padding:6px 8px; overflow:hidden; cursor:pointer; display:flex; flex-direction:column; }
+.xkb-course .cn { font-size:12px; font-weight:800; line-height:1.25; }
+.xkb-course .cr { font-size:9px; margin-top:3px; opacity:.85; }
+
+/* === 查询结果全屏模式 === */
+body.in-result main { max-width:100%; padding:0; }
+body.in-result #resultContent { padding:0; }
+body.in-result #resultSection > .card { background:transparent; border:none; box-shadow:none; }
+body.in-result #resultSection .card-header,
+body.in-result #resultSection .cache-notice { display:none; }
+
+/* 结果页顶栏：更高、三栏布局 */
+body.in-result #mainTopbar { padding: calc(8px + var(--sb, 0px)) 10px 8px; min-height: 88px; align-items: flex-start; }
+body.in-result .tb-home-only { display:none !important; }
+body.in-result #loginBtn, body.in-result #logoutBtn, body.in-result #statusDot, body.in-result #statusText { display:none !important; }
+body.in-result .tb-result-wrap { display:flex !important; align-items:flex-start; justify-content:space-between; gap:8px; }
+.tb-result-wrap { display:none; width:100%; position:relative; min-height:56px; }
+.tb-col { display:flex; align-items:flex-start; gap:8px; }
+.tb-col-center { flex:1; justify-content:center; text-align:center; }
+.tb-col-right { align-items:center; gap:6px; }
+.tb-week-block { display:flex; flex-direction:column; gap:1px; }
+.tb-exit-btn { font-size:8px; padding:4px 2px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:2px; cursor:pointer; line-height:1.2; min-width:0; writing-mode:vertical-rl; text-orientation:upright; letter-spacing:1px; }
+.tb-r-week { display:flex; align-items:center; gap:3px; cursor:pointer; font-size:15px; font-weight:800; color:var(--ink); line-height:1.2; }
+.tb-r-arrow { font-size:9px; color:var(--ink-light); }
+.tb-r-sem { font-size:10px; color:var(--ink-light); line-height:1.2; }
+.tb-r-title { font-size:16px; font-weight:800; color:var(--ink); line-height:1.3; }
+.tb-r-range { font-size:10px; color:var(--ink-light); margin-top:1px; }
+.tb-icon-btn { width:26px; height:24px; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+.back-btn { display:block; padding:0; width:26px; height:24px; font-size:14px; line-height:24px; text-align:center; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+
+/* === 查询参数面板 + 浏览列表：结果页变成可拖动浮窗 === */
+body.in-result #querySection, body.in-result #browseNav {
+  position: fixed; z-index: 160; right: -6px; width: 28px; height: 70px; overflow: hidden;
+  border-radius: 8px;
+  box-shadow: -1px 1px 8px rgba(0,0,0,.1);
+  transition: width .25s ease, right .2s ease, left .2s ease;
+  touch-action: none;
+}
+body.in-result #querySection > .card, body.in-result #browseNav > .card { display: none; }
+body.in-result #querySection > .fd-tab, body.in-result #browseNav > .fd-tab {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  writing-mode: vertical-rl; padding: 8px 5px 8px 3px; box-sizing: border-box;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  cursor: pointer; user-select: none;
+}
+body.in-result #querySection > .fd-tab { background: var(--pink-deep); color: #fff; }
+body.in-result #browseNav > .fd-tab { background: var(--green-deep); color: #fff; }
+body.in-result #querySection.dock-left, body.in-result #browseNav.dock-left {
+  right: auto; left: -6px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 8px rgba(0,0,0,.1);
+}
+body.in-result #querySection.open, body.in-result #browseNav.open { width: 240px; }
+body.in-result #querySection.open > .fd-tab, body.in-result #browseNav.open > .fd-tab { display: none; }
+body.in-result #querySection.open > .card, body.in-result #browseNav.open > .card { display: block; padding: 8px; margin-bottom: 0; }
+
+/* === 今日课程 / 缓存信息：首页=正常卡片，结果页=可左右停靠浮窗 === */
+#todaySection .fd-tab, #cacheInfoSection .fd-tab,
+#querySection .fd-tab, #browseNav .fd-tab { display:none; }
+/* 首页四个面板间距拉开 */
+#todaySection, #querySection, #browseNav, #cacheInfoSection { margin-bottom: 40px; }
+
+body.in-result #todaySection,
+body.in-result #cacheInfoSection {
+  position: fixed; right: -6px; left: auto; z-index: 160;
+  width: 28px; height: 70px; overflow: hidden;
+  border-radius: 8px;
+  box-shadow: -1px 1px 8px rgba(0,0,0,.1);
+  transition: width .25s ease, left .2s ease, right .2s ease;
+  touch-action: none;
+}
+body.in-result #todaySection.dock-left,
+body.in-result #cacheInfoSection.dock-left {
+  right: auto; left: -6px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 8px rgba(0,0,0,.1);
+}
+body.in-result #todaySection { top: 100px; }
+body.in-result #browseNav { top: 180px; }
+body.in-result #querySection { top: 260px; }
+body.in-result #cacheInfoSection { top: 340px; }
+body.in-result #todaySection > .card,
+body.in-result #cacheInfoSection > .card { display: none; }
+body.in-result #todaySection > .fd-tab,
+body.in-result #cacheInfoSection > .fd-tab {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  writing-mode: vertical-rl; padding: 8px 5px 8px 3px; box-sizing: border-box;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  cursor: pointer; user-select: none;
+}
+body.in-result #todaySection > .fd-tab { background: var(--green); color: var(--cream); }
+body.in-result #cacheInfoSection > .fd-tab { background: var(--pink); color: var(--green-deep); }
+
+body.in-result #todaySection.open,
+body.in-result #cacheInfoSection.open,
+body.in-result #querySection.open,
+body.in-result #browseNav.open { width: 240px; height: auto; max-height: 80vh; overflow-y: auto; }
+body.in-result #todaySection.open > .card,
+body.in-result #cacheInfoSection.open > .card { display: block; padding: 8px; margin-bottom: 0; }
+body.in-result #todaySection.open > .fd-tab,
+body.in-result #cacheInfoSection.open > .fd-tab { display: none; }
+
 .course-card { border-radius: 12px; border: 1px solid var(--glass-border); padding: 12px; margin-bottom: 8px;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   box-shadow: 0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
@@ -185,6 +317,32 @@ html[data-style="classic"] .sched-table td { border: 1px solid var(--line); bord
 html[data-theme="dark"] .course-card.green { background: rgba(143,174,110,0.82); border-color: rgba(143,174,110,0.5); color: var(--green-deep); }
 html[data-theme="dark"] .course-card.pink { background: rgba(176,117,138,0.8); border-color: rgba(200,134,156,0.4); color: var(--cream); }
 .course-card:active { transform: scale(0.98); }
+
+/* 展开浮窗的四角拖拽标记 */
+body.in-result #todaySection.open,
+body.in-result #cacheInfoSection.open,
+body.in-result #querySection.open,
+body.in-result #browseNav.open { position: fixed; }
+body.in-result #todaySection.open::before,
+body.in-result #cacheInfoSection.open::before,
+body.in-result #querySection.open::before,
+body.in-result #browseNav.open::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 0; height: 0;
+  border-style: solid; border-width: 10px 10px 0 0;
+  border-color: var(--accent, #3a5f3a) transparent transparent transparent;
+  z-index: 10;
+}
+body.in-result #todaySection.open::after,
+body.in-result #cacheInfoSection.open::after,
+body.in-result #querySection.open::after,
+body.in-result #browseNav.open::after {
+  content: ''; position: absolute;
+  bottom: 0; right: 0; width: 0; height: 0;
+  border-style: solid; border-width: 0 0 10px 10px;
+  border-color: transparent transparent var(--accent, #3a5f3a) transparent;
+  z-index: 10;
+}
 .course-card .name { font-size: 15px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
 .course-card .period { font-size: 10px; letter-spacing: 0.12em; font-family: var(--mono); margin-bottom: 6px; }
 .course-card.green .period { color: var(--pink); }
@@ -288,13 +446,13 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
 .profile-item .v { font-size: 14px; font-weight: 500; margin-top: 2px; word-break: break-all; }
 
 /* 查询类型卡片按钮组 */
-.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 6px; }
 .type-btn {
-  min-height: 52px; padding: 10px 8px; border: 1px solid var(--glass-border); border-radius: 12px;
+  min-height: 36px; padding: 6px 8px; border: 1px solid var(--glass-border); border-radius: 10px;
   background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  color: var(--green); font-size: 14px; text-align: center;
+  color: var(--green); font-size: 13px; text-align: center;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
-  margin-bottom: 8px; box-shadow: inset 0 1px 0 var(--glass-hi);
+  box-shadow: inset 0 1px 0 var(--glass-hi);
   transition: transform .12s ease, background .2s ease, box-shadow .2s ease; }
 .type-btn:active { transform: scale(0.96); }
 .type-btn.active { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-weight: 600; box-shadow: 0 2px 14px rgba(0,0,0,0.12); }
@@ -426,21 +584,56 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
   </defs>
 </svg>
 
-<header class="topbar">
-  <div class="topbar-left">
-    <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+<header class="topbar" id="mainTopbar">
+  <!-- 首页元素 -->
+  <div class="topbar-left tb-home-only" style="gap:8px;">
     <span class="mono" style="color:var(--green); font-size:9px;">JWXT</span>
     <h1 class="topbar-title">教务查询 <span style="font-size:11px; color:var(--pink-deep); font-weight:400;">v0.9.7</span></h1>
   </div>
+  <!-- 结果页顶栏：三栏对称布局 -->
+  <div class="tb-result-wrap" id="tbResultWrap">
+    <div class="tb-col tb-col-left">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="tb-week-block">
+        <div class="tb-r-week" onclick="showWeekPicker()">
+          <span id="tbWeekText">第1周</span>
+          <span class="tb-r-arrow">▾</span>
+        </div>
+        <div class="tb-r-sem" id="tbSemText">2026-2027 第1学期</div>
+      </div>
+    </div>
+    <div class="tb-col tb-col-center">
+      <div class="tb-r-title" id="tbResultTitle">我的课表</div>
+      <div class="tb-r-range" id="tbResultRange"></div>
+    </div>
+    <div class="tb-col tb-col-right">
+      <span class="status-dot" id="statusDotResult"></span>
+      <button class="tb-icon-btn" id="tbToggleForm" onclick="toggleScheduleForm()" title="切换网格/列表">
+        <svg id="tbIconGrid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        <svg id="tbIconList" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg>
+      </button>
+      <button class="tb-icon-btn" id="resultLogoutBtn" onclick="doLogout()" title="退出">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
   <div style="display:flex; align-items:center; gap:8px;">
-    <span class="status-dot" id="statusDot"></span>
-    <span class="mono" id="statusText" style="font-size:8px;">缓存模式</span>
-    <button id="styleBtn" onclick="toggleStyle()" style="font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">经典</button>
-    <button id="themeBtn" onclick="toggleTheme()" style="font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">深色</button>
-    <button id="loginBtn" onclick="showLogin()" style="font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">登录</button>
-    <button id="logoutBtn" onclick="doLogout()" style="display:none; font-size:9px; padding:2px 6px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:3px; cursor:pointer;">退出</button>
+    <span class="status-dot tb-home-only" id="statusDot"></span>
+    <span class="mono tb-home-only" id="statusText" style="font-size:8px;">缓存模式</span>
+    <button class="tb-home-only" id="styleBtn" onclick="toggleStyle()" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-size:8px;writing-mode:vertical-rl;letter-spacing:1px;line-height:1;">玻璃</button>
+    <button class="tb-home-only" id="themeBtn" onclick="toggleTheme()" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-size:8px;writing-mode:vertical-rl;letter-spacing:1px;line-height:1;">深色</button>
+    <button id="loginBtn" onclick="showLogin()" title="登录" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+    </button>
+    <button id="logoutBtn" onclick="doLogout()" title="退出" style="display:none;width:24px;height:24px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
   </div>
 </header>
+
+<!-- 周次选择弹窗 -->
+<div id="weekPickerMask" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.4); z-index:500;"></div>
+<div id="weekPicker" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--sheet-bg); border-radius:16px; padding:16px; z-index:501; max-width:280px; width:80%; max-height:60vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.2);"></div>
 
 <main id="main">
 
@@ -462,9 +655,8 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
     </div>
   </section>
 
-  <!-- 查询表单 -->
-  <!-- 今日课程（滚动） -->
-  <section id="todaySection" class="hidden">
+  <!-- 今日课程（首页卡片 / 结果页浮窗） -->
+  <section id="todaySection">
     <div class="card card-green">
       <div class="card-header">
         <span class="mono">今日课程</span>
@@ -472,19 +664,20 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
       </div>
       <div id="todayCourses"></div>
     </div>
+    <div class="fd-tab" ontouchend="if(this.parentElement._justDragged){return;}event.preventDefault();toggleFloat('todaySection')">今日课程</div>
   </section>
 
   <section id="querySection">
     <div class="card card-pink">
       <div class="card-header"><span class="mono">查询参数</span></div>
       <div class="type-grid" id="typeGrid"></div>
-      <div id="nameRow" class="hidden">
+      <div id="nameRow" class="hidden" style="margin-top:12px;">
         <div style="display:flex; gap:6px;">
           <input type="text" id="queryName" placeholder="名称" style="flex:1; margin-bottom:0;" />
           <button class="small outline" onclick="openPicker()" style="flex-shrink:0;">选择</button>
         </div>
       </div>
-      <div id="weekRow" class="hidden" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+      <div id="weekRow" class="hidden" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; margin-bottom:16px;">
         <input type="text" id="queryWeek" placeholder="周次" style="width:100%; margin-bottom:0;" />
         <select id="queryWeekday" style="width:100%; margin-bottom:0;">
           <option value="">星期</option>
@@ -500,29 +693,28 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
         <button style="flex:1;" onclick="runQuery(true)">刷新</button>
       </div>
     </div>
+    <div class="fd-tab" ontouchend="if(this.parentElement._justDragged){return;}event.preventDefault();toggleResultFloat('querySection')">查询参数</div>
   </section>
 
   <!-- 浏览入口 -->
   <section id="browseNav">
     <div class="card card-green">
-      <div class="card-header"><span class="mono">浏览列表</span></div>
+      <div class="card-header"><span class="mono">全校列表</span></div>
       <div class="btn-group">
         <button class="btn-chip" onclick="openBrowse('teacher')">全校教师</button>
         <button class="btn-chip" onclick="openBrowse('class')">全校班级</button>
         <button class="btn-chip" onclick="openBrowse('classroom')">全校教室</button>
       </div>
     </div>
+    <div class="fd-tab" ontouchend="if(this.parentElement._justDragged){return;}event.preventDefault();toggleResultFloat('browseNav')">全校列表</div>
   </section>
 
-  <!-- 缓存信息（默认折叠） -->
+  <!-- 缓存信息（首页卡片 / 结果页浮窗） -->
   <section id="cacheInfoSection">
     <div class="card card-green">
       <div class="card-header" onclick="toggleCacheInfo()" style="cursor:pointer; user-select:none;">
         <span class="mono">缓存信息</span>
-        <span style="display:flex; align-items:center; gap:8px;">
-          <span class="caret" id="cacheCaret" style="color:var(--green);"></span>
-          <button class="small outline" onclick="event.stopPropagation(); clearAllCache()">清空缓存</button>
-        </span>
+        <span class="caret" id="cacheCaret" style="color:var(--green);"></span>
       </div>
       <div id="cacheBody" style="display:none; font-size:11px; color:var(--ink-light); line-height:1.8;">
         <div>存储类型：WebView localStorage</div>
@@ -531,6 +723,7 @@ html[data-style="classic"] .settings-panel { background: var(--cream); }
         <div id="cacheList" style="font-size:11px; color:var(--green-deep); padding:4px 0;"></div>
       </div>
     </div>
+    <div class="fd-tab" ontouchend="if(this.parentElement._justDragged){return;}event.preventDefault();toggleFloat('cacheInfoSection')">缓存信息</div>
   </section>
 
   <!-- 浏览结果 -->
@@ -675,6 +868,101 @@ function toggleCacheInfo() {
   const caret = document.getElementById('cacheCaret');
   if (body.style.display === 'none') { body.style.display = 'block'; caret.classList.add('open'); }
   else { body.style.display = 'none'; caret.classList.remove('open'); }
+}
+
+// 边缘浮窗展开/收起
+function toggleFloat(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+// 收起所有浮窗（进入查询结果时调用）
+function collapseFloats() {
+  ['todaySection','cacheInfoSection','querySection','browseNav'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  });
+}
+// 浮窗拖动：展开后只从四角拖，收起时点标签只展开/收起
+function initFloatDrag() {
+  ['todaySection','cacheInfoSection','querySection','browseNav'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var sx=0, sy=0, ox=0, oy=0, dragging=false, moved=false;
+    function start(x,y,e) {
+      var isResult = document.body.classList.contains('in-result');
+      var r = el.getBoundingClientRect();
+      if (!isResult) {
+        // 首页：从卡片标题区域拖
+        var onHeader = e && e.target && e.target.closest && e.target.closest('.card-header');
+        if (!onHeader) return;
+      } else {
+        if (!el.classList.contains('open')) {
+          // 收起状态：整个浮窗都可以拖（轻点还是会触发 toggle）
+          dragging=true; moved=false; sx=x; sy=y;
+          el.style.transition='none';
+          return;
+        }
+        // 展开状态：从四角拖 或 从卡片标题区域拖
+        var corner = 14;
+        var inCorner = (
+          (x - r.left < corner && y - r.top < corner) ||
+          (r.right - x < corner && y - r.top < corner) ||
+          (x - r.left < corner && r.bottom - y < corner) ||
+          (r.right - x < corner && r.bottom - y < corner)
+        );
+        var onHeader2 = e && e.target && e.target.closest && e.target.closest('.card-header');
+        if (!inCorner && !onHeader2) return;
+      }
+      dragging=true; moved=false; sx=x; sy=y;
+      el.style.transition='none';
+      var tr = el.style.transform || '';
+      var m = tr.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+      ox = m ? parseFloat(m[1]) : 0;
+      oy = m ? parseFloat(m[2]) : 0;
+    }
+    function move(x,y,e) {
+      if (!dragging) return;
+      var dx = x-sx, dy = y-sy;
+      if (Math.abs(dx)>3 || Math.abs(dy)>3) { moved=true; el._justDragged = true; }
+      if (!moved) return;
+      el.style.transform = 'translate('+(ox+dx)+'px,'+(oy+dy)+'px)';
+      if (e && e.cancelable) e.preventDefault();
+    }
+    function end() {
+      if (!dragging) return;
+      dragging=false;
+      if (!moved) return;
+      // 拖动后延迟清除标志，防止本次 touchend 触发 toggle
+      setTimeout(function(){ el._justDragged = false; }, 50);
+      el.style.transition='transform .3s ease';
+      var isResult = document.body.classList.contains('in-result');
+      var w = window.innerWidth || 375;
+      var rect = el.getBoundingClientRect();
+      var cx = rect.left + rect.width/2;
+      if (isResult) {
+        // 结果页：停靠左右边，收起，弹回边缘位置
+        if (cx < w/2) el.classList.add('dock-left');
+        else el.classList.remove('dock-left');
+        el.classList.remove('open');
+        el.style.transform = '';
+      } else {
+        // 首页：弹回原位
+        el.style.transform = '';
+      }
+    }
+    el.addEventListener('touchstart', function(e){ start(e.touches[0].clientX, e.touches[0].clientY, e); }, {passive:true});
+    el.addEventListener('touchmove', function(e){ move(e.touches[0].clientX, e.touches[0].clientY, e); }, {passive:false});
+    el.addEventListener('touchend', end);
+    el.addEventListener('mousedown', function(e){ start(e.clientX, e.clientY, e); });
+    window.addEventListener('mousemove', function(e){ move(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', end);
+    // 双击收起
+    el.addEventListener('dblclick', function(){
+      el.classList.remove('open');
+      el.style.transition='transform .3s ease';
+      el.style.transform='';
+    });
+  });
 }
 
 function setThemeMode(v) {
@@ -844,9 +1132,17 @@ async function doLogin() {
   if (html.length > 5000) {
     S.loggedIn = true;
     document.getElementById('loginHint').textContent = '已登录';
-    document.getElementById('statusDot').className = 'status-dot ok';
+    var sd0 = document.getElementById('statusDot');
+    sd0.className = 'status-dot ok';
+    sd0.style.background = '';
     document.getElementById('statusText').textContent = '已登录';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'flex';
+    document.getElementById('logoutBtn').innerHTML = ICO_LOGOUT;
+    document.getElementById('loginBtn').style.display = 'none';
+    var sdr = document.getElementById('statusDotResult');
+    if (sdr) sdr.style.background = 'var(--green)';
+    var rlb = document.getElementById('resultLogoutBtn');
+    if (rlb) { rlb.innerHTML = ICO_LOGOUT; rlb.onclick = doLogout; rlb.title = '退出'; }
     // 只存账号方便下次回填，绝不保存明文密码；会话由原生 CookieManager 保持
     localStorage.setItem('jwxt_creds', JSON.stringify({account: acc}));
     localStorage.setItem('jwxt_login', '1');
@@ -879,15 +1175,22 @@ async function doLoginNow() {
   }
 }
 
+var ICO_LOGIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>';
+var ICO_LOGOUT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
+
 function doLogout() {
   S.loggedIn = false;
   document.getElementById('statusText').textContent = '缓存模式';
-  document.getElementById('statusDot').style.background = 'var(--pink)';
+  document.getElementById('statusDot').style.background = '#b5544f';
   document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('loginBtn').style.display = 'flex';
+  document.getElementById('loginBtn').innerHTML = ICO_LOGIN;
   document.getElementById('loginHint').textContent = '已退出登录';
-  // 隐藏登录面板，显示登录按钮
+  var sdr = document.getElementById('statusDotResult');
+  if (sdr) sdr.style.background = '#b5544f';
+  var rb = document.getElementById('resultLogoutBtn');
+  if (rb) { rb.innerHTML = ICO_LOGIN; rb.onclick = showLogin; rb.title = '登录'; }
   document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('loginBtn').style.display = '';
   // 退出登录：清除本地凭证（无明文密码）并通知原生清除会话 cookie
   try { localStorage.removeItem('jwxt_creds'); } catch(e) {}
   try { localStorage.removeItem('jwxt_login'); } catch(e) {}
@@ -1449,10 +1752,22 @@ function setCache(k, v) {
 function showView(v, pushHistory) {
   var prevView = S.view;
   S.view = v;
-  document.getElementById('querySection').style.display = v === 'main' ? '' : 'none';
-  document.getElementById('browseNav').style.display = v === 'main' ? '' : 'none';
+  // 结果页时查询/浏览面板变成浮窗，不隐藏
+  document.getElementById('querySection').style.display = v === 'result' ? '' : (v === 'main' ? '' : 'none');
+  document.getElementById('browseNav').style.display = v === 'result' ? '' : (v === 'main' ? '' : 'none');
   document.getElementById('resultSection').classList.toggle('hidden', v !== 'result');
-  document.getElementById('backBtn').classList.toggle('show', v !== 'main');
+  var bb = document.getElementById('backBtn');
+  if (bb) bb.classList.toggle('show', v !== 'main');
+  document.body.classList.toggle('in-result', v === 'result');
+  // 进结果页时收起所有浮窗
+  if (v === 'result') {
+    collapseFloats();
+    // 强制隐藏查询/浏览的卡片内容
+    var qs = document.getElementById('querySection');
+    var bn = document.getElementById('browseNav');
+    if (qs) { qs.classList.remove('open'); }
+    if (bn) { bn.classList.remove('open'); }
+  }
   window.scrollTo(0, 0);
   // 记录历史：从主页面进入结果页时 push
   if (pushHistory !== false && v !== prevView && v === 'result') {
@@ -1512,12 +1827,25 @@ function init() {
       S.loggedIn = true;
       const txt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
       txt('loginHint', '已登录');
-      const sd = document.getElementById('statusDot'); if (sd) sd.className = 'status-dot ok';
+      const sd = document.getElementById('statusDot'); if (sd) { sd.className = 'status-dot ok'; sd.style.background = ''; }
       txt('statusText', '已登录');
-      const lb = document.getElementById('logoutBtn'); if (lb) lb.style.display = 'inline-block';
+      const sdr = document.getElementById('statusDotResult'); if (sdr) sdr.style.background = 'var(--green)';
+      const rlb = document.getElementById('resultLogoutBtn'); if (rlb) { rlb.innerHTML=ICO_LOGOUT; rlb.onclick = doLogout; rlb.title='退出'; }
+      const lb = document.getElementById('logoutBtn'); if (lb) { lb.style.display = 'flex'; lb.innerHTML = ICO_LOGOUT; }
       const lbn = document.getElementById('loginBtn'); if (lbn) lbn.style.display = 'none';
     }
   } catch (e) {}
+
+  // 根据登录状态设置结果页按钮
+  var initRlb = document.getElementById('resultLogoutBtn');
+  var initSdr = document.getElementById('statusDotResult');
+  if (S.loggedIn) {
+    if (initRlb) { initRlb.innerHTML = ICO_LOGOUT; initRlb.onclick = doLogout; initRlb.title='退出'; }
+    if (initSdr) initSdr.style.background = 'var(--green)';
+  } else {
+    if (initRlb) { initRlb.innerHTML = ICO_LOGIN; initRlb.onclick = showLogin; initRlb.title='登录'; }
+    if (initSdr) initSdr.style.background = '#b5544f';
+  }
 
   restoreTheme();
 
@@ -1552,6 +1880,19 @@ function init() {
   // 今日课程
   renderTodayCourses();
   refreshOngoing();
+  initFloatDrag();
+  initWeekSwipe();
+  // 查询/浏览浮窗点击切换
+  ['querySection','browseNav'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', function(e) {
+      if (!document.body.classList.contains('in-result')) return;
+      // 展开状态下点击卡片内部不收起
+      if (el.classList.contains('open') && e.target.closest('.card')) return;
+      el.classList.toggle('open');
+    });
+  });
 }
 
 // 每次打开 App 刷新"今日课程"常驻通知（ongoing，一直显示在通知栏，点击跳本周课表）
@@ -1687,9 +2028,17 @@ function selectType(v) {
 function checkCacheStatus() {
   refreshCacheList();
   const hasCache = localStorage.getItem(CK+'self') || localStorage.getItem(CK+'score');
+  var sdr = document.getElementById('statusDotResult');
+  var sd = document.getElementById('statusDot');
+  if (S.loggedIn) {
+    if (sd) { sd.className = 'status-dot ok'; sd.style.background = ''; }
+    if (sdr) sdr.style.background = 'var(--green)';
+    return;
+  }
   if (hasCache) {
-    document.getElementById('statusDot').className = 'status-dot cached';
+    if (sd) { sd.className = 'status-dot cached'; sd.style.background = ''; }
     document.getElementById('statusText').textContent = '缓存模式';
+    if (sdr) sdr.style.background = '#b5544f';
   }
 }
 
@@ -1825,6 +2174,15 @@ function showEmptyDetail(building, dayIdx, slotIdx) {
 function renderResult(type, data) {
   const el = document.getElementById('resultContent');
   S.lastType = type; S.lastData = data;
+  document.body.classList.add('in-result');
+  collapseFloats();
+
+  // 统一更新顶栏标题
+  var TYPE_NAMES = {self:'我的课表', teacher:'教师课表', classroom:'教室课表', class:'班级课表', course:'课程课表',
+    score:'成绩查询', gpa:'绩点计算', progress:'学习进度', exam:'考试安排', profile:'学籍卡片',
+    elective:'选课轮次', electives:'选课结果', calendar:'教学周历', empty:'空教室'};
+  var tbT = document.getElementById('tbResultTitle');
+  if (tbT) tbT.textContent = TYPE_NAMES[type] || '查询结果';
 
   if (type === 'score') {
     if (!data.courses || !data.courses.length) { el.innerHTML = '<div class="empty-text">无成绩</div>'; return; }
@@ -1951,25 +2309,60 @@ function renderResult(type, data) {
       h += '<button onclick="selectEmptyBuilding(\''+bd.building+'\')" style="flex-shrink:0; padding:6px 14px; border-radius:16px; border:1px solid '+(active?'var(--accent)':'var(--border)')+'; background:'+(active?'var(--accent)':'transparent')+'; color:'+(active?'#fff':'var(--ink)')+'; font-size:13px; font-weight:600;">'+esc(bd.label)+'</button>';
     });
     h += '</div>';
-    // 只显示选中教学楼的矩阵：格子显示数量，点击弹出详情
+    // 只显示选中教学楼的矩阵：复刻易校园真实课表样式
     var bd = data.buildings.find(function(b){return b.building===S.emptyBuilding;});
     if (bd) {
-      h += '<div style="margin:4px 0;">';
-      h += '<div style="font-weight:700; font-size:15px; margin:4px 0 6px;">'+esc(bd.label)+' <span style="font-size:11px; font-weight:400; color:var(--ink-light);">（共'+bd.rooms.length+'间）</span></div>';
-      h += '<div class="table-wrap"><table style="font-size:12px;"><thead><tr><th style="white-space:nowrap;">节次</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th></tr></thead><tbody>';
-      bd.grid.forEach(function(row, i) {
-        h += '<tr><td style="white-space:nowrap; font-weight:600; vertical-align:middle;">'+SLOT_LABEL[i]+'</td>';
+      var todayDow = new Date().getDay(); todayDow = todayDow===0?7:todayDow;
+      // 计算本周一~周五的日期
+      var now = new Date();
+      var dow = (now.getDay()+6)%7; // 周一=0
+      var monday = new Date(now); monday.setDate(now.getDate()-dow);
+      h += '<div style="margin:4px 0 16px;">';
+      h += '<div style="font-weight:700; font-size:16px; margin:4px 0 2px;">'+esc(bd.label)+'</div>';
+      h += '<div style="font-size:11px; color:var(--ink-light); margin-bottom:12px;">共 '+bd.rooms.length+' 间 · 点击格子查看</div>';
+      // Grid 容器：1 节次列(40px) + 5 天列，格子间有间距
+      h += '<div style="display:grid; grid-template-columns:40px repeat(5,1fr); gap:4px; padding:4px;">';
+      // 左上角角格（月份）
+      h += '<div style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:8px; font-size:11px; color:var(--ink-light); font-weight:600;">'+(monday.getMonth()+1)+'月</div>';
+      // 表头：星期几 + 日期，今天用胶囊高亮
+      for (var di=0; di<5; di++) {
+        var ddate = new Date(monday); ddate.setDate(monday.getDate()+di);
+        var isToday = (di+1)===todayDow;
+        var DAY_CH = ['一','二','三','四','五'];
+        h += '<div style="text-align:center; padding:4px 0 8px;">';
+        h += '<div style="font-size:12px; color:var(--ink-light); font-weight:600; margin-bottom:2px;">周'+DAY_CH[di]+'</div>';
+        if (isToday) {
+          h += '<div style="display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:700;">'+ddate.getDate()+'</div>';
+        } else {
+          h += '<div style="font-size:13px; color:var(--ink); font-weight:600;">'+ddate.getDate()+'</div>';
+        }
+        h += '</div>';
+      }
+      // 6 大节 × 5 天
+      var EMPTY_TIMES = [
+        ['08:00','09:40'],['10:00','11:40'],['14:30','16:10'],
+        ['16:20','18:00'],['19:00','20:40'],['21:00','22:40']
+      ];
+      bd.grid.forEach(function(row, si) {
+        // 节次列：节次号 + 上下课时间
+        h += '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--ink-light); line-height:1.2;">';
+        h += '<span>'+(si+1)+'</span>';
+        h += '<span style="font-size:8px; font-weight:400; color:var(--ink-light); margin-top:2px;">'+EMPTY_TIMES[si][0]+'<br>'+EMPTY_TIMES[si][1]+'</span>';
+        h += '</div>';
         row.forEach(function(free, di) {
           var n = free.length;
+          var isToday = (di+1)===todayDow;
           if (n > 0) {
-            h += '<td style="text-align:center; vertical-align:middle; cursor:pointer; padding:10px 4px; word-break:keep-all;" onclick="showEmptyDetail(\''+bd.building+'\','+di+','+i+')"><b style="font-size:14px; color:var(--accent);">'+n+'</b><span style="font-size:10px; color:var(--ink-light);"> 间</span></td>';
+            h += '<div onclick="showEmptyDetail(\''+bd.building+'\','+di+','+si+')" style="border-radius:10px; padding:10px 4px; text-align:center; cursor:pointer; min-height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:'+(isToday?'color-mix(in srgb, var(--accent) 15%, transparent)':'color-mix(in srgb, var(--accent) 7%, transparent)')+';">';
+            h += '<b style="font-size:17px; color:var(--accent); line-height:1.1;">'+n+'</b>';
+            h += '<div style="font-size:9px; color:var(--ink-light); margin-top:2px;">间空</div>';
+            h += '</div>';
           } else {
-            h += '<td style="text-align:center; vertical-align:middle; color:var(--ink-light);">—</td>';
+            h += '<div style="border-radius:10px; min-height:48px; background:transparent;"></div>';
           }
         });
-        h += '</tr>';
       });
-      h += '</tbody></table></div></div>';
+      h += '</div></div>';
     }
     el.innerHTML = h;
     // 弹窗容器
@@ -1983,118 +2376,130 @@ function renderResult(type, data) {
     }
 
   } else {
-    // 课表类 - 林间刊页卡片风格，支持周/日视图切换 + 点击详情 + 长按复制
+    // 课表类 - 易校园风格 CSS Grid 圆角课程格
     const courses = data.courses || [];
     if (!courses.length) { el.innerHTML = '<div class="empty-text">未查询到课程</div>'; return; }
     S.lastCourses = courses;
-    // 表格行 = 小节 1..12
-    const SLOTS = [1,2,3,4,5,6,7,8,9,10,11,12];
-    // 课程起止小节（跨节课程覆盖多个小节）
-    function courseSpan(c) {
-      let nums = (c.period || '').match(/\d{2}/g);
-      if (!nums) nums = (c.periodLabel || '').match(/\d+/g);
-      if (nums && nums.length) { const v = nums.map(x => parseInt(x, 10)); return {s: v[0], e: v[v.length - 1]}; }
-      return null;
+
+    const ROW_H = 78, N_ROWS = 12;
+    const WD = ['一','二','三','四','五','六','日'];
+    const PTIMES = [
+      {s:'08:00',e:'08:45'},{s:'08:55',e:'09:40'},{s:'10:00',e:'10:45'},{s:'10:55',e:'11:40'},
+      {s:'14:30',e:'15:15'},{s:'15:25',e:'16:10'},{s:'16:20',e:'17:05'},{s:'17:15',e:'18:00'},
+      {s:'19:00',e:'19:45'},{s:'19:55',e:'20:40'},{s:'21:00',e:'21:35'},{s:'21:55',e:'22:40'}
+    ];
+    // 20 个莫兰迪色系
+    const PALETTE = [
+      '#7A9CC6','#B5A89C','#8FAA8F','#C49B9B','#8FAEAA',
+      '#C9B896','#A89BC4','#94A5B8','#B8A08C','#8FB8A8',
+      '#C98FA0','#A0B88F','#B0A0C9','#8FA0B8','#C9A08F',
+      '#8FC9B8','#B88FC9','#A8C98F','#C9B8A0','#8FA8C9'
+    ];
+    function mixWhite(hex, r) {
+      const n = parseInt(hex.slice(1),16);
+      return 'rgb('+Math.round(((n>>16)&255)+(255-((n>>16)&255))*r)+','+Math.round(((n>>8)&255)+(255-((n>>8)&255))*r)+','+Math.round((n&255)+(255-(n&255))*r)+')';
     }
-    function courseCell(c) {
-      const sp = courseSpan(c);
-      const cls = (sp && sp.s % 2 === 0) ? 'pink' : '';
-      return '<div class="sched-course '+cls+'" onclick="showCourseByIndex('+courses.indexOf(c)+')">'
-        + '<span class="cn">'+esc(c.name||'')+'</span>'
-        + '<span class="cr">'+esc(c.classroom||'')+'</span></div>';
+    function courseColor(name) {
+      let h = 0; for (let i=0;i<(name||'').length;i++) h = (h*31 + (name||'').charCodeAt(i)) % 997;
+      return PALETTE[h % PALETTE.length];
     }
-    // 节次归一化：优先用 period，否则从 periodLabel 提取数字转成 seg.code 格式（如 '第5-6节'→'0506'）
     function periodKey(c) {
       if (c.period) return c.period;
       const m = (c.periodLabel || '').match(/\d+/g);
-      if (m && m.length >= 2) return ('0' + m[0]).slice(-2) + ('0' + m[m.length - 1]).slice(-2);
-      if (m && m.length === 1) return ('0' + m[0]).slice(-2);
-      return c.period || '';
+      if (m && m.length >= 2) return ('0'+m[0]).slice(-2)+('0'+m[m.length-1]).slice(-2);
+      if (m && m.length === 1) return ('0'+m[0]).slice(-2);
+      return '';
     }
-    function buildTable(daySet) {
-      // daySet: 若为 null 表示周视图(7列)；否则 [dayIdx] 表示仅今天
-      const single = daySet && daySet.length === 1;
-      const days = single ? daySet : [1,2,3,4,5,6,7];
-      let h = '<div class="table-wrap"><table class="sched-table"><thead><tr>';
-      // 表头
-      h += '<th>节次</th>';
-      if (single) h += '<th>'+esc(WEEKDAYS[days[0]-1])+' · 今天</th>';
-      else days.forEach(d => { h += '<th>'+esc(WEEKDAYS[d-1])+'</th>'; });
-      h += '</tr></thead><tbody>';
-      // 小节行：跨节课程用 rowspan 合并，保证不遗漏
-      const occupied = {};
-      SLOTS.forEach(p => {
-        h += '<tr><td class="seg">'+p+'</td>';
-        days.forEach(d => {
-          if (occupied[p+'|'+d]) return;  // 已被上方跨节课程 rowspan 占用
-          const slot = courses.filter(c => { const s = courseSpan(c); return c.weekday === d && s && s.s === p; });
-          if (slot.length) {
-            const maxSpan = Math.max.apply(null, slot.map(c => courseSpan(c).e - courseSpan(c).s + 1));
-            for (let r = 0; r < maxSpan; r++) occupied[(p+r)+'|'+d] = true;
-            h += '<td rowspan="'+maxSpan+'">'+slot.map(c => courseCell(c)).join('')+'</td>';
-          } else {
-            h += '<td class="empty"><span class="e">—</span></td>';
-          }
-        });
-        h += '</tr>';
-      });
-      h += '</tbody></table></div>';
-      return h;
-    }
-    // 列表形式：按天分组，每门课一行
-    function buildList(daySet) {
-      const single = daySet && daySet.length === 1;
-      const days = single ? daySet : [1,2,3,4,5,6,7];
-      let h = '';
-      days.forEach(d => {
-        const list = courses.filter(c => c.weekday === d).sort((a,b)=>periodKey(a).localeCompare(periodKey(b)));
-        h += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+esc(WEEKDAYS[d-1])+(single?' · 今天':'')+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+list.length+'节</span></div>';
-        if (!list.length) h += '<p class="empty-day">'+(single?'今天无课':'无课')+'</p>';
-        else list.forEach((c, ci) => { h += courseCard(courses.indexOf(c), ci%2===0?'green':'pink'); });
-        h += '</div>';
-      });
-      return h;
-    }
-    // 视图切换条 + 形式切换条
-    let h = '<div style="display:flex; gap:6px; margin-bottom:8px;">';
-    h += '<button class="small" style="flex:1;'+(S.scheduleView==='week'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'week\')">本周</button>';
-    h += '<button class="small" style="flex:1;'+(S.scheduleView==='today'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleView(\'today\')">今天</button>';
-    h += '</div>';
-    h += '<div style="display:flex; gap:6px; margin-bottom:12px;">';
-    h += '<button class="small" style="flex:1;'+(S.scheduleForm==='table'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'table\')">表格</button>';
-    h += '<button class="small" style="flex:1;'+(S.scheduleForm==='list'?'':' background:transparent; color:var(--green);')+'" onclick="setScheduleForm(\'list\')">列表</button>';
-    h += '</div>';
-    // 结果界面内切换周次/星期 + 打开官网课表
-    h += '<div style="display:flex; gap:6px; margin-bottom:12px; align-items:center;">';
-    h += '<input type="number" id="resWeek" min="1" max="30" placeholder="周次" style="flex:1; margin-bottom:0;" value="'+esc((document.getElementById('queryWeek')||{}).value||'')+'"/>';
-    h += '<select id="resWeekday" style="flex:1; margin-bottom:0;"><option value="">星期</option>';
-    for (var _d = 1; _d <= 7; _d++) { var _sel = ((document.getElementById('queryWeekday')||{}).value === String(_d)) ? ' selected' : ''; h += '<option value="'+_d+'"'+_sel+'>'+WEEKDAYS[_d-1].replace('星期','')+'</option>'; }
-    h += '</select>';
-    h += '<button class="small" onclick="applyResParam()" style="flex-shrink:0;">应用</button>';
-    h += '<button class="small outline" onclick="openWebSchedule()" style="flex-shrink:0;">官网</button>';
-    h += '</div>';
-    let dayArg = null;
-    if (S.scheduleView === 'today') {
-      const now = new Date();
-      const today = now.getDay();
-      dayArg = [today === 0 ? 7 : today];
-    } else if (NEEDS_WEEK.indexOf(type) >= 0) {
-      // 若在界面里选了具体星期，则只显示该天
-      const wd = (document.getElementById('queryWeekday') || {}).value;
-      if (wd) dayArg = [parseInt(wd, 10)];
-    }
-    let bodyHtml;
+
+    var TYPE_TITLE = {self:'我的课表', teacher:'教师课表', classroom:'教室课表', class:'班级课表', course:'课程课表'};
+    var resTitle = TYPE_TITLE[type] || '课表';
+
+    // 根据查询周次计算日期范围（校历第1周周一 = SEMESTER_START）
+    var qw = document.getElementById('queryWeek');
+    var wk = qw ? parseInt(qw.value, 10) : NaN;
+    if (!wk || isNaN(wk)) wk = currentWeek();
+    var _mon = new Date(SEMESTER_START);
+    _mon.setDate(_mon.getDate() + (wk - 1) * 7);
+    var _sun = new Date(_mon); _sun.setDate(_mon.getDate() + 6);
+    var _range = (_mon.getMonth()+1)+'/'+_mon.getDate()+' - '+(_sun.getMonth()+1)+'/'+_sun.getDate();
+    var todayD = new Date().getDay()===0?7:new Date().getDay();
+
+    // 更新顶栏结果区
+    var tbW = document.getElementById('tbWeekText');
+    var tbT = document.getElementById('tbResultTitle');
+    var tbR = document.getElementById('tbResultRange');
+    if (tbW) tbW.textContent = '第'+wk+'周';
+    if (tbT) tbT.textContent = resTitle;
+    if (tbR) tbR.textContent = _range;
+
+    // 列表模式
     if (S.scheduleForm === 'list') {
-      bodyHtml = buildList(dayArg);
-    } else {
-      try {
-        bodyHtml = buildTable(dayArg);
-      } catch(tblErr) {
-        // 表格渲染失败时自动回退到列表，避免空白
-        bodyHtml = '<div class="error-box" style="margin-bottom:10px;">表格渲染出错，已切换为列表显示：'+esc(tblErr.message||'')+'</div>' + buildList(dayArg);
+      let lh = '<div style="padding:8px;">';
+      for (let d=1; d<=7; d++) {
+        const list = courses.filter(c => c.weekday === d).sort((a,b)=>periodKey(a).localeCompare(periodKey(b)));
+        lh += '<div class="schedule-day"><div class="schedule-day-header"><span class="schedule-day-title">'+WD[d-1]+'</span><span class="mono" style="font-size:9px; color:var(--green);">'+list.length+'节</span></div>';
+        if (!list.length) lh += '<p class="empty-day">无课</p>';
+        else list.forEach((c) => {
+          const ci = courses.indexOf(c);
+          const col = courseColor(c.name);
+          const bg = mixWhite(col, 0.88);
+          lh += '<div onclick="showCourseByIndex('+ci+')" style="border-radius:10px; border:2px solid '+col+'; background:'+bg+'; padding:8px 10px; margin-bottom:6px; cursor:pointer;">';
+          lh += '<div style="font-size:13px; font-weight:700; color:'+col+';">'+esc(c.name||'')+'</div>';
+          lh += '<div style="font-size:11px; color:'+col+'; margin-top:2px; opacity:.8;">第'+(courseSpan(c)?courseSpan(c).s:'?')+'-'+(courseSpan(c)?courseSpan(c).e:'?')+'节 · '+esc(c.classroom||'')+'</div>';
+          lh += '</div>';
+        });
+        lh += '</div>';
       }
+      el.innerHTML = lh;
+      return;
     }
-    h += bodyHtml;
+
+    // === CSS Grid 课表（网格模式，铺满全屏） ===
+    let h = '<div class="xkb-wrap" style="border-radius:0; border:none; box-shadow:none;">';
+    h += '<div class="xkb-head">';
+    h += '<div class="xkb-month">'+(_mon.getMonth()+1)+'月</div>';
+    h += '<div class="xkb-days">';
+    for (let d=1; d<=7; d++) {
+      const ddate = new Date(_mon); ddate.setDate(_mon.getDate()+d-1);
+      const isT = d === todayD;
+      h += '<div class="xkb-day'+(isT?' today':'')+'">';
+      h += '<div class="wd">'+WD[d-1]+'</div>';
+      h += '<div class="dt">'+ddate.getDate()+'</div>';
+      h += '</div>';
+    }
+    h += '</div></div>';
+
+    h += '<div class="xkb-body">';
+    h += '<div class="xkb-lecol">';
+    for (let i=0; i<N_ROWS; i++) {
+      h += '<div class="lr"><div class="no">'+(i+1)+'</div><div class="tm">'+PTIMES[i].s+'<br>'+PTIMES[i].e+'</div></div>';
+    }
+    h += '</div>';
+
+    h += '<div class="xkb-grid-wrap"><div class="xkb-grid">';
+    for (let k=1; k<N_ROWS; k++) {
+      h += '<div class="xkb-dline" style="top:'+(k*ROW_H)+'px;"></div>';
+    }
+    h += '<div style="position:absolute;top:0;bottom:0;left:'+((todayD-1)*100/7)+'%;width:'+(100/7)+'%;background:color-mix(in srgb, var(--green) 5%, #fff);pointer-events:none;"></div>';
+
+    courses.forEach(function(c, ci) {
+      const sp = courseSpan(c);
+      if (!sp) return;
+      const day = c.weekday;
+      if (!day || day < 1 || day > 7) return;
+      const top = (sp.s - 1) * ROW_H;
+      const height = (sp.e - sp.s + 1) * ROW_H - 4;
+      const left = (day - 1) * (100/7);
+      const color = courseColor(c.name);
+      const bg = mixWhite(color, 0.88);
+      h += '<div class="xkb-course" onclick="showCourseByIndex('+ci+')" style="top:'+top+'px;height:'+height+'px;left:calc('+left+'% + 3px);width:calc('+(100/7)+'% - 6px);background:'+bg+';border:2px solid '+color+';padding:4px 6px;">';
+      h += '<div class="cn" style="color:'+color+';font-size:11px;">'+esc(c.name||'')+'</div>';
+      h += '<div class="cn" style="color:'+color+';font-size:8px;opacity:.7;">第'+sp.s+'-'+sp.e+'节</div>';
+      if (c.classroom) h += '<div class="cr" style="color:'+color+';font-size:8.5px;">'+esc(c.classroom)+'</div>';
+      h += '</div>';
+    });
+
+    h += '</div></div></div></div>';
     el.innerHTML = h;
   }
 }
@@ -2120,40 +2525,198 @@ function setScheduleView(v) {
 
 function setScheduleForm(v) {
   S.scheduleForm = v;
+  var ig = document.getElementById('tbIconGrid');
+  var il = document.getElementById('tbIconList');
+  if (ig) ig.style.display = v === 'grid' ? '' : 'none';
+  if (il) il.style.display = v === 'list' ? '' : 'none';
+  renderResult(S.queryType, S.lastData);
+}
+
+// 切换网格/列表（图标按钮）
+function toggleScheduleForm() {
+  setScheduleForm(S.scheduleForm === 'grid' ? 'list' : 'grid');
+}
+
+// 查询/浏览浮窗点击展开收起
+function toggleResultFloat(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+// 水平滑动切周（带相邻周预览）
+function initWeekSwipe() {
+  var startX = 0, startY = 0, dragging = false, axis = null;
+  var el = document.getElementById('resultContent');
+  if (!el || el._swipeInited) return;
+  el._swipeInited = true;
+
+  // 创建相邻周预览层
+  var ghost = document.createElement('div');
+  ghost.id = 'weekGhost';
+  ghost.style.cssText = 'position:absolute; top:0; bottom:0; width:100%; z-index:0; overflow:hidden; display:none;';
+  el.parentElement.style.position = 'relative';
+  el.parentElement.appendChild(ghost);
+  el.style.position = 'relative';
+  el.style.zIndex = 1;
+
+  function getAdjacentWeek(delta) {
+    var qw = document.getElementById('queryWeek');
+    var curWk = qw ? parseInt(qw.value, 10) : currentWeek();
+    var newWk = curWk + delta;
+    if (newWk < 1) return null;
+    var type = S.queryType;
+    var params = { week: String(newWk) };
+    if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
+    params.weekday = (document.getElementById('queryWeekday')||{}).value || '';
+    if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+    var cached = getCache(cacheKey(type, params));
+    return { week: newWk, data: cached ? cached.data : null };
+  }
+
+  function renderGhost(delta) {
+    var adj = getAdjacentWeek(delta);
+    if (!adj || !adj.data) {
+      ghost.innerHTML = '<div style="padding:40px; text-align:center; color:var(--ink-light); font-size:13px;">第'+adj.week+'周<br>无缓存</div>';
+      return;
+    }
+    // 简化渲染：只显示周次标题和课程数
+    var courses = adj.data.courses || [];
+    ghost.innerHTML = '<div style="padding:20px; text-align:center;">' +
+      '<div style="font-size:14px; font-weight:700; color:var(--ink);">第'+adj.week+'周</div>' +
+      '<div style="font-size:11px; color:var(--ink-light); margin-top:4px;">'+courses.length+' 节课</div>' +
+      '</div>';
+  }
+
+  el.addEventListener('touchstart', function(e) {
+    dragging = true; axis = null;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    el.style.transition = 'none';
+    ghost.style.transition = 'none';
+  }, {passive:true});
+
+  el.addEventListener('touchmove', function(e) {
+    if (!dragging) return;
+    var dx = e.touches[0].clientX - startX;
+    var dy = e.touches[0].clientY - startY;
+    if (axis === null) axis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+    if (axis === 'h') {
+      // dx<0 = 向左滑 = 下周
+      var delta = dx < 0 ? 1 : -1;
+      ghost.style.display = 'block';
+      ghost.style.left = delta > 0 ? '100%' : '-100%';
+      if (!ghost._loadedFor || ghost._loadedFor !== delta) {
+        renderGhost(delta);
+        ghost._loadedFor = delta;
+      }
+      el.style.transform = 'translateX(' + dx + 'px)';
+      ghost.style.transform = 'translateX(' + (delta > 0 ? dx + window.innerWidth : dx - window.innerWidth) + 'px)';
+      e.preventDefault();
+    }
+  }, {passive:false});
+
+  el.addEventListener('touchend', function(e) {
+    if (!dragging) return;
+    dragging = false;
+    var dx = e.changedTouches[0].clientX - startX;
+    el.style.transition = 'transform .2s ease';
+    ghost.style.transition = 'transform .2s ease';
+    if (axis === 'h' && Math.abs(dx) > window.innerWidth * 0.2) {
+      var delta = dx < 0 ? 1 : -1;
+      el.style.transform = 'translateX(' + (delta > 0 ? '-100%' : '100%') + ')';
+      ghost.style.transform = 'translateX(0)';
+      setTimeout(function(){
+        el.style.transform=''; ghost.style.display='none'; ghost._loadedFor=null;
+        el.style.transition=''; ghost.style.transition='';
+        resWeekNav(delta);
+      }, 200);
+    } else {
+      el.style.transform = '';
+      ghost.style.transform = '';
+      setTimeout(function(){ el.style.transition=''; ghost.style.transition=''; ghost.style.display='none'; ghost._loadedFor=null; }, 200);
+    }
+    axis = null;
+  }, {passive:true});
+}
+
+// 周次选择弹窗
+function showWeekPicker() {
+  const mask = document.getElementById('weekPickerMask');
+  const pop = document.getElementById('weekPicker');
+  if (!mask || !pop) return;
+  const curWk = (document.getElementById('queryWeek')||{}).value || currentWeek();
+  let html = '<div style="font-size:13px; font-weight:700; margin-bottom:10px; color:var(--ink);">选择周次</div>';
+  html += '<div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;">';
+  for (let w=1; w<=20; w++) {
+    const isCur = String(w) === String(curWk);
+    html += '<button onclick="pickWeek('+w+')" style="padding:8px 0; border-radius:8px; border:1px solid '+(isCur?'var(--green)':'var(--line)')+'; background:'+(isCur?'var(--green)':'transparent')+'; color:'+(isCur?'#fff':'var(--ink)')+'; font-size:12px; font-weight:'+(isCur?'700':'400')+'; cursor:pointer;">第'+w+'周</button>';
+  }
+  html += '</div>';
+  pop.innerHTML = html;
+  mask.style.display = 'block';
+  pop.style.display = 'block';
+  mask.onclick = function(){ mask.style.display='none'; pop.style.display='none'; };
+}
+function pickWeek(w) {
+  document.getElementById('weekPickerMask').style.display = 'none';
+  document.getElementById('weekPicker').style.display = 'none';
+  const qw = document.getElementById('queryWeek');
+  if (qw) qw.value = String(w);
+  // 查缓存重渲染
+  const type = S.queryType;
+  const params = {};
+  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
+  params.week = String(w);
+  params.weekday = (document.getElementById('queryWeekday')||{}).value || '';
+  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
+  const cached = getCache(cacheKey(type, params));
+  if (cached) renderResult(type, cached.data);
+  else alert('第'+w+'周无缓存，请先登录后查询一次');
+}
+
+// 结果区"查询"按钮：读 resWeek/resWeekday，写回主表单，读缓存重渲染
+function applyResParam() {
   const type = S.queryType;
   const params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
   if (NEEDS_WEEK.indexOf(type) >= 0) {
-    const wkEl = document.getElementById('queryWeek');
-    let wk = wkEl.value.trim();
-    if (!wk) wk = String(currentWeek());   // 默认查询本周
+    const rw = document.getElementById('resWeek');
+    const rwd = document.getElementById('resWeekday');
+    let wk = rw ? rw.value.trim() : '';
+    if (!wk) wk = String(currentWeek());
     params.week = wk;
-    params.weekday = document.getElementById('queryWeekday').value;
+    params.weekday = rwd ? rwd.value : '';
+    const qw = document.getElementById('queryWeek'); if (qw) qw.value = wk;
+    const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = params.weekday;
   }
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
   const ck = cacheKey(type, params);
   const cached = getCache(ck);
   if (cached) renderResult(type, cached.data);
-  else alert('无缓存数据，请先查询');
+  else alert('该周次/星期无缓存，请先登录后查询一次');
 }
 
-// 在结果界面切换周次/星期（写回主查询参数，按参数读缓存或提示）
-function applyResParam() {
+// 周导航：±1 周（不依赖结果区输入框，直接读写主查询表单）
+function resWeekNav(delta) {
   const type = S.queryType;
-  const week = (document.getElementById('resWeek') || {}).value || '';
-  const weekday = (document.getElementById('resWeekday') || {}).value || '';
+  if (NEEDS_WEEK.indexOf(type) < 0) return;
   const qw = document.getElementById('queryWeek');
-  const qwd = document.getElementById('queryWeekday');
-  if (qw) qw.value = week;
-  if (qwd) qwd.value = weekday;
+  let wk = qw ? parseInt(qw.value, 10) : NaN;
+  if (!wk || isNaN(wk)) wk = currentWeek();
+  wk += delta;
+  if (wk < 1) wk = 1;
+  if (qw) qw.value = String(wk);
+  // 同步结果区输入框
+  const rw = document.getElementById('resWeek'); if (rw) rw.value = String(wk);
+  // 尝试读缓存
   const params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
-  if (NEEDS_WEEK.indexOf(type) >= 0) { params.week = week; params.weekday = weekday; }
+  params.week = String(wk);
+  params.weekday = (document.getElementById('queryWeekday') || {}).value || '';
   if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
-  const ck = cacheKey(type, params);
-  const cached = getCache(ck);
-  if (cached) renderResult(type, cached.data);
-  else alert('该周次/星期无缓存，请先登录查询一次');
+  const cached = getCache(cacheKey(type, params));
+  if (cached) { renderResult(type, cached.data); }
+  else { alert('第'+wk+'周无缓存，请先登录后查询一次'); }
 }
 
 // 用外部浏览器打开教务系统课表官网
@@ -2181,21 +2744,53 @@ function courseCard(idx, cls) {
   return h;
 }
 
+// 全局：解析课程节次范围
+function courseSpan(c) {
+  var p = (c.period || '').toString();
+  if (p) {
+    var nums = p.match(/\d{2}/g);
+    if (nums && nums.length >= 2) {
+      var v = nums.map(function(x){return parseInt(x,10);});
+      return {s:v[0], e:v[v.length-1]};
+    }
+    var single = parseInt(p, 10);
+    if (single >= 1 && single <= 6) {
+      return {s: (single-1)*2+1, e: single*2};
+    }
+  }
+  if (c.periodLabel) {
+    var m = c.periodLabel.match(/[（(]\s*(\d{1,2})\s*[,，]\s*(\d{1,2})\s*小节/);
+    if (m) return {s: parseInt(m[1],10), e: parseInt(m[2],10)};
+    var m2 = c.periodLabel.match(/第\s*(\d+)\s*[-–]\s*(\d+)\s*节/);
+    if (m2) return {s: parseInt(m2[1],10), e: parseInt(m2[2],10)};
+  }
+  return null;
+}
+
 function showCourseByIndex(idx) {
   var c = (S.lastCourses || [])[idx];
   if (!c) return;
   S.detailIdx = idx;
-  var h = '<div style="text-align:center; margin-bottom:14px;"><div style="font-size:22px; font-weight:700; color:var(--green);">'+esc(c.name||'')+'</div>';
-  if (c.periodLabel) h += '<div class="mono" style="color:var(--pink-deep); margin-top:4px;">'+esc(c.periodLabel)+'</div>';
+  var h = '<div style="text-align:center; margin-bottom:14px;"><div style="font-size:20px; font-weight:700; color:var(--green); line-height:1.3;">'+esc(c.name||'')+'</div>';
+  if (c.periodLabel) h += '<div class="mono" style="color:var(--pink-deep); margin-top:6px; font-size:12px; white-space:pre-line;">'+esc(c.periodLabel)+'</div>';
   h += '</div>';
   h += '<div style="display:flex; gap:8px; margin-bottom:14px;">';
   h += '<button class="small" style="flex:1;" onclick="copyCourseInfo(false)">复制教室</button>';
   h += '<button class="small outline" style="flex:1;" onclick="copyCourseInfo(true)">复制全部</button>';
   h += '</div>';
   h += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
-  var fields = [['教师','teacher'],['教室','classroom'],['班级','classes'],['周次','week'],['星期','weekday_name'],['节次','period']];
+  // 解析节次信息
+  var sp = courseSpan(c);
+  var fields = [
+    ['教师', c.teacher],
+    ['教室', c.classroom],
+    ['班级', c.classes],
+    ['周次', c.week],
+    ['星期', c.weekday_name],
+    ['节次', sp ? ('第'+sp.s+'-'+sp.e+'节') : (c.period||'')],
+  ];
   fields.forEach(function(f) {
-    var v = c[f[1]];
+    var v = f[1];
     if (v) {
       h += '<div style="background:var(--cream-2); border-left:3px solid var(--green); padding:8px 10px; border-radius:0 6px 6px 0;">';
       h += '<div style="font-size:10px; color:var(--ink-light); font-family:var(--mono); letter-spacing:0.1em;">'+esc(f[0])+'</div>';

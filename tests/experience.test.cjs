@@ -4,6 +4,10 @@ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.join(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'jwxt-webapp/index.html'),'utf8');
 const experience=fs.readFileSync(path.join(root,'jwxt-webapp/ui/experience.js'),'utf8');
+test('published interface uses the Claude paper palette and original dashboard identity',()=>{
+ const css=fs.readFileSync(path.join(root,'jwxt-webapp/ui/app.css'),'utf8');
+ assert.ok(html.includes('<title>Claude 风格 · 教务查询</title>'));assert.ok(css.includes('--paper:#f6f3ec'));assert.ok(css.includes('--accent:#a64e32'));assert.ok(experience.includes('今天，安排从容。'));assert.ok(experience.includes("dashboard.id='claudeDashboard'"));assert.ok(!experience.includes('appleDashboard'));assert.ok(!experience.includes('教务事务，'));
+});
 function fn(name){const m=html.match(new RegExp('function '+name+'\\([^]*?^}', 'm'));assert.ok(m,name);return m[0];}
 function classes(initial=[]){const set=new Set(initial);return {contains:k=>set.has(k),add:(...v)=>v.forEach(x=>set.add(x)),remove:(...v)=>v.forEach(x=>set.delete(x)),toggle(k,force){const next=force===undefined?!set.has(k):force;next?set.add(k):set.delete(k);return next;}};}
 function storage(entries={}){const map=new Map(Object.entries(entries));return {get length(){return map.size},key:i=>[...map.keys()][i],getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)};}

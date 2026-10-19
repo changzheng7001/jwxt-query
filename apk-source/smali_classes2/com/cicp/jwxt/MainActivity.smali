@@ -52,6 +52,24 @@
 
 
 # virtual methods
+.method private dispatchSystemTheme()V
+    .locals 3
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+    if-eqz v0, :theme_done
+    const-string v1, "window.onSystemThemeChanged&&window.onSystemThemeChanged()"
+    const/4 v2, 0x0
+    invoke-virtual {v0, v1, v2}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+    :theme_done
+    return-void
+.end method
+
+.method public onConfigurationChanged(Landroid/content/res/Configuration;)V
+    .locals 0
+    invoke-super {p0, p1}, Landroid/app/Activity;->onConfigurationChanged(Landroid/content/res/Configuration;)V
+    invoke-direct {p0}, Lcom/cicp/jwxt/MainActivity;->dispatchSystemTheme()V
+    return-void
+.end method
+
 # 持久化保存会话cookie(写入SharedPreferences,App重启后可恢复)
 .method public saveCookies()V
     .locals 4
@@ -308,6 +326,8 @@
     .locals 6
 
     invoke-super {p0}, Landroid/app/Activity;->onResume()V
+
+    invoke-direct {p0}, Lcom/cicp/jwxt/MainActivity;->dispatchSystemTheme()V
 
     invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
 

@@ -50,6 +50,10 @@ test('other week has no today marker; unsafe course names are escaped',()=>{
   const pane=ctx.buildSchedulePane({courses:[{name:'<img src=x onerror=alert(1)>',weekday:1,period:'0102',classroom:'A"B'}]},1,false,false);
   assert.ok(!pane.includes('demo-day today'));assert.ok(!pane.includes('<img src=x'));assert.ok(pane.includes('&lt;img'));
 });
+test('grid course names wrap in groups of three while retaining the full accessible name',()=>{
+  const {ctx}=context();const pane=ctx.buildSchedulePane({courses:[{name:'刑事诉讼法学',weekday:1,period:'0102'}]},8,false,false);
+  assert.ok(pane.includes('<div class="cn"><span>刑事诉</span><span>讼法学</span></div>'));assert.ok(pane.includes('aria-label="刑事诉讼法学 第1-2节"'));
+});
 test('front-end, packaged HTML and all bundled assets stay identical',()=>{
   const root=path.join(__dirname,'..');assert.equal(html,fs.readFileSync(path.join(root,'apk-source/assets/index.html'),'utf8'));
   for(const name of fs.readdirSync(path.join(root,'jwxt-webapp/schedule-assets')))assert.deepEqual(fs.readFileSync(path.join(root,'jwxt-webapp/schedule-assets',name)),fs.readFileSync(path.join(root,'apk-source/assets/schedule-assets',name)));

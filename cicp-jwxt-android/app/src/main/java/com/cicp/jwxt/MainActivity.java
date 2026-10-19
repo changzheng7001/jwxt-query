@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,7 +53,7 @@ public class MainActivity extends Activity {
         }
 
         setContentView(R.layout.activity_main);
-        applyImmersive(false); // 默认浅色主题：沉浸状态栏 + 深色图标
+        applyImmersive(isSystemDarkMode());
 
         webView = findViewById(R.id.webview);
         WebSettings s = webView.getSettings();
@@ -75,6 +76,29 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleGotoSchedule(intent);
+    }
+
+    private boolean isSystemDarkMode() {
+        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    private void dispatchSystemTheme() {
+        if (webView != null) {
+            webView.evaluateJavascript("window.onSystemThemeChanged&&window.onSystemThemeChanged()", null);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        dispatchSystemTheme();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        dispatchSystemTheme();
     }
 
     @Override
@@ -120,6 +144,11 @@ public class MainActivity extends Activity {
 
     /** JS 桥：前端通过 window.Android.xxx() 调用 */
     private class WebAppInterface {
+
+        @JavascriptInterface
+        public boolean getSystemDarkMode() {
+            return isSystemDarkMode();
+        }
 
         /** 通用 HTTP 请求（自动携带 CookieManager 会话） */
         @JavascriptInterface

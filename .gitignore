@@ -30,3 +30,7 @@ Thumbs.db
 
 # apktool 构建目录
 apk-source/build/
+
+# 本地凭证（含明文密码，勿提交）
+skills/*/scripts/credentials.json
+*.rooms_cache.html

@@ -17,7 +17,7 @@ function context() {
   const handlers={}, windowHandlers={}, cache=new Map();
   const el={style:{},clientWidth:390,parentElement:{style:{},appendChild(){}},addEventListener:(name,handler)=>handlers[name]=handler};
   elements.resultContent=el;
-  const ctx={console,Date,Number,Map,Array,String,parseInt,clearTimeout,setTimeout,S:{queryType:'self',scheduleForm:'grid'},NEEDS_NAME:[],NEEDS_SEM:[],currentWeek:()=>8,SEMESTER_START:new Date('2026-08-31T00:00:00'),getCache:k=>cache.get(k),document:{body:{classList:{contains:()=>true}},getElementById:id=>elements[id],createElement:()=>({style:{}})},window:{innerWidth:390,addEventListener:(name,handler)=>windowHandlers[name]=handler}};
+  const ctx={console,Date,Number,Map,Array,String,parseInt,clearTimeout,setTimeout,requestAnimationFrame:cb=>setTimeout(cb,0),S:{queryType:'self',scheduleForm:'grid'},NEEDS_NAME:[],NEEDS_SEM:[],currentWeek:()=>8,SEMESTER_START:new Date('2026-08-31T00:00:00'),getCache:k=>cache.get(k),document:{body:{classList:{contains:()=>true}},getElementById:id=>elements[id],createElement:()=>({style:{}})},window:{innerWidth:390,addEventListener:(name,handler)=>windowHandlers[name]=handler}};
   vm.createContext(ctx);
   // 结尾取启动调用之前：兼容 `init();` 与 `try { init(); } finally {...}` 两种写法
   const endAt = Math.max(html.lastIndexOf('\ninit();'), html.lastIndexOf('try { init(); }'));
@@ -26,10 +26,13 @@ function context() {
   ctx.messages=[];ctx.scheduleTip=m=>ctx.messages.push(m);ctx.renderResult=(type,data)=>{ctx.rendered={type,data}};
   return {ctx,elements,handlers,cache};
 }
-test('uncached week leaves the displayed week and data unchanged',()=>{
+test('uncached week switches to an empty week with a tip',()=>{
   const {ctx,elements}=context();elements.queryWeek.value='8';
-  assert.equal(ctx.switchScheduleWeek(9),false);
-  assert.equal(elements.queryWeek.value,'8');assert.equal(ctx.rendered,undefined);assert.equal(ctx.messages.length,1);
+  // 无缓存也直接切过去显示空课表，比停在上一周更直观
+  assert.equal(ctx.switchScheduleWeek(9),true);
+  assert.equal(elements.queryWeek.value,'9');
+  assert.equal(ctx.rendered.data.courses.length,0);assert.equal(ctx.rendered.data.emptyWeek,true);
+  assert.equal(ctx.messages.length,1);
 });
 test('a cached empty week is a valid destination; blank selection defaults to current week',()=>{
   const {ctx,elements,cache}=context();assert.equal(ctx.scheduleWeek(),8);
@@ -42,9 +45,11 @@ test('first week swipe and cancelled swipe reset safely',()=>{
   assert.doesNotThrow(()=>handlers.touchmove({touches:[{clientX:200,clientY:100}],cancelable:true,preventDefault(){}}));
   handlers.touchcancel();assert.equal(elements.resultContent.style.transform,'');assert.equal(elements.queryWeek.value,'1');
 });
-test('swipe preview resolves a blank week against current week and commits cached destination',()=>{
+test('swipe preview resolves a blank week against current week and commits cached destination',async()=>{
   const {ctx,elements,handlers,cache}=context();cache.set('self_w9',{data:{courses:[]}});ctx.initWeekSwipe();
   handlers.touchstart({touches:[{clientX:300,clientY:100}]});handlers.touchmove({touches:[{clientX:100,clientY:100}],cancelable:true,preventDefault(){}});handlers.touchend();
+  // 切换在滑出动画结束后（250ms）才落地，等动画收尾再断言
+  await new Promise(r=>setTimeout(r,350));
   assert.equal(elements.queryWeek.value,'9');assert.equal(ctx.rendered.type,'self');
 });
 test('other week has no today marker; unsafe course names are escaped',()=>{
@@ -52,9 +57,9 @@ test('other week has no today marker; unsafe course names are escaped',()=>{
   const pane=ctx.buildSchedulePane({courses:[{name:'<img src=x onerror=alert(1)>',weekday:1,period:'0102',classroom:'A"B'}]},1,false,false);
   assert.ok(!pane.includes('demo-day today'));assert.ok(!pane.includes('<img src=x'));assert.ok(pane.includes('&lt;img'));
 });
-test('grid course names wrap in groups of three while retaining the full accessible name',()=>{
+test('grid course names wrap in groups of four while retaining the full accessible name',()=>{
   const {ctx}=context();const pane=ctx.buildSchedulePane({courses:[{name:'刑事诉讼法学',weekday:1,period:'0102'}]},8,false,false);
-  assert.ok(pane.includes('<div class="cn"><span>刑事诉</span><span>讼法学</span></div>'));assert.ok(pane.includes('aria-label="刑事诉讼法学 第1-2节"'));
+  assert.ok(pane.includes('<div class="cn"><span>刑事诉讼</span><span>法学</span></div>'));assert.ok(pane.includes('aria-label="刑事诉讼法学 第1-2节"'));
 });
 test('front-end, packaged HTML and all bundled assets stay identical',()=>{
   const root=path.join(__dirname,'..');assert.equal(html,fs.readFileSync(path.join(root,'apk-source/assets/index.html'),'utf8'));

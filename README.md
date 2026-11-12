@@ -150,6 +150,7 @@ cd cicp-jwxt-android
 
 - 对外展示用 `V序号`（设置页右上角、关于项），源码中用 `V__VNUM__` 占位，打包时替换
 - 安装包 `versionName` 固定 `0.9.8`，`versionCode` 固定 `1000`，新老构建可互相覆盖安装，方便回退验证
+- 最新构建下载：[v0.9.8-v187 Release](https://github.com/changzheng7001/jwxt-query/releases/tag/v0.9.8-v187)（预发布，含 APK）
 
 ## 开发说明
 

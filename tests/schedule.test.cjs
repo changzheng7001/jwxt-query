@@ -19,7 +19,9 @@ function context() {
   elements.resultContent=el;
   const ctx={console,Date,Number,Map,Array,String,parseInt,clearTimeout,setTimeout,S:{queryType:'self',scheduleForm:'grid'},NEEDS_NAME:[],NEEDS_SEM:[],currentWeek:()=>8,SEMESTER_START:new Date('2026-08-31T00:00:00'),getCache:k=>cache.get(k),document:{body:{classList:{contains:()=>true}},getElementById:id=>elements[id],createElement:()=>({style:{}})},window:{innerWidth:390,addEventListener:(name,handler)=>windowHandlers[name]=handler}};
   vm.createContext(ctx);
-  const helpers=html.slice(html.indexOf('const SCHEDULE_COLORS'),html.lastIndexOf('\ninit();'));
+  // 结尾取启动调用之前：兼容 `init();` 与 `try { init(); } finally {...}` 两种写法
+  const endAt = Math.max(html.lastIndexOf('\ninit();'), html.lastIndexOf('try { init(); }'));
+  const helpers=html.slice(html.indexOf('const SCHEDULE_COLORS'), endAt);
   vm.runInContext(fn('cacheKey')+'\n'+fn('courseSpan')+'\n'+fn('esc')+'\n'+helpers+'\n'+fn('initWeekSwipe'),ctx);
   ctx.messages=[];ctx.scheduleTip=m=>ctx.messages.push(m);ctx.renderResult=(type,data)=>{ctx.rendered={type,data}};
   return {ctx,elements,handlers,cache};

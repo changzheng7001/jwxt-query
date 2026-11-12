@@ -20,7 +20,7 @@
 
 # direct methods
 .method constructor <init>(Lcom/cicp/jwxt/MainActivity;)V
-    .locals 0
+    .registers 2
     .param p1, "this$0"    # Lcom/cicp/jwxt/MainActivity;
 
     .line 24
@@ -32,7 +32,7 @@
 .end method
 
 .method private addCookie(Ljava/lang/String;Ljava/lang/String;)V
-    .locals 9
+    .registers 12
     .param p1, "name"    # Ljava/lang/String;
     .param p2, "value"    # Ljava/lang/String;
 
@@ -67,8 +67,8 @@
 
     move v5, v4
 
-    :goto_0
-    if-ge v5, v3, :cond_3
+    :goto_18
+    if-ge v5, v3, :cond_44
 
     aget-object v6, v0, v5
 
@@ -78,12 +78,12 @@
 
     move-result v7
 
-    if-eqz v7, :cond_0
+    if-eqz v7, :cond_23
 
-    goto :goto_1
+    goto :goto_41
 
     .line 105
-    :cond_0
+    :cond_23
     const/16 v7, 0x3d
 
     invoke-virtual {v6, v7}, Ljava/lang/String;->indexOf(I)I
@@ -92,7 +92,7 @@
 
     .line 106
     .local v7, "eq":I
-    if-lez v7, :cond_2
+    if-lez v7, :cond_41
 
     invoke-virtual {v6, v4, v7}, Ljava/lang/String;->substring(II)Ljava/lang/String;
 
@@ -102,42 +102,42 @@
 
     move-result v8
 
-    if-nez v8, :cond_2
+    if-nez v8, :cond_41
 
     .line 107
     invoke-virtual {v2}, Ljava/lang/StringBuilder;->length()I
 
     move-result v8
 
-    if-lez v8, :cond_1
+    if-lez v8, :cond_3e
 
     invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     .line 108
-    :cond_1
+    :cond_3e
     invoke-virtual {v2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     .line 103
     .end local v6    # "p":Ljava/lang/String;
     .end local v7    # "eq":I
-    :cond_2
-    :goto_1
+    :cond_41
+    :goto_41
     add-int/lit8 v5, v5, 0x1
 
-    goto :goto_0
+    goto :goto_18
 
     .line 111
-    :cond_3
+    :cond_44
     invoke-virtual {v2}, Ljava/lang/StringBuilder;->length()I
 
     move-result v3
 
-    if-lez v3, :cond_4
+    if-lez v3, :cond_4d
 
     invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     .line 112
-    :cond_4
+    :cond_4d
     invoke-virtual {v2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object v1
@@ -163,7 +163,6 @@
 
     invoke-static {v1, v3}, Lcom/cicp/jwxt/MainActivity;->-$$Nest$fputcookieStore(Lcom/cicp/jwxt/MainActivity;Ljava/lang/StringBuilder;)V
 
-    # 持久化保存会话cookie
     iget-object v1, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
 
     invoke-virtual {v1}, Lcom/cicp/jwxt/MainActivity;->saveCookies()V
@@ -173,7 +172,7 @@
 .end method
 
 .method private followRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
-    .locals 18
+    .registers 23
     .param p1, "method"    # Ljava/lang/String;
     .param p2, "urlStr"    # Ljava/lang/String;
     .param p3, "body"    # Ljava/lang/String;
@@ -195,14 +194,14 @@
 
     const/4 v4, 0x5
 
-    if-le v3, v4, :cond_0
+    if-le v3, v4, :cond_e
 
     const-string v4, "ERROR: too many redirects"
 
     return-object v4
 
     .line 37
-    :cond_0
+    :cond_e
     new-instance v4, Ljava/net/URL;
 
     move-object/from16 v5, p2
@@ -280,7 +279,7 @@
 
     move-result v8
 
-    if-lez v8, :cond_1
+    if-lez v8, :cond_68
 
     .line 50
     iget-object v8, v0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
@@ -298,7 +297,7 @@
     invoke-virtual {v6, v9, v8}, Ljava/net/HttpURLConnection;->setRequestProperty(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 53
-    :cond_1
+    :cond_68
     const-string v8, "POST"
 
     invoke-virtual {v8, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
@@ -307,7 +306,7 @@
 
     const-string v9, "UTF-8"
 
-    if-eqz v8, :cond_2
+    if-eqz v8, :cond_96
 
     .line 54
     const-string v8, "Content-Type"
@@ -322,13 +321,13 @@
     invoke-virtual {v6, v8}, Ljava/net/HttpURLConnection;->setDoOutput(Z)V
 
     .line 56
-    if-eqz v2, :cond_2
+    if-eqz v2, :cond_96
 
     invoke-virtual/range {p3 .. p3}, Ljava/lang/String;->isEmpty()Z
 
     move-result v8
 
-    if-nez v8, :cond_2
+    if-nez v8, :cond_96
 
     .line 57
     invoke-virtual {v6}, Ljava/net/HttpURLConnection;->getOutputStream()Ljava/io/OutputStream;
@@ -351,7 +350,7 @@
 
     .line 64
     .end local v8    # "os":Ljava/io/OutputStream;
-    :cond_2
+    :cond_96
     invoke-virtual {v6}, Ljava/net/HttpURLConnection;->getResponseCode()I
 
     move-result v8
@@ -364,7 +363,7 @@
 
     .line 67
     .local v10, "headers":Ljava/util/Map;, "Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;>;"
-    if-eqz v10, :cond_6
+    if-eqz v10, :cond_11f
 
     .line 68
     invoke-interface {v10}, Ljava/util/Map;->entrySet()Ljava/util/Set;
@@ -375,12 +374,12 @@
 
     move-result-object v11
 
-    :goto_0
+    :goto_a8
     invoke-interface {v11}, Ljava/util/Iterator;->hasNext()Z
 
     move-result v12
 
-    if-eqz v12, :cond_6
+    if-eqz v12, :cond_11f
 
     invoke-interface {v11}, Ljava/util/Iterator;->next()Ljava/lang/Object;
 
@@ -398,7 +397,7 @@
 
     .line 70
     .local v13, "key":Ljava/lang/String;
-    if-eqz v13, :cond_5
+    if-eqz v13, :cond_117
 
     const-string v14, "Set-Cookie"
 
@@ -406,7 +405,7 @@
 
     move-result v14
 
-    if-eqz v14, :cond_5
+    if-eqz v14, :cond_117
 
     .line 71
     invoke-interface {v12}, Ljava/util/Map$Entry;->getValue()Ljava/lang/Object;
@@ -419,12 +418,12 @@
 
     move-result-object v14
 
-    :goto_1
+    :goto_ce
     invoke-interface {v14}, Ljava/util/Iterator;->hasNext()Z
 
     move-result v15
 
-    if-eqz v15, :cond_5
+    if-eqz v15, :cond_117
 
     invoke-interface {v14}, Ljava/util/Iterator;->next()Ljava/lang/Object;
 
@@ -442,7 +441,7 @@
 
     .line 73
     .local v7, "semi":I
-    if-lez v7, :cond_3
+    if-lez v7, :cond_e8
 
     const/4 v1, 0x0
 
@@ -450,12 +449,12 @@
 
     move-result-object v17
 
-    goto :goto_2
+    goto :goto_ea
 
-    :cond_3
+    :cond_e8
     move-object/from16 v17, v15
 
-    :goto_2
+    :goto_ea
     move-object/from16 v1, v17
 
     .line 74
@@ -468,7 +467,7 @@
 
     .line 75
     .local v2, "eq":I
-    if-lez v2, :cond_4
+    if-lez v2, :cond_10d
 
     const/4 v5, 0x0
 
@@ -496,11 +495,11 @@
 
     invoke-direct {v0, v5, v7}, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->addCookie(Ljava/lang/String;Ljava/lang/String;)V
 
-    goto :goto_3
+    goto :goto_10f
 
     .end local v16    # "semi":I
     .restart local v7    # "semi":I
-    :cond_4
+    :cond_10d
     move/from16 v16, v7
 
     .line 76
@@ -508,7 +507,7 @@
     .end local v2    # "eq":I
     .end local v7    # "semi":I
     .end local v15    # "sc":Ljava/lang/String;
-    :goto_3
+    :goto_10f
     move-object/from16 v1, p1
 
     move-object/from16 v5, p2
@@ -517,12 +516,12 @@
 
     const/4 v7, 0x0
 
-    goto :goto_1
+    goto :goto_ce
 
     .line 78
     .end local v12    # "entry":Ljava/util/Map$Entry;, "Ljava/util/Map$Entry<Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;>;"
     .end local v13    # "key":Ljava/lang/String;
-    :cond_5
+    :cond_117
     move-object/from16 v1, p1
 
     move-object/from16 v5, p2
@@ -531,20 +530,20 @@
 
     const/4 v7, 0x0
 
-    goto :goto_0
+    goto :goto_a8
 
     .line 81
-    :cond_6
+    :cond_11f
     const/16 v1, 0x12e
 
-    if-eq v8, v1, :cond_7
+    if-eq v8, v1, :cond_127
 
     const/16 v1, 0x12d
 
-    if-ne v8, v1, :cond_9
+    if-ne v8, v1, :cond_167
 
     .line 82
-    :cond_7
+    :cond_127
     const-string v1, "Location"
 
     invoke-virtual {v6, v1}, Ljava/net/HttpURLConnection;->getHeaderField(Ljava/lang/String;)Ljava/lang/String;
@@ -556,7 +555,7 @@
     invoke-virtual {v6}, Ljava/net/HttpURLConnection;->disconnect()V
 
     .line 84
-    if-eqz v1, :cond_9
+    if-eqz v1, :cond_167
 
     .line 85
     const-string v2, "/"
@@ -565,7 +564,7 @@
 
     move-result v2
 
-    if-eqz v2, :cond_8
+    if-eqz v2, :cond_15d
 
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -602,7 +601,7 @@
     move-result-object v1
 
     .line 86
-    :cond_8
+    :cond_15d
     add-int/lit8 v2, v3, 0x1
 
     const-string v5, "GET"
@@ -617,7 +616,7 @@
 
     .line 90
     .end local v1    # "location":Ljava/lang/String;
-    :cond_9
+    :cond_167
     new-instance v1, Ljava/io/BufferedReader;
 
     new-instance v2, Ljava/io/InputStreamReader;
@@ -625,20 +624,20 @@
     .line 91
     const/16 v5, 0x190
 
-    if-lt v8, v5, :cond_a
+    if-lt v8, v5, :cond_174
 
     invoke-virtual {v6}, Ljava/net/HttpURLConnection;->getErrorStream()Ljava/io/InputStream;
 
     move-result-object v5
 
-    goto :goto_4
+    goto :goto_178
 
-    :cond_a
+    :cond_174
     invoke-virtual {v6}, Ljava/net/HttpURLConnection;->getInputStream()Ljava/io/InputStream;
 
     move-result-object v5
 
-    :goto_4
+    :goto_178
     invoke-direct {v2, v5, v9}, Ljava/io/InputStreamReader;-><init>(Ljava/io/InputStream;Ljava/lang/String;)V
 
     invoke-direct {v1, v2}, Ljava/io/BufferedReader;-><init>(Ljava/io/Reader;)V
@@ -651,7 +650,7 @@
 
     .line 94
     .local v2, "sb":Ljava/lang/StringBuilder;
-    :goto_5
+    :goto_183
     invoke-virtual {v1}, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
 
     move-result-object v5
@@ -659,7 +658,7 @@
     move-object v7, v5
 
     .local v7, "line":Ljava/lang/String;
-    if-eqz v5, :cond_b
+    if-eqz v5, :cond_194
 
     invoke-virtual {v2, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
@@ -669,10 +668,10 @@
 
     invoke-virtual {v5, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    goto :goto_5
+    goto :goto_183
 
     .line 95
-    :cond_b
+    :cond_194
     invoke-virtual {v1}, Ljava/io/BufferedReader;->close()V
 
     .line 96
@@ -688,273 +687,10 @@
 
 
 # virtual methods
-.method public getSystemDarkMode()Z
-    .locals 2
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
-    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
-    move-result-object v0
-    invoke-virtual {v0}, Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;
-    move-result-object v0
-    iget v0, v0, Landroid/content/res/Configuration;->uiMode:I
-    and-int/lit8 v0, v0, 0x30
-    const/16 v1, 0x20
-    if-ne v0, v1, :system_light
-    const/4 v0, 0x1
-    return v0
-    :system_light
-    const/4 v0, 0x0
-    return v0
-.end method
-
-.method public httpRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-    .locals 3
-    .param p1, "method"    # Ljava/lang/String;
-    .param p2, "urlStr"    # Ljava/lang/String;
-    .param p3, "body"    # Ljava/lang/String;
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    .line 28
-    const/4 v0, 0x0
-
-    :try_start_0
-    invoke-direct {p0, p1, p2, p3, v0}, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->followRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
-
-    move-result-object v0
-    :try_end_0
-    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
-
-    return-object v0
-
-    .line 29
-    :catch_0
-    move-exception v0
-
-    .line 30
-    .local v0, "e":Ljava/lang/Exception;
-    new-instance v1, Ljava/lang/StringBuilder;
-
-    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v2, "ERROR:"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    invoke-virtual {v0}, Ljava/lang/Exception;->getMessage()Ljava/lang/String;
-
-    move-result-object v2
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v1
-
-    return-object v1
-.end method
-.method public openBrowser(Ljava/lang/String;)V
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    .locals 4
-
-    :try_start_0
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
-
-    new-instance v1, Landroid/content/Intent;
-
-    const-string v2, "android.intent.action.VIEW"
-
-    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
-
-    invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
-
-    move-result-object v2
-
-    invoke-virtual {v1, v2}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
-
-    invoke-virtual {v0, v1}, Landroid/app/Activity;->startActivity(Landroid/content/Intent;)V
-    :try_end_0
-    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
-
-    goto :goto_0
-
-    :catch_0
-    move-exception v3
-    :goto_0
-    return-void
-.end method
-.method public showNotification(Ljava/lang/String;Ljava/lang/String;Z)Z
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    .locals 11
-
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
-
-    # API33+ 无通知权限 -> 请求权限后返回（授权后由 JS 补发）
-    :try_start_perm
-    sget v8, Landroid/os/Build$VERSION;->SDK_INT:I
-    const/16 v9, 0x21
-    if-lt v8, v9, :cond_hasperm
-    const-string v8, "android.permission.POST_NOTIFICATIONS"
-    invoke-virtual {v0, v8}, Landroid/content/Context;->checkSelfPermission(Ljava/lang/String;)I
-    move-result v8
-    if-nez v8, :cond_hasperm
-    const/4 v8, 0x1
-    new-array v8, v8, [Ljava/lang/String;
-    const/4 v9, 0x0
-    const-string v10, "android.permission.POST_NOTIFICATIONS"
-    aput-object v10, v8, v9
-    const/16 v9, 0x7d1
-    invoke-virtual {v0, v8, v9}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
-    const/4 v0, 0x0
-    return v0
-    :cond_hasperm
-    :try_end_perm
-    .catch Ljava/lang/Exception; {:try_start_perm .. :try_end_perm} :catch_perm
-    goto :goto_perm
-    :catch_perm
-    move-exception v8
-    :goto_perm
-
-    :try_start_0
-    const-string v1, "notification"
-    invoke-virtual {v0, v1}, Landroid/app/Activity;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
-    move-result-object v1
-    check-cast v1, Landroid/app/NotificationManager;
-
-    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
-    const/16 v3, 0x1a
-    if-lt v2, v3, :cond_nochan
-    const-string v2, "jwxt_chan"
-    const-string v3, "CICP\u6559\u52a1\u63d0\u9192"
-    const/4 v4, 0x3
-    new-instance v5, Landroid/app/NotificationChannel;
-    invoke-direct {v5, v2, v3, v4}, Landroid/app/NotificationChannel;-><init>(Ljava/lang/String;Ljava/lang/CharSequence;I)V
-    invoke-virtual {v1, v5}, Landroid/app/NotificationManager;->createNotificationChannel(Landroid/app/NotificationChannel;)V
-    :cond_nochan
-
-    const-class v2, Lcom/cicp/jwxt/MainActivity;
-    new-instance v3, Landroid/content/Intent;
-    invoke-direct {v3, v0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
-    const-string v2, "goto"
-    const-string v4, "schedule"
-    invoke-virtual {v3, v2, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
-    const/4 v2, 0x0
-    const/4 v4, 0x0
-    invoke-static {v0, v2, v3, v4}, Landroid/app/PendingIntent;->getActivity(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
-    move-result-object v2
-
-    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
-    const/16 v4, 0x1a
-    if-lt v3, v4, :cond_oldbuilder
-    const-string v3, "jwxt_chan"
-    new-instance v5, Landroid/app/Notification$Builder;
-    invoke-direct {v5, v0, v3}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;Ljava/lang/String;)V
-    goto :goto_builder
-    :cond_oldbuilder
-    new-instance v5, Landroid/app/Notification$Builder;
-    invoke-direct {v5, v0}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;)V
-    :goto_builder
-
-    sget v3, Landroid/R$drawable;->ic_menu_agenda:I
-    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setSmallIcon(I)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, p1}, Landroid/app/Notification$Builder;->setContentTitle(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
-    invoke-virtual {v5, p3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
-    new-instance v2, Landroid/app/Notification$BigTextStyle;
-    invoke-direct {v2}, Landroid/app/Notification$BigTextStyle;-><init>()V
-    invoke-virtual {v2, p2}, Landroid/app/Notification$BigTextStyle;->bigText(Ljava/lang/CharSequence;)Landroid/app/Notification$BigTextStyle;
-    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setStyle(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;
-    invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
-    move-result-object v3
-    const/4 v4, 0x1
-    invoke-virtual {v1, v4, v3}, Landroid/app/NotificationManager;->notify(ILandroid/app/Notification;)V
-    const/4 v0, 0x1
-    return v0
-    :try_end_0
-    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
-    goto :goto_ret
-    :catch_0
-    move-exception v2
-    const/4 v0, 0x0
-    return v0
-    :goto_ret
-    return-void
-.end method
-
-# 状态栏配色跟随前端主题，使状态栏与 App 一致（不显示灰色）
-# @JavascriptInterface 在 JS 线程执行，View 操作需切到 UI 线程（runOnUiThread）
-.method public setStatusTheme(Z)V
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    .locals 2
-
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
-
-    new-instance v1, Lcom/cicp/jwxt/StatusRunnable;
-
-    invoke-direct {v1, v0, p1}, Lcom/cicp/jwxt/StatusRunnable;-><init>(Landroid/app/Activity;Z)V
-
-    invoke-virtual {v0, v1}, Landroid/app/Activity;->runOnUiThread(Ljava/lang/Runnable;)V
-
-    return-void
-.end method
-
-# 返回状态栏高度(px)，供前端给顶部 topbar 预留沉浸式 padding
-.method public getStatusBarHeight()I
-    .annotation runtime Landroid/webkit/JavascriptInterface;
-    .end annotation
-
-    .locals 5
-
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
-
-    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
-
-    move-result-object v1
-
-    const-string v2, "status_bar_height"
-
-    const-string v3, "dimen"
-
-    const-string v4, "android"
-
-    invoke-virtual {v1, v2, v3, v4}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
-
-    move-result v2
-
-    if-lez v2, :cond_zero
-
-    invoke-virtual {v1, v2}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
-
-    move-result v1
-
-    return v1
-
-    :cond_zero
-
-    const/4 v1, 0x0
-
-    return v1
-.end method
-
-# 退出登录:清空内存与持久化会话cookie
 .method public clearSession()V
+    .registers 4
     .annotation runtime Landroid/webkit/JavascriptInterface;
     .end annotation
-
-    .locals 3
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
 
@@ -985,6 +721,361 @@
     move-result-object v0
 
     invoke-interface {v0}, Landroid/content/SharedPreferences$Editor;->apply()V
+
+    return-void
+.end method
+
+.method public getStatusBarHeight()I
+    .registers 6
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v1
+
+    const-string v2, "status_bar_height"
+
+    const-string v3, "dimen"
+
+    const-string v4, "android"
+
+    invoke-virtual {v1, v2, v3, v4}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v2
+
+    if-lez v2, :cond_17
+
+    invoke-virtual {v1, v2}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
+
+    move-result v1
+
+    return v1
+
+    :cond_17
+    const/4 v1, 0x0
+
+    return v1
+.end method
+
+.method public getSystemDarkMode()Z
+    .registers 3
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-virtual {v0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;
+
+    move-result-object v0
+
+    iget v0, v0, Landroid/content/res/Configuration;->uiMode:I
+
+    and-int/lit8 v0, v0, 0x30
+
+    const/16 v1, 0x20
+
+    if-ne v0, v1, :cond_14
+
+    const/4 v0, 0x1
+
+    return v0
+
+    :cond_14
+    const/4 v0, 0x0
+
+    return v0
+.end method
+
+.method public httpRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    .registers 7
+    .param p1, "method"    # Ljava/lang/String;
+    .param p2, "urlStr"    # Ljava/lang/String;
+    .param p3, "body"    # Ljava/lang/String;
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    .line 28
+    const/4 v0, 0x0
+
+    :try_start_1
+    invoke-direct {p0, p1, p2, p3, v0}, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->followRequest(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
+
+    move-result-object v0
+    :try_end_5
+    .catch Ljava/lang/Exception; {:try_start_1 .. :try_end_5} :catch_6
+
+    return-object v0
+
+    .line 29
+    :catch_6
+    move-exception v0
+
+    .line 30
+    .local v0, "e":Ljava/lang/Exception;
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v2, "ERROR:"
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    invoke-virtual {v0}, Ljava/lang/Exception;->getMessage()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    return-object v1
+.end method
+
+.method public openBrowser(Ljava/lang/String;)V
+    .registers 6
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    :try_start_0
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v1, Landroid/content/Intent;
+
+    const-string v2, "android.intent.action.VIEW"
+
+    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
+
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->startActivity(Landroid/content/Intent;)V
+    :try_end_13
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_13} :catch_14
+
+    goto :goto_15
+
+    :catch_14
+    move-exception v3
+
+    :goto_15
+    return-void
+.end method
+
+.method public setStatusTheme(Z)V
+    .registers 4
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v1, Lcom/cicp/jwxt/StatusRunnable;
+
+    invoke-direct {v1, v0, p1}, Lcom/cicp/jwxt/StatusRunnable;-><init>(Landroid/app/Activity;Z)V
+
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->runOnUiThread(Ljava/lang/Runnable;)V
+
+    return-void
+.end method
+
+.method public showNotification(Ljava/lang/String;Ljava/lang/String;Z)Z
+    .registers 15
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    :try_start_2
+    sget v8, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v9, 0x21
+
+    if-lt v8, v9, :cond_1f
+
+    const-string v8, "android.permission.POST_NOTIFICATIONS"
+
+    invoke-virtual {v0, v8}, Landroid/content/Context;->checkSelfPermission(Ljava/lang/String;)I
+
+    move-result v8
+
+    if-eqz v8, :cond_1f
+
+    const/4 v8, 0x1
+
+    new-array v8, v8, [Ljava/lang/String;
+
+    const/4 v9, 0x0
+
+    const-string v10, "android.permission.POST_NOTIFICATIONS"
+
+    aput-object v10, v8, v9
+
+    const/16 v9, 0x7d1
+
+    invoke-virtual {v0, v8, v9}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
+
+    const/4 v0, 0x0
+
+    return v0
+    :try_end_1f
+    .catch Ljava/lang/Exception; {:try_start_2 .. :try_end_1f} :catch_20
+
+    :cond_1f
+    goto :goto_21
+
+    :catch_20
+    move-exception v8
+
+    :goto_21
+    :try_start_21
+    const-string v1, "notification"
+
+    invoke-virtual {v0, v1}, Landroid/app/Activity;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+
+    move-result-object v1
+
+    check-cast v1, Landroid/app/NotificationManager;
+
+    sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v3, 0x1a
+
+    if-lt v2, v3, :cond_3c
+
+    const-string v2, "jwxt_high"
+
+    const-string v3, "CICP\u6559\u52a1\u63d0\u9192"
+
+    const/4 v4, 0x4
+
+    new-instance v5, Landroid/app/NotificationChannel;
+
+    invoke-direct {v5, v2, v3, v4}, Landroid/app/NotificationChannel;-><init>(Ljava/lang/String;Ljava/lang/CharSequence;I)V
+
+    invoke-virtual {v1, v5}, Landroid/app/NotificationManager;->createNotificationChannel(Landroid/app/NotificationChannel;)V
+
+    :cond_3c
+    const-class v2, Lcom/cicp/jwxt/MainActivity;
+
+    new-instance v3, Landroid/content/Intent;
+
+    invoke-direct {v3, v0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+
+    const-string v2, "goto"
+
+    const-string v4, "schedule"
+
+    invoke-virtual {v3, v2, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const/high16 v4, 0x4000000
+
+    invoke-static {v0, v4, v3, v4}, Landroid/app/PendingIntent;->getActivity(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+
+    move-result-object v2
+
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    const/16 v4, 0x1a
+
+    if-lt v3, v4, :cond_5e
+
+    const-string v3, "jwxt_high"
+
+    new-instance v5, Landroid/app/Notification$Builder;
+
+    invoke-direct {v5, v0, v3}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;Ljava/lang/String;)V
+
+    goto :goto_63
+
+    :cond_5e
+    new-instance v5, Landroid/app/Notification$Builder;
+
+    invoke-direct {v5, v0}, Landroid/app/Notification$Builder;-><init>(Landroid/content/Context;)V
+
+    :goto_63
+    sget v3, Landroid/R$drawable;->ic_menu_agenda:I
+
+    invoke-virtual {v5, v3}, Landroid/app/Notification$Builder;->setSmallIcon(I)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5, p1}, Landroid/app/Notification$Builder;->setContentTitle(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5, p2}, Landroid/app/Notification$Builder;->setContentText(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setContentIntent(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5, p3}, Landroid/app/Notification$Builder;->setOngoing(Z)Landroid/app/Notification$Builder;
+
+    new-instance v2, Landroid/app/Notification$BigTextStyle;
+
+    invoke-direct {v2}, Landroid/app/Notification$BigTextStyle;-><init>()V
+
+    invoke-virtual {v2, p2}, Landroid/app/Notification$BigTextStyle;->bigText(Ljava/lang/CharSequence;)Landroid/app/Notification$BigTextStyle;
+
+    invoke-virtual {v5, v2}, Landroid/app/Notification$Builder;->setStyle(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;
+
+    invoke-virtual {v5}, Landroid/app/Notification$Builder;->build()Landroid/app/Notification;
+
+    move-result-object v3
+
+    const/4 v4, 0x1
+
+    invoke-virtual {v1, v4, v3}, Landroid/app/NotificationManager;->notify(ILandroid/app/Notification;)V
+
+    const/4 v0, 0x1
+
+    return v0
+    :try_end_89
+    .catch Ljava/lang/Exception; {:try_start_21 .. :try_end_89} :catch_8a
+
+    goto :goto_8d
+
+    :catch_8a
+    move-exception v2
+
+    const/4 v0, 0x0
+
+    return v0
+
+    :goto_8d
+    return-void
+.end method
+
+.method public showNativeLogin()V
+    .registers 2
+
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-static {v0}, Lcom/cicp/jwxt/NativeLogin;->show(Landroid/app/Activity;)V
+
+    return-void
+.end method
+
+.method public openInApp(Ljava/lang/String;)V
+    .registers 3
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$WebAppInterface;->this$0:Lcom/cicp/jwxt/MainActivity;
+
+    invoke-static {v0, p1}, Lcom/cicp/jwxt/InAppOpen;->open(Landroid/app/Activity;Ljava/lang/String;)V
 
     return-void
 .end method

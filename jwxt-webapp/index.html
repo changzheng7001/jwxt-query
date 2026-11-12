@@ -8,8 +8,8 @@
 // Set the first paint to the saved preference, including older Android WebViews.
 (function(){var mode='system';try{mode=localStorage.getItem('jwxt_theme')||'system';}catch(e){}var system=false;try{system=window.Android&&Android.getSystemDarkMode?Android.getSystemDarkMode():window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;}catch(e){}document.documentElement.setAttribute('data-theme',(mode==='dark'||mode==='system'&&system)?'dark':'');})();
 </script>
-<style>
-:root {
+<style>:root{
+  --sab: env(safe-area-inset-bottom, 0px);
   --cream: #efe7d4; --cream-2: #e6dcc4;
   --green: #2e4a2a; --green-lite: #3a5a36; --green-deep: #243a21;
   --pink: #e89cb1; --pink-deep: #d27e96;
@@ -27,8 +27,8 @@
   --grad-b: rgba(46,74,42,0.30);
   --grad-c: rgba(214,203,176,0.30);
   --sheet-bg: rgba(250,244,228,0.97);
-}
-html[data-theme="dark"] {
+  --timemask: rgba(250,245,236,0.88);
+}html[data-theme="dark"]{
   --cream: #161b17; --cream-2: #1d231e;
   --green: #8fae6e; --green-lite: #7a9960; --green-deep: #8fae6e;
   --pink: #b0758a; --pink-deep: #c8869c;
@@ -42,9 +42,9 @@ html[data-theme="dark"] {
   --grad-b: rgba(143,174,110,0.26);
   --grad-c: rgba(164,154,130,0.18);
   --sheet-bg: rgba(23,28,24,0.97);
-}
-/* 经典主题：关闭玻璃效果，恢复不透明白底 + 绿边框 */
-html[data-style="classic"] {
+  --timemask: rgba(28,34,29,0.82);
+}/* 经典主题：关闭玻璃效果，恢复不透明白底 + 绿边框 */
+html[data-style="classic"]{
   --glass: var(--cream);
   --glass-2: var(--cream-2);
   --glass-border: var(--green);
@@ -52,19 +52,8 @@ html[data-style="classic"] {
   --blur: 0px;
   --grad-a: transparent; --grad-b: transparent; --grad-c: transparent;
   --sheet-bg: var(--cream);
-}
-html[data-style="classic"] html::before { background: var(--cream); animation: none; }
-html[data-style="classic"] body { background: var(--cream); }
-html[data-style="classic"] .topbar { -webkit-mask-image: none; box-shadow: none; }
-html[data-style="classic"] .sheet { background: var(--cream); }
-html[data-style="classic"] .card { border-width: 2px; border-radius: 8px; box-shadow: none; }
-html[data-style="classic"] .type-btn { border-width: 2px; border-radius: 8px; box-shadow: none; }
-html[data-style="classic"] input[type="text"], html[data-style="classic"] input[type="password"], html[data-style="classic"] select { border-width: 2px; border-radius: 6px; }
-html[data-style="classic"] button { border-width: 2px; border-radius: 6px; box-shadow: none; }
-html[data-style="classic"] button.outline { background: transparent; }
-html[data-style="classic"] .sheet { box-shadow: none; }
-/* 固定彩色光斑背景，供毛玻璃模糊透出 */
-html::before {
+}html[data-style="classic"] html::before{ background: var(--cream); animation: none; }html[data-style="classic"] body{ background: var(--cream); }html[data-style="classic"] .topbar{ -webkit-mask-image: none; box-shadow: none; }html[data-style="classic"] .sheet{ background: var(--cream); }html[data-style="classic"] .card{ border-width: 2px; border-radius: 8px; box-shadow: none; }html[data-style="classic"] .type-btn{ border-width: 2px; border-radius: 8px; box-shadow: none; }html[data-style="classic"] input[type="text"],html[data-style="classic"] input[type="password"],html[data-style="classic"] select{ border-width: 2px; border-radius: 6px; }html[data-style="classic"] button{ border-width: 2px; border-radius: 6px; box-shadow: none; }html[data-style="classic"] button.outline{ background: transparent; }html[data-style="classic"] .sheet{ box-shadow: none; }/* 固定彩色光斑背景，供毛玻璃模糊透出 */
+html::before{
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
     radial-gradient(420px 420px at 12% 8%, var(--grad-a), transparent 60%),
@@ -73,173 +62,43 @@ html::before {
     var(--cream);
   animation: glassDrift 18s ease-in-out infinite alternate;
 }
-@keyframes glassDrift {
-  0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
-  100% { background-position: 20% 10%, 70% 25%, 35% 80%, 0 0; }
-}
-html[data-theme="dark"] body { background: transparent; }
-html[data-theme="dark"] html::before {
+@keyframes glassDrift {0%{ background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }100%{ background-position: 20% 10%, 70% 25%, 35% 80%, 0 0; }
+}html[data-theme="dark"] body{ background: transparent; }html[data-theme="dark"] html::before{
   background:
     radial-gradient(420px 420px at 12% 8%, var(--grad-a), transparent 60%),
     radial-gradient(520px 520px at 88% 20%, var(--grad-b), transparent 65%),
     radial-gradient(480px 480px at 55% 92%, var(--grad-c), transparent 60%),
     #11140f;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { width: 100%; min-height: 100%; }
-body { background: transparent; color: var(--ink); font-family: var(--serif); font-size: 15px; line-height: 1.5; }
-.mono { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
-
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: calc(12px + var(--sb, 0px)) 16px 12px; position: sticky; top: 0; z-index: 100;
+}*{ box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }html,body{ width: 100%; min-height: 100%; }body{ background: transparent; color: var(--ink); font-family: var(--serif); font-size: 15px; line-height: 1.5; }.mono{ font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }.topbar{ display: flex; align-items: center; justify-content: space-between; padding: calc(12px + var(--sb, 0px)) 16px 12px; position: sticky; top: 0; z-index: 100;
   background: var(--glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 1px 20px rgba(0,0,0,0.06);
   -webkit-mask-image: linear-gradient(#000 85%, transparent);
-}
-.topbar-left { display: flex; align-items: center; gap: 8px; }
-.topbar-title { font-size: 20px; color: var(--green); font-weight: 600; }
-.back-btn { background: none; border: none; color: var(--green); font-size: 20px; padding: 0 8px; cursor: pointer; display: none; line-height: 1; }
-.back-btn.show { display: block; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #8b949e; display: inline-block; }
-.status-dot.ok { background: var(--green); }
-.status-dot.cached { background: #b5544f; }
-
-/* 周次/星期框对称统一：grid 两列严格等分，绝对等宽居中 */
-#weekRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
-#weekRow input, #weekRow select {
+}.topbar-left{ display: flex; align-items: center; gap: 8px; }.topbar-title{ font-size: 20px; color: var(--green); font-weight: 600; }.back-btn{ background: none; border: none; color: var(--green); font-size: 20px; padding: 0 8px; cursor: pointer; display: none; line-height: 1; }.back-btn.show{ display: block; }.status-dot{ width: 8px; height: 8px; border-radius: 50%; background: #8b949e; display: inline-block; }.status-dot.ok{ background: var(--green); }.status-dot.cached{ background: #b5544f; }/* 周次/星期框对称统一：grid 两列严格等分，绝对等宽居中 */
+#weekRow{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }#weekRow input,#weekRow select{
   height: 40px; box-sizing: border-box; padding: 0 10px; width: 100%;
   border: 1px solid var(--glass-border); border-radius: 8px;
   background: var(--sheet-bg); color: var(--ink); font-size: 14px;
   margin-bottom: 0;
-}
-#weekRow select { appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 26px;
+}#weekRow select{ appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 26px;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b7355' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 10px center;
-}
-#weekRow input::placeholder { color: var(--ink-light); }
-
-main { max-width: 600px; margin: 0 auto; padding: 12px 28px; }
-
-.card { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px; margin-bottom: 14px;
+}#weekRow input::placeholder{ color: var(--ink-light); }main{ max-width: 600px; margin: 0 auto; padding: 12px 28px; }.card{ border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px; margin-bottom: 14px;
   background: var(--glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
   box-shadow: 0 4px 24px rgba(0,0,0,0.05), inset 0 1px 0 var(--glass-hi);
-  transition: transform .15s ease, box-shadow .2s ease; }
-.card-green { background: var(--glass-2); }
-.card-pink { border-color: rgba(210,126,150,0.35); }
-.card-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--green); padding-bottom: 6px; margin-bottom: 10px; }
-.card-header .mono { color: var(--green); font-size: 10px; }
-.card-pink .card-header { border-color: var(--pink-deep); }
-.card-pink .card-header .mono { color: var(--pink-deep); }
-
-.login-collapse { cursor: pointer; user-select: none; }
-.login-collapse::after { content: '▼'; float: right; font-size: 9px; transition: transform 0.2s; }
-.login-collapse.collapsed::after { transform: rotate(-90deg); }
-.login-body { display: block; }
-.login-body.hidden { display: none; }
-
-input, select, button { font-family: var(--serif); font-size: 14px; }
-input[type="text"], input[type="password"], select {
+  transition: transform .15s ease, box-shadow .2s ease; }.card-green{ background: var(--glass-2); }.card-pink{ border-color: rgba(210,126,150,0.35); }.card-header{ display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--green); padding-bottom: 6px; margin-bottom: 10px; }.card-header .mono{ color: var(--green); font-size: 10px; }.card-pink .card-header{ border-color: var(--pink-deep); }.card-pink .card-header .mono{ color: var(--pink-deep); }.login-body{ display: block; }#loginMask{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.42); z-index:410; }body.in-result #loginSection.popup-login{ display:block !important; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,420px); margin:0; z-index:420; }body.in-result #loginSection.popup-login .card{ margin:0; box-shadow:0 24px 60px rgba(20,28,22,.34); }.login-body.hidden{ display: none; }input,select,button{ font-family: var(--serif); font-size: 14px; }input[type="text"],input[type="password"],select{
   width: 100%; min-height: 42px; padding: 0 12px; margin-bottom: 8px;
   background: var(--glass-2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid var(--glass-border); border-radius: 10px;
   color: var(--ink); outline: none; -webkit-appearance: none; appearance: none;
-}
-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%232e4a2a' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
-
-button {
+}select{ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%232e4a2a' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }button{
   min-height: 42px; padding: 0 16px; border: 1px solid var(--glass-border); border-radius: 10px;
   background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-weight: 600; cursor: pointer; font-size: 13px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08), inset 0 1px 0 var(--glass-hi);
-  transition: transform .1s ease, opacity .2s, box-shadow .2s; }
-button:active { transform: scale(0.96); }
-button:disabled { opacity: 0.5; }
-button.outline { background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--green); }
-button.small { min-height: 34px; padding: 0 10px; font-size: 11px; }
-.btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.btn-chip { min-height: 32px; padding: 0 12px; background: transparent; color: var(--green); border: 2px solid var(--green); font-size: 11px; }
-
-/* 课表卡片 - 林间刊页风格 */
-.schedule-day { margin-bottom: 14px; }
-.schedule-day-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--green); padding-bottom: 4px; margin-bottom: 8px; }
-.schedule-day-title { font-size: 17px; font-weight: 600; color: var(--green); }
-
-/* 课表表格（易校园风格） */
-.sched-table { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 11px; min-width: 620px; }
-.sched-table thead th { padding: 6px 2px; background: transparent; color: var(--ink); font-weight: 600; border-radius: 8px; text-align: center; white-space: nowrap; vertical-align: bottom; }
-.sched-table thead th .wd { font-size: 11px; color: var(--ink-light); display: block; }
-.sched-table thead th .dt { font-size: 14px; display: block; margin-top: 2px; }
-.sched-table thead th.today .dt { display: inline-block; width: 26px; height: 26px; line-height: 26px; border-radius: 50%; background: var(--green); color: var(--cream); }
-.sched-table thead th.today .wd { color: var(--green); }
-.sched-table td { border: none; border-radius: 10px; padding: 3px; vertical-align: top; text-align: center; background: transparent; }
-.sched-table td.today-col { background: color-mix(in srgb, var(--green) 7%, transparent); }
-.sched-table td.seg { color: var(--ink-light); background: transparent; font-size: 11px; font-weight: 600; vertical-align: middle; }
-.sched-table td .e { color: var(--ink-light); opacity: 0.25; }
-.sched-course { border-radius: 8px; padding: 6px 6px; margin-bottom: 3px; line-height: 1.3; cursor: pointer; position: relative; overflow: hidden; }
-.sched-course::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: rgba(255,255,255,0.35); }
-.sched-course .cn { font-weight: 700; font-size: 11px; display: block; word-break: break-all; }
-.sched-course .cr { font-size: 9px; opacity: 0.9; display: block; word-break: break-all; margin-top: 2px; }
-.sched-course { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); }
-.sched-course.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
-html[data-theme="dark"] .sched-course.pink { color: var(--cream); }
-.sched-course:active { transform: scale(0.97); }
-/* 经典主题 */
-html[data-style="classic"] .sched-table { border-collapse: collapse; border-spacing: 0; min-width: 0; font-size: 11px; }
-html[data-style="classic"] .sched-table thead th { background: var(--green); color: var(--cream); border-radius: 0; border: 1px solid var(--green); }
-html[data-style="classic"] .sched-table thead th.today .dt { background: transparent; color: var(--cream); }
-html[data-style="classic"] .sched-table td { border: 1px solid var(--line); border-radius: 0; background: transparent; }
-html[data-style="classic"] .sched-course::before { display: none; }
-
-/* === 易校园风格课表 CSS Grid（圆角课程格 + 分层表头） === */
-.xkb-wrap { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.06); }
-.xkb-head { display:flex; align-items:stretch; border-bottom:1px solid #E8EAEE; }
-.xkb-head .xkb-month { width:48px; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#333; background:#F5F6F8; border-right:1px solid #E8EAEE; padding:8px 2px; flex-shrink:0; }
-.xkb-head .xkb-days { flex:1; display:flex; }
-.xkb-head .xkb-day { flex:1; text-align:center; padding:7px 2px; }
-.xkb-head .xkb-day .wd { font-size:13px; font-weight:700; color:#3D4149; }
-.xkb-head .xkb-day .dt { font-size:11px; color:#8A8F98; margin-top:1px; }
-.xkb-head .xkb-day.today { background:linear-gradient(180deg,var(--green),var(--green-deep)); }
-.xkb-head .xkb-day.today .wd { color:#fff; }
-.xkb-head .xkb-day.today .dt { color:rgba(255,255,255,.85); }
-.xkb-body { display:flex; }
-.xkb-lecol { width:48px; background:#FAFBFC; border-right:1px solid #E8EAEE; flex-shrink:0; }
-.xkb-lecol .lr { height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:1px solid #EEF0F3; }
-.xkb-lecol .lr .no { font-size:13px; font-weight:800; color:#4A4F57; }
-.xkb-lecol .lr .tm { font-size:8.5px; color:#9AA0A8; white-space:nowrap; margin-top:1px; }
-.xkb-grid-wrap { flex:1; position:relative; overflow:hidden; }
-.xkb-grid { position:relative; height:936px; }
-.xkb-dline { position:absolute; left:0; right:0; height:1px; background:#F0F2F5; }
-.xkb-course { position:absolute; border-radius:10px; padding:6px 8px; overflow:hidden; cursor:pointer; display:flex; flex-direction:column; }
-.xkb-course .cn { font-size:12px; font-weight:800; line-height:1.25; }
-.xkb-course .cr { font-size:9px; margin-top:3px; opacity:.85; }
-
-/* === 查询结果全屏模式 === */
-body.in-result main { max-width:100%; padding:0; }
-body.in-result #resultContent { padding:0; }
-body.in-result #resultSection > .card { background:transparent; border:none; box-shadow:none; }
-body.in-result #resultSection .card-header,
-body.in-result #resultSection .cache-notice { display:none; }
-
-/* 结果页顶栏：更高、三栏布局 */
-body.in-result #mainTopbar { padding: calc(8px + var(--sb, 0px)) 10px 8px; min-height: 88px; align-items: flex-start; }
-body.in-result .tb-home-only { display:none !important; }
-body.in-result #loginBtn, body.in-result #logoutBtn, body.in-result #statusDot, body.in-result #statusText { display:none !important; }
-body.in-result .tb-result-wrap { display:flex !important; align-items:flex-start; justify-content:space-between; gap:8px; }
-.tb-result-wrap { display:none; width:100%; position:relative; min-height:56px; }
-.tb-col { display:flex; align-items:flex-start; gap:8px; }
-.tb-col-center { flex:1; justify-content:center; text-align:center; }
-.tb-col-right { align-items:center; gap:6px; }
-.tb-week-block { display:flex; flex-direction:column; gap:1px; }
-.tb-exit-btn { font-size:8px; padding:4px 2px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:2px; cursor:pointer; line-height:1.2; min-width:0; writing-mode:vertical-rl; text-orientation:upright; letter-spacing:1px; }
-.tb-r-week { display:flex; align-items:center; gap:3px; cursor:pointer; font-size:15px; font-weight:800; color:var(--ink); line-height:1.2; }
-.tb-r-arrow { font-size:9px; color:var(--ink-light); }
-.tb-r-sem { font-size:10px; color:var(--ink-light); line-height:1.2; }
-.tb-r-title { font-size:16px; font-weight:800; color:var(--ink); line-height:1.3; }
-.tb-r-range { font-size:10px; color:var(--ink-light); margin-top:1px; }
-.tb-icon-btn { width:26px; height:24px; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
-.back-btn { display:block; padding:0; width:26px; height:24px; font-size:14px; line-height:24px; text-align:center; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
-
-/* === 查询参数面板 + 浏览列表：结果页变成可拖动浮窗 === */
-body.in-result #querySection, body.in-result #browseNav {
+  transition: transform .1s ease, opacity .2s, box-shadow .2s; }button:active{ transform: scale(0.96); }button:disabled{ opacity: 0.5; }button.outline{ background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--green); }button.small{ min-height: 34px; padding: 0 10px; font-size: 11px; }.btn-group{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }.btn-chip{ min-height: 32px; padding: 0 4px; background: transparent; color: var(--green); border: 2px solid var(--green); font-size: 11px; white-space: nowrap; }/* === 查询结果全屏模式 === */
+body.in-result main{ max-width:100%; padding:0; }body.in-result #resultContent{ padding:0; }body.in-result #resultSection > .card{ background:transparent; border:none; box-shadow:none; }body.in-result #resultSection .card-header,body.in-result #resultSection .cache-notice{ display:none; }/* 结果页顶栏：更高、三栏布局 */
+body.in-result #mainTopbar{ padding: calc(8px + var(--sb, 0px)) 10px 8px; min-height: 88px; align-items: flex-start; }body.in-result .tb-home-only{ display:none !important; }body.in-result #loginBtn,body.in-result #logoutBtn,body.in-result #statusDot,body.in-result #statusText{ display:none !important; }body.in-result .tb-result-wrap{ display:flex !important; align-items:flex-start; justify-content:space-between; gap:8px; }.tb-result-wrap{ display:none; width:100%; position:relative; min-height:56px; }.tb-col{ display:flex; align-items:flex-start; gap:8px; }.tb-col-center{ flex:1; justify-content:center; text-align:center; }.tb-col-right{ align-items:center; gap:6px; }.tb-week-block{ display:flex; flex-direction:column; gap:1px; }.tb-r-week{ display:flex; align-items:center; gap:3px; cursor:pointer; font-size:15px; font-weight:800; color:var(--ink); line-height:1.2; }.tb-r-arrow{ font-size:9px; color:var(--ink-light); }.tb-r-sem{ font-size:10px; color:var(--ink-light); line-height:1.2; }.tb-r-title{ font-size:16px; font-weight:800; color:var(--ink); line-height:1.3; }.tb-r-range{ font-size:10px; color:var(--ink-light); margin-top:1px; }.tb-icon-btn{ width:26px; height:24px; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }.back-btn{ display:block; padding:0; width:26px; height:24px; font-size:14px; line-height:24px; text-align:center; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }/* === 查询参数面板 + 浏览列表：结果页变成可拖动浮窗 === */
+body.in-result #querySection,body.in-result #browseNav{
   position: fixed; z-index: 160; right: 0; width: 22px; height: 70px; overflow: hidden;
   border:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px;
   background:linear-gradient(145deg,rgba(255,255,255,.63),rgba(245,239,224,.38));
@@ -247,38 +106,17 @@ body.in-result #querySection, body.in-result #browseNav {
   box-shadow:0 7px 22px rgba(36,47,34,.15),inset 0 1px 0 rgba(255,255,255,.75);
   transition:width .3s cubic-bezier(.2,.8,.2,1),left .3s ease,right .3s ease,box-shadow .25s ease;
   touch-action: none;
-}
-body.in-result #querySection > .card, body.in-result #browseNav > .card { display: none; }
-body.in-result #querySection > .fd-tab, body.in-result #browseNav > .fd-tab {
+}body.in-result #querySection > .card,body.in-result #browseNav > .card{ display: none; }body.in-result #querySection > .fd-tab,body.in-result #browseNav > .fd-tab{
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 100%;
   writing-mode: vertical-rl; padding: 8px 2px; box-sizing: border-box;
   font-size: 10px; font-weight: 650; letter-spacing: 1.5px;
   cursor: pointer; user-select: none;
-}
-body.in-result #querySection > .fd-tab { background:linear-gradient(180deg,rgba(231,161,178,.44),rgba(231,161,178,.12)); color:var(--green-deep); }
-body.in-result #browseNav > .fd-tab { background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep); }
-body.in-result #querySection.dock-left, body.in-result #browseNav.dock-left {
+}body.in-result #querySection > .fd-tab{ background:linear-gradient(180deg,rgba(231,161,178,.44),rgba(231,161,178,.12)); color:var(--green-deep); }body.in-result #browseNav > .fd-tab{ background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep); }body.in-result #querySection.dock-left,body.in-result #browseNav.dock-left{
   right:auto; left:0; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0;
-}
-body.in-result #querySection.avoid-left, body.in-result #browseNav.avoid-left,
-body.in-result #todaySection.avoid-left, body.in-result #cacheInfoSection.avoid-left { left:0!important; right:auto!important; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }
-body.in-result #querySection.avoid-right, body.in-result #browseNav.avoid-right,
-body.in-result #todaySection.avoid-right, body.in-result #cacheInfoSection.avoid-right { right:0!important; left:auto!important; border-left:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px; }
-body.in-result #querySection.open, body.in-result #browseNav.open { width:min(248px,calc(100vw - 52px)); max-height:calc(100vh - 108px - env(safe-area-inset-top,0px)); overflow-y:auto; z-index:180; border:1px solid rgba(255,255,255,.74); border-radius:10px; touch-action:pan-y; overscroll-behavior:contain; background:rgba(249,246,235,.86); -webkit-backdrop-filter:blur(24px) saturate(160%); backdrop-filter:blur(24px) saturate(160%); box-shadow:0 18px 48px rgba(31,42,31,.24),inset 0 1px 0 rgba(255,255,255,.9); }
-body.in-result #querySection.open:not(.dock-left), body.in-result #browseNav.open:not(.dock-left) { left:auto; right:0; }
-body.in-result #querySection.open.dock-left, body.in-result #browseNav.open.dock-left { left:0; right:auto; }
-body.in-result #querySection.open > .fd-tab, body.in-result #browseNav.open > .fd-tab { display: none; }
-body.in-result #querySection.open > .card, body.in-result #browseNav.open > .card { display: block; padding: 8px; margin-bottom: 0; }
-
-/* === 今日课程 / 缓存信息：首页=正常卡片，结果页=可左右停靠浮窗 === */
-#todaySection .fd-tab, #cacheInfoSection .fd-tab,
-#querySection .fd-tab, #browseNav .fd-tab { display:none; }
-/* 首页四个面板间距拉开 */
-#todaySection, #querySection, #browseNav, #cacheInfoSection { margin-bottom: 40px; }
-
-body.in-result #todaySection,
-body.in-result #cacheInfoSection {
+}body.in-result #querySection.avoid-left,body.in-result #browseNav.avoid-left,body.in-result #todaySection.avoid-left,body.in-result #cacheInfoSection.avoid-left{ left:0!important; right:auto!important; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }body.in-result #querySection.avoid-right,body.in-result #browseNav.avoid-right,body.in-result #todaySection.avoid-right,body.in-result #cacheInfoSection.avoid-right{ right:0!important; left:auto!important; border-left:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px; }body.in-result #querySection.open,body.in-result #browseNav.open{ width:min(248px,calc(100vw - 52px)); max-height:calc(100vh - 108px - env(safe-area-inset-top,0px)); overflow-y:auto; z-index:180; border:1px solid rgba(255,255,255,.74); border-radius:10px; touch-action:pan-y; overscroll-behavior:contain; background:rgba(249,246,235,.86); -webkit-backdrop-filter:blur(24px) saturate(160%); backdrop-filter:blur(24px) saturate(160%); box-shadow:0 18px 48px rgba(31,42,31,.24),inset 0 1px 0 rgba(255,255,255,.9); }body.in-result #querySection.open:not(.dock-left),body.in-result #browseNav.open:not(.dock-left){ left:auto; right:0; }body.in-result #querySection.open.dock-left,body.in-result #browseNav.open.dock-left{ left:0; right:auto; }body.in-result #querySection.open > .fd-tab,body.in-result #browseNav.open > .fd-tab{ display: none; }body.in-result #querySection.open > .card,body.in-result #browseNav.open > .card{ display: block; padding: 8px; margin-bottom: 0; }/* === 今日课程 / 缓存信息：首页=正常卡片，结果页=可左右停靠浮窗 === */
+#todaySection .fd-tab,#cacheInfoSection .fd-tab,#querySection .fd-tab,#browseNav .fd-tab{ display:none; }/* 首页四个面板间距拉开 */
+#todaySection,#querySection,#browseNav,#cacheInfoSection{ margin-bottom: 40px; }body.in-result #todaySection,body.in-result #cacheInfoSection{
   position: fixed; right: 0; left:auto; z-index:160;
   width:22px; height:70px; overflow:hidden;
   border:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px;
@@ -287,197 +125,79 @@ body.in-result #cacheInfoSection {
   box-shadow:0 7px 22px rgba(36,47,34,.15),inset 0 1px 0 rgba(255,255,255,.75);
   transition:width .3s cubic-bezier(.2,.8,.2,1),left .3s ease,right .3s ease,box-shadow .25s ease;
   touch-action: none;
-}
-body.in-result #todaySection.dock-left,
-body.in-result #cacheInfoSection.dock-left {
+}body.in-result #todaySection.dock-left,body.in-result #cacheInfoSection.dock-left{
   right:auto; left:0; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0;
-}
-body.in-result #todaySection { top:calc(104px + env(safe-area-inset-top,0px)); }
-body.in-result #browseNav { top:calc(184px + env(safe-area-inset-top,0px)); }
-body.in-result #querySection { top:calc(264px + env(safe-area-inset-top,0px)); }
-body.in-result #cacheInfoSection { top:calc(344px + env(safe-area-inset-top,0px)); }
-body.in-result #todaySection > .card,
-body.in-result #cacheInfoSection > .card { display: none; }
-body.in-result #todaySection > .fd-tab,
-body.in-result #cacheInfoSection > .fd-tab {
+}body.in-result #todaySection{ top:calc(104px + env(safe-area-inset-top,0px)); }body.in-result #browseNav{ top:calc(184px + env(safe-area-inset-top,0px)); }body.in-result #querySection{ top:calc(264px + env(safe-area-inset-top,0px)); }body.in-result #cacheInfoSection{ top:calc(344px + env(safe-area-inset-top,0px)); }body.in-result #todaySection > .card,body.in-result #cacheInfoSection > .card{ display: none; }body.in-result #todaySection > .fd-tab,body.in-result #cacheInfoSection > .fd-tab{
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 100%;
   writing-mode: vertical-rl; padding: 8px 2px; box-sizing: border-box;
   font-size: 10px; font-weight: 700; letter-spacing: 1px;
   cursor: pointer; user-select: none;
-}
-body.in-result #todaySection > .fd-tab { background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep); }
-body.in-result #cacheInfoSection > .fd-tab { background:linear-gradient(180deg,rgba(231,161,178,.44),rgba(231,161,178,.12)); color:var(--green-deep); }
+}body.in-result #todaySection > .fd-tab{ background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep); }body.in-result #cacheInfoSection > .fd-tab{ background:linear-gradient(180deg,rgba(231,161,178,.44),rgba(231,161,178,.12)); color:var(--green-deep); }body.in-result #todaySection.open,body.in-result #cacheInfoSection.open,body.in-result #querySection.open,body.in-result #browseNav.open{ width:min(248px,calc(100vw - 52px)); height:auto; max-height:calc(100vh - 108px - env(safe-area-inset-top,0px)); overflow-y:auto; z-index:180; border:1px solid rgba(255,255,255,.74); border-radius:10px; touch-action:pan-y; overscroll-behavior:contain; background:rgba(249,246,235,.86); -webkit-backdrop-filter:blur(24px) saturate(160%); backdrop-filter:blur(24px) saturate(160%); box-shadow:0 18px 48px rgba(31,42,31,.24),inset 0 1px 0 rgba(255,255,255,.9); }body.in-result #todaySection.open:not(.dock-left),body.in-result #cacheInfoSection.open:not(.dock-left){ left:auto; right:0; }body.in-result #todaySection.open.dock-left,body.in-result #cacheInfoSection.open.dock-left{ left:0; right:auto; }body.in-result #todaySection.open > .card,body.in-result #cacheInfoSection.open > .card{ display: block; padding: 8px; margin-bottom: 0; }body.in-result #todaySection.open > .fd-tab,body.in-result #cacheInfoSection.open > .fd-tab{ display: none; }body.in-result #todaySection.open .card-header,body.in-result #cacheInfoSection.open .card-header,body.in-result #querySection.open .card-header,body.in-result #browseNav.open .card-header{ min-height:30px; cursor:pointer; }/* === 官网跳转磁贴：与其余右侧磁贴同款（首页/结果页都是磁贴） === */
+#siteSection{
+  position: fixed; right:0; left:auto; z-index:160;
+  width:22px; height:70px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px;
+  background:linear-gradient(145deg,rgba(255,255,255,.63),rgba(245,239,224,.38));
+  -webkit-backdrop-filter:blur(18px) saturate(155%); backdrop-filter:blur(18px) saturate(155%);
+  box-shadow:0 7px 22px rgba(36,47,34,.15),inset 0 1px 0 rgba(255,255,255,.75);
+  transition:transform .3s ease,left .3s ease,right .3s ease,box-shadow .25s ease;
+  touch-action:none; margin:0;
+}#siteSection > .card{ display:none; }#siteSection.open > .card{ display:block; padding:8px; margin-bottom:0; }#siteSection.open > .fd-tab{ display:none !important; }#siteSection > .fd-tab{
+  display:flex !important; align-items:center; justify-content:center;
+  width:100%; height:100%;
+  writing-mode:vertical-rl; padding:8px 2px; box-sizing:border-box;
+  font-size:10px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; user-select:none;
+  background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep);
+}#siteSection > .fd-tab:active{ transform:scale(.96); }#siteSection.dock-left{ right:auto; left:0; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }#siteSection.avoid-left{ left:0!important; right:auto!important; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }#siteSection.avoid-right{ right:0!important; left:auto!important; border-left:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px; }#siteSection.panel-lift > .fd-tab{ transform:scale(1.06); transition:transform .45s cubic-bezier(.22,.61,.36,1); }body.in-result #todaySection.open > .card,body.in-result #cacheInfoSection.open > .card,body.in-result #querySection.open > .card,body.in-result #browseNav.open > .card{ background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; border:0; box-shadow:none; }html[data-theme="dark"] body.in-result #todaySection.open,html[data-theme="dark"] body.in-result #cacheInfoSection.open,html[data-theme="dark"] body.in-result #querySection.open,html[data-theme="dark"] body.in-result #browseNav.open{ background:rgba(28,34,29,.82); border-color:rgba(255,255,255,.22); }/* 表格 */
+#settingsTile{
+  position: fixed; right:0; left:auto; z-index:160;
+  width:22px; height:70px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px;
+  background:linear-gradient(145deg,rgba(255,255,255,.63),rgba(245,239,224,.38));
+  -webkit-backdrop-filter:blur(18px) saturate(155%); backdrop-filter:blur(18px) saturate(155%);
+  box-shadow:0 7px 22px rgba(36,47,34,.15),inset 0 1px 0 rgba(255,255,255,.75);
+  transition:transform .3s ease,left .3s ease,right .3s ease,box-shadow .25s ease;
+  touch-action:none; margin:0;
+}#settingsTile > .card{ display:none; }#settingsTile.open > .card{ display:block; padding:8px; margin-bottom:0; }#settingsTile.open > .fd-tab{ display:none !important; }#settingsTile > .fd-tab{
+  display:flex !important; align-items:center; justify-content:center;
+  width:100%; height:100%;
+  writing-mode:vertical-rl; padding:8px 2px; box-sizing:border-box;
+  font-size:10px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; user-select:none;
+  background:linear-gradient(180deg,rgba(112,145,101,.38),rgba(112,145,101,.12)); color:var(--green-deep);
+}#settingsTile > .fd-tab:active{ transform:scale(.96); }#settingsTile.dock-left{ right:auto; left:0; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }#settingsTile.avoid-left{ left:0!important; right:auto!important; border-right:1px solid rgba(255,255,255,.68); border-left:0; border-radius:0 8px 8px 0; }#settingsTile.avoid-right{ right:0!important; left:auto!important; border-left:1px solid rgba(255,255,255,.68); border-right:0; border-radius:8px 0 0 8px; }#settingsTile.panel-lift > .fd-tab{ transform:scale(1.06); transition:transform .45s cubic-bezier(.22,.61,.36,1); }body.in-result #todaySection.open > .card,body.in-result #cacheInfoSection.open > .card,body.in-result #querySection.open > .card,body.in-result #browseNav.open > .card{ background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; border:0; box-shadow:none; }html[data-theme="dark"] body.in-result #todaySection.open,html[data-theme="dark"] body.in-result #cacheInfoSection.open,html[data-theme="dark"] body.in-result #querySection.open,html[data-theme="dark"] body.in-result #browseNav.open{ background:rgba(28,34,29,.82); border-color:rgba(255,255,255,.22); }/* 表格 */#settingsTile{ animation:none; }body.show-settings #settingsTile,body.show-settings #siteSection{ display:none !important; }
+.settings-hero .settings-version{ position:absolute; right:6px; bottom:10px; left:auto; top:auto; }
 
-body.in-result #todaySection.open,
-body.in-result #cacheInfoSection.open,
-body.in-result #querySection.open,
-body.in-result #browseNav.open { width:min(248px,calc(100vw - 52px)); height:auto; max-height:calc(100vh - 108px - env(safe-area-inset-top,0px)); overflow-y:auto; z-index:180; border:1px solid rgba(255,255,255,.74); border-radius:10px; touch-action:pan-y; overscroll-behavior:contain; background:rgba(249,246,235,.86); -webkit-backdrop-filter:blur(24px) saturate(160%); backdrop-filter:blur(24px) saturate(160%); box-shadow:0 18px 48px rgba(31,42,31,.24),inset 0 1px 0 rgba(255,255,255,.9); }
-body.in-result #todaySection.open:not(.dock-left), body.in-result #cacheInfoSection.open:not(.dock-left) { left:auto; right:0; }
-body.in-result #todaySection.open.dock-left, body.in-result #cacheInfoSection.open.dock-left { left:0; right:auto; }
-body.in-result #todaySection.open > .card,
-body.in-result #cacheInfoSection.open > .card { display: block; padding: 8px; margin-bottom: 0; }
-body.in-result #todaySection.open > .fd-tab,
-body.in-result #cacheInfoSection.open > .fd-tab { display: none; }
+@keyframes tileNudge{ 0%{transform:scale(1)} 22%{transform:scale(1.16)} 46%{transform:scale(.94)} 72%{transform:scale(1.09)} 100%{transform:scale(1)} }
+#settingsTile.tile-bounce{ animation:tileNudge .42s ease; }
 
-body.in-result #todaySection.open .card-header,
-body.in-result #cacheInfoSection.open .card-header,
-body.in-result #querySection.open .card-header,
-body.in-result #browseNav.open .card-header { min-height:30px; cursor:pointer; }
-.course-card { border-radius: 12px; border: 1px solid var(--glass-border); padding: 12px; margin-bottom: 8px;
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  box-shadow: 0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
-  transition: transform .15s ease, box-shadow .2s ease; }
-.course-card.green { background: rgba(46,74,42,0.80); border-color: rgba(46,74,42,0.5); color: var(--cream); }
-.course-card.pink { background: rgba(232,156,177,0.75); border-color: rgba(210,126,150,0.4); color: var(--green-deep); }
-html[data-theme="dark"] .course-card.green { background: rgba(143,174,110,0.82); border-color: rgba(143,174,110,0.5); color: var(--green-deep); }
-html[data-theme="dark"] .course-card.pink { background: rgba(176,117,138,0.8); border-color: rgba(200,134,156,0.4); color: var(--cream); }
-.course-card:active { transform: scale(0.98); }
-
-body.in-result #todaySection.open > .card,
-body.in-result #cacheInfoSection.open > .card,
-body.in-result #querySection.open > .card,
-body.in-result #browseNav.open > .card { background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; border:0; box-shadow:none; }
-html[data-theme="dark"] body.in-result #todaySection.open,
-html[data-theme="dark"] body.in-result #cacheInfoSection.open,
-html[data-theme="dark"] body.in-result #querySection.open,
-html[data-theme="dark"] body.in-result #browseNav.open { background:rgba(28,34,29,.82); border-color:rgba(255,255,255,.22); }
-.course-card .name { font-size: 15px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
-.course-card .period { font-size: 10px; letter-spacing: 0.12em; font-family: var(--mono); margin-bottom: 6px; }
-.course-card.green .period { color: var(--pink); }
-.course-card.pink .period { color: var(--green-deep); }
-.course-card .info { font-size: 12px; line-height: 1.7; }
-/* 课表列表行 */
-.course-row { display: flex; gap: 12px; align-items: stretch; border-radius: 12px; border: 1px solid var(--glass-border); padding: 10px 12px; margin-bottom: 8px;
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04), inset 0 1px 0 var(--glass-hi);
-  transition: transform .15s ease, box-shadow .2s ease; }
-.course-row:active { transform: scale(0.98); }
-.course-row.green { background: linear-gradient(135deg, rgba(46,74,42,0.9), rgba(36,58,33,0.9)); }
-.course-row.pink { background: linear-gradient(135deg, rgba(232,156,177,0.85), rgba(210,126,150,0.85)); }
-html[data-theme="dark"] .course-row.green { background: linear-gradient(135deg, rgba(143,174,110,0.9), rgba(122,153,96,0.9)); }
-html[data-theme="dark"] .course-row.pink { background: linear-gradient(135deg, rgba(176,117,138,0.85), rgba(200,134,156,0.85)); }
-.course-row.green { color: var(--cream); }
-.course-row.pink { color: var(--green-deep); }
-html[data-theme="dark"] .course-row.green { color: var(--green-deep); }
-html[data-theme="dark"] .course-row.pink { color: var(--cream); }
-.course-row .time-col { flex-shrink: 0; width: 70px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--glass-border); padding-right: 10px; }
-.course-row .time-col .period { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; font-weight: 600; }
-.course-row .time-col .room-line { font-size: 10px; margin-top: 4px; opacity: 0.85; word-break: break-all; }
-.course-row .body { flex: 1; min-width: 0; }
-.course-row .body .name { font-size: 15px; font-weight: 600; line-height: 1.3; }
-.course-row .body .meta { font-size: 11px; line-height: 1.6; margin-top: 3px; opacity: 0.9; word-break: break-all; }
-.course-row.green .time-col .period { color: var(--pink); }
-.course-row.pink .time-col .period { color: var(--green-deep); }
-html[data-theme="dark"] .course-row.green .time-col .period { color: var(--pink); }
-html[data-theme="dark"] .course-row.pink .time-col .period { color: var(--cream); }
-.empty-day { padding: 6px 0; color: var(--ink-light); font-style: italic; font-size: 12px; }
-
-/* 表格 */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { text-align: left; padding: 8px 6px; background: var(--cream-2); border-bottom: 2px solid var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); white-space: nowrap; }
-td { padding: 8px 6px; border-bottom: 1px solid var(--line); }
-tr:nth-child(even) td { background: var(--row); }
-.failed { color: var(--pink-deep); font-weight: 600; }
-
-/* GPA */
-.gpa-hero { background: linear-gradient(135deg, var(--green-lite), var(--green-deep)); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 14px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); }
-.gpa-hero .label { color: var(--pink); font-size: 9px; letter-spacing: 0.16em; font-family: var(--mono); }
-.gpa-hero .value { font-size: 48px; font-weight: 700; color: var(--cream); line-height: 1; margin: 6px 0; }
-.gpa-hero .sub { color: var(--cream); font-size: 12px; }
-.stats-row { display: flex; gap: 6px; margin-bottom: 14px; }
-.stat-box { flex: 1; border-radius: 6px; border: 2px solid; padding: 10px; text-align: center; }
-.stat-box .label { font-size: 8px; letter-spacing: 0.1em; font-family: var(--mono); }
-.stat-box .value { font-size: 20px; font-weight: 700; margin-top: 2px; }
-.stat-box.pink { background: var(--pink); border-color: var(--pink-deep); color: var(--green-deep); }
-.stat-box.green { background: var(--green-lite); border-color: var(--green); color: var(--cream); }
-.stat-box.cream { background: var(--cream-2); border-color: var(--green); color: var(--green); }
-
-/* 教师列表 */
-.letter-nav { display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 10px; padding: 6px; background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 12px; position: sticky; top: 88px; z-index: 100; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.letter-nav::-webkit-scrollbar { display: none; }
-.letter-nav span { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; font-size: 11px; font-family: monospace; font-weight: 600; border-radius: 8px; cursor: pointer; transition: transform .1s, background .15s; }
-.letter-nav span:active { transform: scale(0.9); }
-.letter-nav span.active { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-.letter-nav span.inactive { background: var(--glass-2); color: var(--ink-light); border: 1px solid var(--line); opacity: 0.5; cursor: default; }
-.teacher-group { margin-bottom: 14px; }
-.teacher-group-title { font-size: 13px; font-weight: 700; color: var(--pink-deep); border-bottom: 2px solid var(--green); padding: 4px 0; margin-bottom: 6px; background: transparent; }
-.teacher-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-.teacher-item { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform .1s; }
-.teacher-item:active { transform: scale(0.95); }
-
-/* 班级列表 */
-.class-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-.class-chip { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform .1s; }
-.class-chip:active { transform: scale(0.95); }
-.grade-group { margin-bottom: 14px; }
-/* 今日课程横向滚动 */
-.today-course-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
-.today-course-chip { flex: 0 0 auto; min-width: 150px; max-width: 220px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 8px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.10); }
-.today-course-chip.pink { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }
-html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
-.today-course-chip .tc-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.today-course-chip .tc-meta { font-size: 10px; opacity: 0.9; margin-top: 3px; }
-.today-course-empty { color: var(--ink-light); font-size: 12px; padding: 4px 0; }
-/* 折叠三角形 */
-.caret { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .6s; }
-.open .caret, .caret.open { transform: rotate(180deg); }
-.grade-title { font-size: 13px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--green); padding-bottom: 3px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-
-/* 教室列表 */
-.building-item { border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 6px; overflow: hidden; background: var(--glass); }
-.building-head { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border: none; cursor: pointer; min-height: auto; font-size: 12px; }
-.building-body { display: none; padding: 6px; background: transparent; }
-.building-body.open { display: block; }
-.room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-.room-item { background: linear-gradient(135deg, var(--green-lite), var(--green)); color: var(--cream); border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 11px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.08); transition: transform .1s; }
-.room-item:active { transform: scale(0.93); }
-
-/* 学籍卡片 - 单列卡片式 */
-.profile-list { display: flex; flex-direction: column; gap: 6px; }
-.profile-item {
-  background: var(--cream-2); border-left: 3px solid var(--green);
-  padding: 8px 12px; border-radius: 0 6px 6px 0;
-}
-.profile-item .k { font-size: 10px; color: var(--ink-light); font-family: var(--mono); letter-spacing: 0.1em; }
-.profile-item .v { font-size: 14px; font-weight: 500; margin-top: 2px; word-break: break-all; }
+.table-wrap{ overflow-x: auto; -webkit-overflow-scrolling: touch; }table{ width: 100%; border-collapse: collapse; font-size: 12px; }th{ text-align: left; padding: 8px 6px; background: var(--cream-2); border-bottom: 2px solid var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); white-space: nowrap; }td{ padding: 8px 6px; border-bottom: 1px solid var(--line); }tr:nth-child(even) td{ background: var(--row); }.failed{ color: var(--pink-deep); font-weight: 600; }/* GPA */
+.gpa-hero{ background: linear-gradient(135deg, var(--green-lite), var(--green-deep)); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); }.gpa-hero .label{ color: var(--pink); font-size: 9px; letter-spacing: 0.16em; font-family: var(--mono); }.gpa-hero .value{ font-size: 48px; font-weight: 700; color: var(--cream); line-height: 1; margin: 6px 0; }.gpa-hero .sub{ color: var(--cream); font-size: 12px; }.stats-row{ display: flex; gap: 6px; margin-bottom: 14px; }.stat-box{ flex: 1; border-radius: 6px; border: 2px solid; padding: 10px; text-align: center; }.stat-box .label{ font-size: 8px; letter-spacing: 0.1em; font-family: var(--mono); }.stat-box .value{ font-size: 20px; font-weight: 700; margin-top: 2px; }.stat-box.pink{ background: var(--pink); border-color: var(--pink-deep); color: var(--green-deep); }.stat-box.green{ background: var(--green-lite); border-color: var(--green); color: var(--cream); }.stat-box.cream{ background: var(--cream-2); border-color: var(--green); color: var(--green); }/* 教师列表 */
+.letter-nav{ display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 10px; padding: 6px; background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 12px; position: sticky; top: 88px; z-index: 100; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }.letter-nav::-webkit-scrollbar{ display: none; }.letter-nav span{ display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; font-size: 11px; font-family: monospace; font-weight: 600; border-radius: 8px; cursor: pointer; transition: transform .1s, background .15s; }.letter-nav span:active{ transform: scale(0.9); }.letter-nav span.active{ background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }.letter-nav span.inactive{ background: var(--glass-2); color: var(--ink-light); border: 1px solid var(--line); opacity: 0.5; cursor: default; }.teacher-group{ margin-bottom: 14px; }.teacher-group-title{ font-size: 13px; font-weight: 700; color: var(--pink-deep); border-bottom: 2px solid var(--green); padding: 4px 0; margin-bottom: 6px; background: transparent; }.teacher-grid{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }.teacher-item{ background: var(--glass-2); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; font-size: 13px; }.teacher-item:active{ transform: scale(0.95); }/* 班级列表 */
+.class-chips{ display: flex; flex-wrap: wrap; gap: 5px; }.class-chip{ background: var(--glass-2); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; cursor: pointer; font-size: 12px; }.class-chip:active{ transform: scale(0.95); }.grade-group{ margin-bottom: 14px; }/* 今日课程横向滚动 */
+.today-course-scroll{ display: flex; overflow-x: auto; gap: 8px; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }.today-course-chip{ flex: 0 0 auto; min-width: 150px; max-width: 220px; background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); border-radius: 10px; padding: 8px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.10); }.today-course-chip.pink{ background: linear-gradient(135deg, var(--pink), var(--pink-deep)); color: var(--green-deep); }html[data-theme="dark"] .today-course-chip.pink{ color: var(--cream); }.today-course-chip .tc-name{ font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.today-course-chip .tc-meta{ font-size: 10px; opacity: 0.9; margin-top: 3px; }.today-course-empty{ color: var(--ink-light); font-size: 12px; padding: 4px 0; }/* 折叠三角形 */
+.caret{ display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transition: transform .6s; }.open .caret,.caret.open{ transform: rotate(180deg); }.grade-title{ font-size: 13px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--green); padding-bottom: 3px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }/* 教室列表 */
+.building-item{ border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 6px; overflow: hidden; background: var(--glass); }.building-head{ width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--accent-soft, var(--glass-2)); color: var(--text, var(--ink)); border: none; cursor: pointer; min-height: auto; font-size: 12px; }.building-body{ display: none; padding: 6px; background: transparent; }.building-body.open{ display: block; }.room-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }.room-item{ background: var(--accent-soft, var(--glass-2)); color: var(--text, var(--ink)); border: 1px solid var(--rule, var(--line)); border-radius: 8px; padding: 7px 4px; text-align: center; font-size: 11px; cursor: pointer; }.room-item:active{ transform: scale(0.93); }/* 学籍卡片 - 单列卡片式 */
 
 /* 查询类型卡片按钮组 */
-.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 6px; }
-.type-btn {
+.type-grid{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 6px; }.type-btn{
   min-height: 36px; padding: 6px 8px; border: 1px solid var(--glass-border); border-radius: 10px;
   background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   color: var(--green); font-size: 13px; text-align: center;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
   box-shadow: inset 0 1px 0 var(--glass-hi);
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease; }
-.type-btn:active { transform: scale(0.96); }
-.type-btn.active { background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-weight: 600; box-shadow: 0 2px 14px rgba(0,0,0,0.12); }
+  transition: transform .12s ease, background .2s ease, box-shadow .2s ease; }.type-btn:active{ transform: scale(0.96); }.type-btn.active{ background: linear-gradient(135deg, var(--green), var(--green-deep)); color: var(--cream); font-weight: 600; box-shadow: 0 2px 14px rgba(0,0,0,0.12); }/* 进度条 */
 
-/* 进度条 */
-.progress-bar-wrap { background: var(--cream-2); border-radius: 4px; height: 20px; overflow: hidden; margin: 4px 0; }
-.progress-bar { background: var(--green); height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10px; color: var(--cream); font-family: var(--mono); min-width: 30px; }
-
-.error-box { background: var(--cream); border: 2px solid var(--pink-deep); border-radius: 6px; padding: 10px; color: var(--pink-deep); margin: 10px 0; font-size: 13px; }
-.cache-notice { background: var(--cream-2); border: 1px solid var(--pink); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: var(--green-deep); }
-.loading { text-align: center; padding: 20px; color: var(--green); }
-.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--green); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.empty-text { text-align: center; padding: 20px; color: var(--ink-light); font-style: italic; font-size: 13px; }
-.search-box { margin-bottom: 10px; }
-.search-box input { margin-bottom: 0; }
-.hidden { display: none !important; }
-@keyframes sheetUp { from { transform: translateY(34px); opacity: .4; } to { transform: none; opacity: 1; } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.sheet { background: var(--sheet-bg); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 -6px 30px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); animation: sheetUp .22s ease-out; }
-.overlay { animation: fadeIn .18s ease-out; }
-
-/* ==== 底部液态玻璃导航栏 ==== */
-.bottomnav {
+.error-box{ background: var(--cream); border: 2px solid var(--pink-deep); border-radius: 6px; padding: 10px; color: var(--pink-deep); margin: 10px 0; font-size: 13px; }.cache-notice{ background: var(--cream-2); border: 1px solid var(--pink); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: var(--green-deep); }.loading{ text-align: center; padding: 20px; color: var(--green); }.spinner{ display: inline-block; width: 18px; height: 18px; border: 2px solid var(--green); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin {to{ transform: rotate(360deg); } }.empty-text{ text-align: center; padding: 20px; color: var(--ink-light); font-style: italic; font-size: 13px; }.hidden{ display: none !important; }
+@keyframes sheetUp {from{ transform: translateY(34px); opacity: .4; }to{ transform: none; opacity: 1; } }
+@keyframes fadeIn {from{ opacity: 0; }to{ opacity: 1; } }.sheet{ background: var(--sheet-bg); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 -6px 30px rgba(0,0,0,0.12), inset 0 1px 0 var(--glass-hi); animation: sheetUp .22s ease-out; }.overlay{ animation: fadeIn .18s ease-out; }/* ==== 底部液态玻璃导航栏 ==== */
+.bottomnav{
   position: fixed; left: 50%; transform: translateX(-50%);
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(14px + var(--sab, 0px));
   display: flex; align-items: center; gap: 5px; width: min(236px, calc(100vw - 40px));
   padding: 6px; border-radius: 30px; z-index: 160; isolation: isolate;
   background: linear-gradient(145deg, rgba(255,255,255,.42), rgba(241,239,232,.16) 48%, rgba(255,255,255,.28));
@@ -486,31 +206,16 @@ html[data-theme="dark"] .today-course-chip.pink { color: var(--cream); }
   border: 1px solid rgba(255,255,255,.68);
   box-shadow: 0 16px 42px rgba(25,37,28,.20), 0 3px 9px rgba(25,37,28,.10), inset 0 1px 0 rgba(255,255,255,.92), inset 0 -1px 0 rgba(80,91,77,.13);
   transition: background .3s ease, box-shadow .3s ease;
-}
-.bottomnav::before {
+}html,body,body *{ -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-user-drag:none; }input,textarea,[contenteditable="true"]{ -webkit-user-select:text; user-select:text; }.panel-lift{ z-index:200 !important; }.panel-lift > .card{ transform: scale(1.04); box-shadow: 0 16px 40px rgba(25,37,28,.26); border-radius:14px; transition: transform .45s cubic-bezier(.22,.61,.36,1), box-shadow .45s ease; }.bottomnav::before{
   content: ''; position: absolute; inset: 1px 9px auto; height: 48%; border-radius: 24px 24px 50% 50%;
   background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.10) 72%, transparent);
   filter: blur(1px); pointer-events: none; z-index: 4;
-}
-.bottomnav::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:4; box-shadow:inset 0 0 0 1px rgba(255,255,255,.22); }
-.bottomnav .nav-item {
+}.bottomnav::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:4; box-shadow:inset 0 0 0 1px rgba(255,255,255,.22); }.bottomnav .nav-item{
   position: relative; z-index: 3; display: flex; flex:1; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   min-width: 0; min-height: 58px; padding: 6px 12px; border: 0; background: transparent;
   color: rgba(35,48,37,.68); font-family: var(--serif); font-size: 11px; font-weight: 600; cursor: pointer;
   border-radius: 24px; transition: color .2s ease, transform .35s cubic-bezier(.2,.8,.2,1);
-}
-.bottomnav .nav-item svg { width: 21px; height: 21px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1); }
-.bottomnav .nav-item.active { color: var(--green-deep); transform: translateY(-1px); }
-.bottomnav .nav-item.active svg { transform: translateY(-1px) scale(1.04); }
-.bottomnav .nav-item.active svg { filter: none; }
-html[data-theme="dark"] .bottomnav { background:linear-gradient(145deg,rgba(247,250,240,.20),rgba(216,225,202,.08) 50%,rgba(255,255,255,.16)); border-color:rgba(255,255,255,.24); box-shadow:0 16px 42px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.36),inset 0 -1px 0 rgba(255,255,255,.08); }
-html[data-theme="dark"] .bottomnav .nav-item { color:rgba(235,239,225,.68); }
-html[data-theme="dark"] .bottomnav .nav-item.active { color: #eaf5c8; }
-html[data-theme="dark"] .bottomnav .nav-item.active svg { filter: none; }
-html[data-style="classic"] .bottomnav { background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-html[data-style="classic"] .bottomnav::before { display: none; }
-html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); transform: none; z-index: 3; background: none; }
-.bottomnav .glass-slide {
+}.bottomnav .nav-item svg{ width: 21px; height: 21px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1); }.bottomnav .nav-item.active{ color: var(--green-deep); transform: translateY(-1px); }.bottomnav .nav-item.active svg{ transform: translateY(-1px) scale(1.04); }.bottomnav .nav-item.active svg{ filter: none; }html[data-theme="dark"] .bottomnav{ background:linear-gradient(145deg,rgba(247,250,240,.20),rgba(216,225,202,.08) 50%,rgba(255,255,255,.16)); border-color:rgba(255,255,255,.24); box-shadow:0 16px 42px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.36),inset 0 -1px 0 rgba(255,255,255,.08); }html[data-theme="dark"] .bottomnav .nav-item{ color:rgba(235,239,225,.68); }html[data-theme="dark"] .bottomnav .nav-item.active{ color: #eaf5c8; }html[data-theme="dark"] .bottomnav .nav-item.active svg{ filter: none; }html[data-style="classic"] .bottomnav{ background: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }html[data-style="classic"] .bottomnav::before{ display: none; }html[data-style="classic"] .bottomnav .nav-item.active{ color: var(--green); transform: none; z-index: 3; background: none; }.bottomnav .glass-slide{
   position: absolute; top: 6px; bottom: 6px; left: 6px; width: 68px; z-index: 2; pointer-events: none;
   overflow: hidden; border-radius: 24px;
   background:linear-gradient(145deg,rgba(255,255,255,.80),rgba(255,255,255,.42) 40%,rgba(246,249,236,.29) 72%,rgba(255,255,255,.54));
@@ -519,130 +224,34 @@ html[data-style="classic"] .bottomnav .nav-item.active { color: var(--green); tr
   backdrop-filter:blur(22px) saturate(210%) brightness(1.12);
   box-shadow:0 5px 16px rgba(39,54,40,.18),0 1px 3px rgba(39,54,40,.12),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -1px 0 rgba(255,255,255,.44);
   transition:left .48s cubic-bezier(.22,1,.36,1),width .42s cubic-bezier(.22,1,.36,1),transform .28s ease;
-}
-.bottomnav .glass-slide::before { content:''; position:absolute; top:-40%; left:-20%; width:140%; height:75%; border-radius:50%; background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.20) 70%,transparent); filter:blur(2px); }
-.bottomnav .glass-slide::after {
+}.bottomnav .glass-slide::before{ content:''; position:absolute; top:-40%; left:-20%; width:140%; height:75%; border-radius:50%; background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.20) 70%,transparent); filter:blur(2px); }.bottomnav .glass-slide::after{
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   box-shadow:inset 1px 0 1px rgba(104,180,255,.54),inset -1px 0 1px rgba(255,126,155,.48),inset 0 0 0 1px rgba(255,255,255,.38);
   background:linear-gradient(115deg,rgba(255,255,255,.16),transparent 34%,rgba(255,255,255,.10) 74%,transparent);
-}
-.bottomnav .nav-item.refract { color: var(--green-deep); }
-.bottomnav .nav-item.refract svg { filter: none; }
-html[data-theme="dark"] .bottomnav .glass-slide { background:linear-gradient(145deg,rgba(245,252,230,.34),rgba(222,238,203,.18) 48%,rgba(255,255,255,.22)); border-color:rgba(255,255,255,.58); box-shadow:0 5px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.70),inset 0 -1px 0 rgba(255,255,255,.18); }
-html[data-theme="dark"] .bottomnav .nav-item.refract { color: #eaf5c8; }
-html[data-theme="dark"] .bottomnav .nav-item.refract svg { filter: none; }
-html[data-style="classic"] .bottomnav .glass-slide { background: rgba(232,220,196,0.95); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }
-html[data-style="classic"] .bottomnav .glass-slide::before, html[data-style="classic"] .bottomnav .glass-slide::after { display: none; }
-html[data-style="classic"] .bottomnav .nav-item.refract { color: var(--green); transform: none; z-index: 3; }
-main { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
-@media (max-width:420px) { main { padding-left:18px; padding-right:18px; } }
+}.bottomnav .nav-item.refract{ color: var(--green-deep); }.bottomnav .nav-item.refract svg{ filter: none; }html[data-theme="dark"] .bottomnav .glass-slide{ background:linear-gradient(145deg,rgba(245,252,230,.34),rgba(222,238,203,.18) 48%,rgba(255,255,255,.22)); border-color:rgba(255,255,255,.58); box-shadow:0 5px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.70),inset 0 -1px 0 rgba(255,255,255,.18); }html[data-theme="dark"] .bottomnav .nav-item.refract{ color: #eaf5c8; }html[data-theme="dark"] .bottomnav .nav-item.refract svg{ filter: none; }html[data-style="classic"] .bottomnav .glass-slide{ background: rgba(232,220,196,0.95); box-shadow: 0 2px 14px rgba(0,0,0,0.12), inset 0 0 3px rgba(255,255,255,0.6); border-color: rgba(207,190,158,0.9); -webkit-backdrop-filter: none; backdrop-filter: none; filter: none; }html[data-style="classic"] .bottomnav .glass-slide::before,html[data-style="classic"] .bottomnav .glass-slide::after{ display: none; }html[data-style="classic"] .bottomnav .nav-item.refract{ color: var(--green); transform: none; z-index: 3; }main{ padding-bottom: calc(104px + var(--sab, 0px)); }
+@media (max-width:420px) {main{ padding-left:18px; padding-right:18px; } }/* ==== 设置面板 ==== */
+body.booting main,body.booting #bottomNav{ visibility:hidden; }
+.cl-head{ font-size:12px; color:var(--ink-light); padding:10px 2px; }
+.cl-item{ padding:11px 13px; margin-bottom:9px; border-radius:14px; background:var(--glass-2); border:1px solid var(--glass-border); }
+.cl-name{ font-size:14px; font-weight:650; color:var(--ink); margin-bottom:3px; }
+.cl-meta{ font-size:11px; color:var(--ink-light); line-height:1.6; }
 
-/* ==== 设置面板 ==== */
-.settings-panel {
+@keyframes jwxtSpin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.tb-icon-btn.spinning svg{ animation:jwxtSpin .9s linear infinite; }
+button.js-refresh.busy{ opacity:.55; pointer-events:none; }
+
+.settings-panel{
   position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 600px; margin: 0 auto;
   z-index: 120; overflow-y: auto; overscroll-behavior:contain;
-  padding:calc(18px + var(--sb, 0px)) 18px calc(116px + env(safe-area-inset-bottom, 0px)); animation: sheetUp .22s ease-out;
-}
-.settings-hero { position:relative; overflow:hidden; padding:23px 20px 21px; margin-bottom:14px; border:1px solid rgba(255,255,255,.66); border-radius:24px; color:#fff; background:linear-gradient(135deg,#304c36 0%,#58734e 58%,#82916c 100%); box-shadow:0 14px 30px rgba(40,62,43,.20),inset 0 1px 0 rgba(255,255,255,.35); }
-.settings-hero::after { content:''; position:absolute; width:180px; height:180px; right:-58px; top:-85px; border:1px solid rgba(255,255,255,.18); border-radius:50%; box-shadow:0 0 0 18px rgba(255,255,255,.045),0 0 0 38px rgba(255,255,255,.035); }
-.settings-kicker { font:10px var(--mono); letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.72); }
-.settings-hero h2 { margin-top:5px; font-size:25px; font-weight:600; letter-spacing:.04em; }
-.settings-hero p { margin-top:3px; font-size:12px; color:rgba(255,255,255,.76); }
-.settings-version { position:absolute; right:16px; bottom:16px; z-index:1; padding:5px 9px; border:1px solid rgba(255,255,255,.32); border-radius:999px; background:rgba(255,255,255,.13); font:10px var(--mono); color:#fff; }
-.settings-panel .settings-group { padding:15px 17px 12px; margin-bottom:12px; border-radius:19px; }
-.settings-section-head { display:flex; align-items:center; gap:11px; padding:0 0 10px; margin-bottom:3px; border-bottom:1px solid var(--glass-border); }
-.settings-icon { display:grid; place-items:center; width:34px; height:34px; flex:0 0 34px; border-radius:12px; color:var(--green); background:linear-gradient(145deg,rgba(255,255,255,.72),var(--glass-2)); box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 8px rgba(30,50,31,.08); font-size:16px; }
-.settings-section-head h3 { color:var(--ink); font-size:14px; font-weight:650; }
-.settings-section-head p { margin-top:1px; color:var(--ink-light); font-size:10px; }
-.settings-panel .set-row { display: flex; align-items: center; justify-content: space-between; gap:14px; min-height:52px; padding: 10px 1px; border-bottom: 1px solid var(--line); }
-.settings-panel .set-row:last-child { border-bottom: none; }
-.settings-panel .set-label { font-size: 14px; color: var(--ink); }
-.settings-panel .set-desc { font-size: 11px; color: var(--ink-light); margin-top: 2px; line-height: 1.5; }
-.settings-panel .set-hint { font-size: 11px; color: var(--ink-light); background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.38); border-radius:12px; padding:10px 12px; margin:8px 0 4px; line-height:1.65; }
-.settings-panel .set-btn { min-height:34px; padding:6px 13px; border-color:var(--glass-border); background:rgba(255,255,255,.28); transition:transform .18s ease,background .18s ease; }
-.settings-panel .set-btn:active { transform:scale(.96); }
-.settings-panel .setting-input { width:auto; min-height:36px; margin:0; padding:0 10px; border-radius:10px; background:rgba(255,255,255,.34); }
-.settings-panel input[type="number"].setting-input { width:76px; }
-.settings-panel .cache-path { max-width:58%; overflow-wrap:anywhere; text-align:right; color:var(--ink-light); font:10px var(--mono); }
-.seg { display: flex; gap: 6px; }
-.seg button { font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.seg button.on { background: var(--green); color: var(--cream); }
-html[data-theme="dark"] .seg button.on { color: #0f120c; }
-.set-btn { font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }
-.switch { position: relative; width: 44px; height: 24px; min-height: 0; padding: 0; border-radius: 999px; background: rgba(0,0,0,0.22); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; box-shadow: inset 0 1px 2px rgba(0,0,0,0.18); }
-.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
-.switch.on { background: var(--green); box-shadow: none; }
-.switch.on::after { transform: translateX(20px); }
-html[data-style="classic"] .settings-panel { background: var(--cream); }
-html[data-style="classic"] .settings-panel .settings-group { border-width:2px; border-radius:10px; }
-html[data-style="classic"] .settings-hero { border-radius:10px; box-shadow:none; }
-html[data-style="classic"] .settings-icon { box-shadow:none; border:1px solid var(--green); border-radius:8px; }
-
-/* 查询课表：与参考 demo 一致的固定表头、整表滚动与底部周次面板。 */
-body.schedule-result { overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; color:#383838; background:#f0eae2; }
-body.schedule-result::before { content:''; position:fixed; inset:calc(84px + var(--sb, 0px)) 0 0; background:#f0eae2 url('schedule-assets/tangyun-bg.png') center top/100% 100% no-repeat; pointer-events:none; z-index:0; }
-body.schedule-result::after { content:''; position:fixed; bottom:0; left:0; right:0; height:230px; background:url('schedule-assets/tangyun-bottom.gif') center bottom/100% 100% no-repeat; pointer-events:none; z-index:0; }
-body.schedule-result #mainTopbar { position:fixed; inset:0 0 auto; height:calc(84px + var(--sb, 0px)); min-height:0; padding:var(--sb, 0px) 15px 0; background:#f5eddf url('schedule-assets/tangyun-top.png') center/100% 100% no-repeat; border:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; -webkit-mask-image:none; }
-body.schedule-result .tb-result-wrap { height:84px; min-height:0; display:block !important; }
-body.schedule-result .tb-col-left { position:absolute; left:0; top:27px; }
-body.schedule-result .tb-col-left .back-btn { display:none; }
-body.schedule-result .tb-week-block { gap:8px; }
-body.schedule-result .tb-r-week { font-size:18px; color:#383838; gap:6px; padding:4px 0; }
-body.schedule-result .tb-r-week.other-week { color:#ff5959; }
-body.schedule-result .tb-r-arrow { font-size:0; width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid currentColor; color:inherit; }
-body.schedule-result .tb-r-sem { font-size:13px; line-height:1; color:#3a2c1e; }
-body.schedule-result .tb-col-center { position:absolute; left:95px; top:6px; width:70px; height:43px; background:url('schedule-assets/tangyun-top.gif') center/100% 100% no-repeat; pointer-events:none; }
-body.schedule-result .tb-r-title, body.schedule-result .tb-r-range, body.schedule-result #statusDotResult { display:none; }
-body.schedule-result .tb-col-right { position:absolute; right:0; top:27px; gap:2px; }
-body.schedule-result .tb-icon-btn { display:flex; border:0; background:transparent; color:#3a2c1e; width:32px; height:32px; border-radius:8px; }
-body.schedule-result .tb-icon-btn svg { width:21px; height:21px; }
-body.schedule-result #resultSection { position:fixed; inset:calc(84px + var(--sb, 0px)) 0 0; z-index:1; }
-body.schedule-result #resultSection > .card { padding:0; margin:0; height:100%; border-radius:0; backdrop-filter:none; -webkit-backdrop-filter:none; }
-body.schedule-result #resultContent { height:100%; min-height:0; touch-action:pan-y; }
-body.schedule-result #bottomNav { display:none; }
-.demo-pane { height:100%; display:flex; flex-direction:column; min-height:0; }
-.demo-head { height:62px; flex:0 0 62px; display:flex; background:rgba(244,236,218,.62) url('schedule-assets/tangyun-head.png') center/100% 100% no-repeat; }
-.demo-month { flex:0 0 12.5%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; }
-.demo-days { flex:1; display:flex; min-width:0; }
-.demo-day { flex:1; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.demo-day .wd { font-size:15px; font-weight:700; }
-.demo-day .dt { font-size:12px; color:#a6a6a6; }
-.demo-day.today .wd, .demo-day.today .dt { color:#b18c49; }
-.demo-day.today::after { content:''; position:absolute; width:26px; height:3px; bottom:1px; border-radius:2px; background:#c4a468; }
-.demo-scroll { display:flex; flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-.demo-scroll::-webkit-scrollbar { display:none; }
-.demo-periods { flex:0 0 12.5%; background:rgba(250,245,236,.72); }
-.demo-period { height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:1px solid rgba(255,255,255,.18); }
-.demo-period .no { font-size:18px; font-weight:600; }
-.demo-period .tm { color:#8c857a; font-size:11px; line-height:1.3; text-align:center; }
-.demo-grid { flex:1; position:relative; min-width:0; }
-.demo-line { position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.5); pointer-events:none; }
-body.schedule-result .demo-course { position:absolute; border-radius:8px; border:2px solid; padding:6px 7px 5px; overflow:hidden; cursor:pointer; text-align:left; font-family:inherit; min-height:0; line-height:1.22; box-shadow:none; letter-spacing:normal; }
-.demo-course:active { transform:scale(.98); }
-.demo-course .cn { font-size:13px; font-weight:700; word-break:break-all; }
-.demo-course .cs { font-size:11px; font-weight:500; margin-top:3px; word-break:break-all; }
-.demo-unplaced { padding:12px; font-size:12px; background:rgba(255,255,255,.9); }
-.demo-empty { padding:40px 16px; text-align:center; color:#706552; }
-.demo-list { padding:12px 16px; overflow-y:auto; height:100%; }
-.demo-list-day { margin-bottom:20px; }
-.demo-list-day h3 { font-size:15px; margin-bottom:8px; }
-.demo-list-course { display:block; width:100%; padding:12px; border:2px solid; border-radius:10px; margin-bottom:8px; text-align:left; font-family:inherit; }
-.demo-back-week { position:fixed; right:36px; bottom:calc(24px + env(safe-area-inset-bottom, 0px)); z-index:155; border:0; background:#ff5959; color:#fff; font-size:14px; border-radius:99px; padding:8px 14px; box-shadow:0 4px 14px #ff595944; }
-#scheduleToast { position:fixed; left:50%; bottom:calc(80px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); max-width:85vw; padding:10px 16px; border-radius:10px; background:#333e; color:#fff; z-index:600; font-size:13px; pointer-events:none; }
-#weekPicker { left:0 !important; right:0; top:auto !important; bottom:0; transform:none !important; width:100% !important; max-width:600px !important; margin:auto; max-height:75vh !important; border-radius:18px 18px 0 0 !important; padding:18px 18px calc(28px + env(safe-area-inset-bottom, 0px)) !important; background:#fff !important; color:#1a1a1a; font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif; }
-.demo-week-head { display:flex; align-items:center; margin-bottom:18px; }
-.demo-week-head strong { font-size:20px; flex:1; text-align:center; }
-.demo-week-close { border:0; background:transparent; color:#666; font-size:14px; padding:8px; }
-.demo-weeks { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
-#weekPicker .demo-week { border:0; border-radius:12px; background:#f1f5fa; color:#1a1a1a; font-size:18px; min-height:44px; padding:10px 0; font-family:inherit; box-shadow:none; }
-#weekPicker .demo-week.current { background:#9aa0a8; color:#fff; }
-#weekPicker .demo-week.selected { background:#ff4d4f; color:#fff; font-weight:700; }
-@media(prefers-reduced-motion:reduce) { #resultContent, #weekGhost { transition:none !important; } }
+  padding:calc(18px + var(--sb, 0px)) 18px calc(116px + var(--sab, 0px)); animation: sheetUp .22s ease-out;
+}.settings-hero{ position:relative; overflow:hidden; padding:23px 20px 21px; margin-bottom:14px; border:1px solid rgba(255,255,255,.66); border-radius:24px; color:#fff; background:linear-gradient(135deg,#304c36 0%,#58734e 58%,#82916c 100%); box-shadow:0 14px 30px rgba(40,62,43,.20),inset 0 1px 0 rgba(255,255,255,.35); }.settings-hero::after{ content:''; position:absolute; width:180px; height:180px; right:-58px; top:-85px; border:1px solid rgba(255,255,255,.18); border-radius:50%; box-shadow:0 0 0 18px rgba(255,255,255,.045),0 0 0 38px rgba(255,255,255,.035); }.settings-kicker{ font:10px var(--mono); letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.72); }.settings-hero h2{ margin-top:5px; font-size:25px; font-weight:600; letter-spacing:.04em; }.settings-hero p{ margin-top:3px; font-size:12px; color:rgba(255,255,255,.76); }.settings-version{ position:absolute; right:16px; bottom:16px; z-index:1; padding:5px 9px; border:1px solid rgba(255,255,255,.32); border-radius:999px; background:rgba(255,255,255,.13); font:10px var(--mono); color:#fff; }.settings-panel .settings-group{ padding:15px 17px 12px; margin-bottom:12px; border-radius:19px; }.settings-section-head{ display:flex; align-items:center; gap:11px; padding:0 0 10px; margin-bottom:3px; border-bottom:1px solid var(--glass-border); }.settings-icon{ display:grid; place-items:center; width:34px; height:34px; flex:0 0 34px; border-radius:12px; color:var(--green); background:linear-gradient(145deg,rgba(255,255,255,.72),var(--glass-2)); box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 8px rgba(30,50,31,.08); font-size:16px; }.settings-section-head h3{ color:var(--ink); font-size:14px; font-weight:650; }.settings-section-head p{ margin-top:1px; color:var(--ink-light); font-size:10px; }.settings-panel .set-row{ display: flex; align-items: center; justify-content: space-between; gap:14px; min-height:52px; padding: 10px 1px; border-bottom: 1px solid var(--line); }.settings-panel .set-row:last-child{ border-bottom: none; }.settings-panel .set-label{ font-size: 14px; color: var(--ink); }.settings-panel .set-desc{ font-size: 11px; color: var(--ink-light); margin-top: 2px; line-height: 1.5; }.settings-panel .set-hint{ font-size: 11px; color: var(--ink-light); background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.38); border-radius:12px; padding:10px 12px; margin:8px 0 4px; line-height:1.65; }.settings-panel .set-btn{ min-height:34px; padding:6px 13px; border-color:var(--glass-border); background:rgba(255,255,255,.28); transition:transform .18s ease,background .18s ease; }.settings-panel .set-btn:active{ transform:scale(.96); }.settings-panel .setting-input{ width:auto; min-height:36px; margin:0; padding:0 10px; border-radius:10px; background:rgba(255,255,255,.34); }.settings-panel input[type="number"].setting-input{ width:76px; }.settings-panel .cache-path{ max-width:58%; overflow-wrap:anywhere; text-align:right; color:var(--ink-light); font:10px var(--mono); }.seg{ display: flex; gap: 6px; }.seg button{ font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }.seg button.on{ background: var(--green); color: var(--cream); }html[data-theme="dark"] .seg button.on{ color: #0f120c; }.set-btn{ font-size: 12px; padding: 5px 11px; border: 1px solid var(--green); background: transparent; color: var(--green); border-radius: 999px; cursor: pointer; }.switch{ position: relative; width: 44px; height: 24px; min-height: 0; padding: 0; border-radius: 999px; background: rgba(0,0,0,0.22); transition: background .25s ease; cursor: pointer; border: none; flex-shrink: 0; box-shadow: inset 0 1px 2px rgba(0,0,0,0.18); }.switch::after{ content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .25s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.35); }.switch.on{ background: var(--green); box-shadow: none; }.switch.on::after{ transform: translateX(20px); }html[data-style="classic"] .settings-panel{ background: var(--cream); }html[data-style="classic"] .settings-panel .settings-group{ border-width:2px; border-radius:10px; }html[data-style="classic"] .settings-hero{ border-radius:10px; box-shadow:none; }html[data-style="classic"] .settings-icon{ box-shadow:none; border:1px solid var(--green); border-radius:8px; }/* 查询课表：与参考 demo 一致的固定表头、整表滚动与底部周次面板。 */
+body.schedule-result{ overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; color:#383838; background:#f0eae2; }body.schedule-result::before{ content:''; position:fixed; inset:calc(84px + var(--sb, 0px)) 0 0; background:#f0eae2 url('schedule-assets/tangyun-bg.png') center top/100% 100% no-repeat; pointer-events:none; z-index:0; }body.schedule-result::after{ content:''; position:fixed; bottom:0; left:0; right:0; height:230px; background:url('schedule-assets/tangyun-bottom.gif') center bottom/100% 100% no-repeat; pointer-events:none; z-index:0; }body.schedule-result #mainTopbar{ position:fixed; inset:0 0 auto; height:calc(84px + var(--sb, 0px)); min-height:0; padding:var(--sb, 0px) 15px 0; background:#f5eddf url('schedule-assets/tangyun-top.png') center/100% 100% no-repeat; border:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; -webkit-mask-image:none; }body.schedule-result .tb-result-wrap{ height:84px; min-height:0; display:block !important; }body.schedule-result .tb-col-left{ position:absolute; left:0; top:27px; }body.schedule-result .tb-col-left .back-btn{ display:none; }body.schedule-result .tb-week-block{ gap:8px; }body.schedule-result .tb-r-week{ font-size:18px; color:#383838; gap:6px; padding:4px 0; }body.schedule-result .tb-r-week.other-week{ color:#ff5959; }body.schedule-result .tb-r-arrow{ font-size:0; width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid currentColor; color:inherit; }body.schedule-result .tb-r-sem{ font-size:13px; line-height:1; color:#3a2c1e; }body.schedule-result .tb-col-center{ position:absolute; left:95px; top:6px; width:70px; height:43px; background:url('schedule-assets/tangyun-top.gif') center/100% 100% no-repeat; pointer-events:none; }body.schedule-result .tb-r-title,body.schedule-result .tb-r-range,body.schedule-result #statusDotResult{ display:none; }body.schedule-result .tb-col-right{ position:absolute; right:0; top:27px; gap:2px; }body.schedule-result .tb-icon-btn{ display:flex; border:0; background:transparent; color:#3a2c1e; width:32px; height:32px; border-radius:8px; }body.schedule-result .tb-icon-btn svg{ width:21px; height:21px; }body.schedule-result #resultSection{ position:fixed; inset:calc(84px + var(--sb, 0px)) 0 0; z-index:1; }body.schedule-result #resultSection > .card{ padding:0; margin:0; height:100%; border-radius:0; backdrop-filter:none; -webkit-backdrop-filter:none; }body.schedule-result #resultContent{ height:100%; min-height:0; touch-action:pan-y; overflow-y:auto; -webkit-overflow-scrolling:touch; }body.schedule-result #resultContent > .today-schedule-list{ min-height:100%; }body.schedule-result #bottomNav{ display:none; }.demo-pane{ height:100%; display:flex; flex-direction:column; min-height:0; position:relative; }.demo-pane::before{ content:''; position:absolute; left:0; top:62px; bottom:0; width:26px; background:var(--timemask); border-right:1px solid rgba(255,255,255,.28); pointer-events:none; z-index:1; }.demo-head{ height:62px; flex:0 0 62px; display:flex; background:rgba(244,236,218,.62) url('schedule-assets/tangyun-head.png') center/100% 100% no-repeat; }.demo-month{ flex:0 0 26px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; writing-mode:vertical-rl; letter-spacing:1px; overflow:hidden; }.demo-days{ flex:1; display:flex; min-width:0; }.demo-day{ flex:1; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }.demo-day .wd{ font-size:14px; font-weight:700; }.demo-day .dt{ font-size:11px; color:#a6a6a6; }.demo-day.today .wd,.demo-day.today .dt{ color:#b18c49; }.demo-day.today::after{ content:''; position:absolute; width:26px; height:3px; bottom:1px; border-radius:2px; background:#c4a468; }.demo-scroll{ display:flex; flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; }.demo-scroll::-webkit-scrollbar{ display:none; }.demo-periods{ flex:0 0 26px; background:transparent; position:relative; z-index:2; }.demo-period{ height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:1px solid rgba(255,255,255,.18); }.demo-period .no{ font-size:13px; font-weight:600; }.demo-period .tm{ color:#8c857a; font-size:8.5px; line-height:1.25; text-align:center; white-space:nowrap; }.demo-grid{ flex:1; position:relative; min-width:0; }.demo-line{ position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.5); pointer-events:none; }body.schedule-result .demo-course{ position:absolute; border-radius:8px; border:1.5px solid; padding:4px 1px 3px; overflow:hidden; cursor:pointer; text-align:left; font-family:inherit; min-height:0; line-height:1.22; box-shadow:none; letter-spacing:normal; }.demo-course:active{ transform:scale(.98); }.demo-course .cn{ font-size:10px; font-weight:700; line-height:1.2; word-break:break-all; }.demo-course .cs{ font-size:8.5px; font-weight:500; margin-top:2px; word-break:break-all; }.demo-course .ct{ font-size:8.5px; font-weight:600; margin-top:1px; line-height:1.15; word-break:break-all; opacity:.92; }.demo-unplaced{ padding:12px; font-size:12px; background:rgba(255,255,255,.9); position:relative; z-index:3; }.demo-empty{ padding:40px 16px; text-align:center; color:#706552; }.demo-back-week{ position:fixed; right:36px; bottom:calc(24px + var(--sab, 0px)); z-index:155; border:0; background:#ff5959; color:#fff; font-size:14px; border-radius:99px; padding:8px 14px; box-shadow:0 4px 14px #ff595944; }#scheduleToast{ position:fixed; left:50%; bottom:calc(80px + var(--sab, 0px)); transform:translateX(-50%); max-width:85vw; padding:10px 16px; border-radius:10px; background:#333e; color:#fff; z-index:600; font-size:13px; pointer-events:none; }#weekPicker{ left:0 !important; right:0; top:auto !important; bottom:0; transform:none !important; width:100% !important; max-width:600px !important; margin:auto; max-height:75vh !important; border-radius:18px 18px 0 0 !important; padding:18px 18px calc(28px + var(--sab, 0px)) !important; background:#fff !important; color:#1a1a1a; font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif; }.demo-week-head{ display:flex; align-items:center; margin-bottom:18px; }.demo-week-head strong{ font-size:20px; flex:1; text-align:center; }.demo-week-close{ border:0; background:transparent; color:#666; font-size:14px; padding:8px; }.demo-weeks{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }#weekPicker .demo-week{ border:0; border-radius:12px; background:#f1f5fa; color:#1a1a1a; font-size:18px; min-height:44px; padding:10px 0; font-family:inherit; box-shadow:none; }#weekPicker .demo-week.current{ background:#9aa0a8; color:#fff; }#weekPicker .demo-week.selected{ background:#ff4d4f; color:#fff; font-weight:700; }
+@media(prefers-reduced-motion:reduce) {#resultContent,#weekGhost{ transition:none !important; } }
 
 </style>
 <link rel="stylesheet" href="ui/app.css">
 </head>
-<body>
+<body class="booting">
 
 <!-- 液态玻璃折射滤镜：玻璃边缘弯曲背景（feDisplacementMap），Chromium/Android WebView 支持 -->
 <svg width="0" height="0" style="position:absolute;" aria-hidden="true" focusable="false">
@@ -686,7 +295,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
         <svg id="tbIconGrid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
         <svg id="tbIconList" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg>
       </button>
-      <button class="tb-icon-btn" id="tbRefreshResult" onclick="runQuery(true)" aria-label="刷新课表" title="刷新课表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg></button>
+      <button class="tb-icon-btn js-refresh" id="tbRefreshResult" onclick="runQuery(true)" aria-label="刷新课表" title="刷新课表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg></button>
       <button class="tb-icon-btn" id="tbReturnHome" onclick="goBack()" aria-label="返回首页" title="返回首页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       <button class="tb-icon-btn" id="resultLogoutBtn" onclick="doLogout()" style="display:none" title="退出">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -708,6 +317,8 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
 <div id="weekPickerMask" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.4); z-index:500;"></div>
 <div id="weekPicker" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--sheet-bg); border-radius:16px; padding:16px; z-index:501; max-width:280px; width:80%; max-height:60vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.2);"></div>
 
+<div id="loginMask" onclick="hideLogin()"></div>
+
 <main id="main">
 
   <!-- 登录面板（默认隐藏，点顶栏登录按钮展开） -->
@@ -718,12 +329,14 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
         <span class="mono" id="loginHint" style="font-size:8px; color:var(--ink-light);">离线缓存中</span>
       </div>
       <div class="login-body">
-        <input type="text" id="account" placeholder="学号" autocomplete="off" />
-        <input type="password" id="password" placeholder="密码" autocomplete="off" />
-        <div style="display:flex; gap:8px;">
-          <button class="small" onclick="doLoginNow()">登录并刷新</button>
-          <button class="small" style="border-color:var(--ink-light); color:var(--ink-light);" onclick="hideLogin()">取消</button>
-        </div>
+        <form id="loginForm" action="#" method="post" autocomplete="on" onsubmit="doLoginNow(); return false;">
+          <input type="text" id="account" name="username" placeholder="学号" autocomplete="username" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <input type="password" id="password" name="password" placeholder="密码" autocomplete="current-password" />
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="small">登录并刷新</button>
+            <button type="button" class="small" style="border-color:var(--ink-light); color:var(--ink-light);" onclick="hideLogin()">取消</button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
@@ -763,7 +376,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
       </div>
       <div style="display:flex; gap:8px;">
         <button style="flex:1;" onclick="runQuery()">查询</button>
-        <button style="flex:1;" onclick="runQuery(true)">刷新</button>
+        <button class="js-refresh" style="flex:1;" onclick="runQuery(true)">刷新</button>
       </div>
     </div>
     <div class="fd-tab" onclick="if(this.parentElement._justDragged)return;toggleResultFloat('querySection')">查询参数</div>
@@ -773,10 +386,11 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
   <section id="browseNav">
     <div class="card card-green">
       <div class="card-header"><span class="mono">全校列表</span></div>
-      <div class="btn-group">
+      <div class="btn-group" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
         <button class="btn-chip" onclick="openBrowse('teacher')">全校教师</button>
         <button class="btn-chip" onclick="openBrowse('class')">全校班级</button>
         <button class="btn-chip" onclick="openBrowse('classroom')">全校教室</button>
+        <button class="btn-chip" onclick="openBrowse('course')">全校课程</button>
       </div>
     </div>
     <div class="fd-tab" onclick="if(this.parentElement._justDragged)return;toggleResultFloat('browseNav')">全校列表</div>
@@ -796,6 +410,22 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
     <div class="fd-tab" onclick="if(this.parentElement._justDragged)return;toggleFloat('cacheInfoSection')">缓存信息</div>
   </section>
 
+  <!-- 官网跳转磁贴 -->
+  <section id="siteSection">
+    <div class="card card-pink">
+      <div class="card-header"><span class="mono">教务官网</span></div>
+      <div style="padding:2px 0 10px; font-size:11px; color:var(--ink-light); line-height:1.7;">打开教务系统官网对应页面</div>
+      <button class="small" style="width:100%;" onclick="openOfficialPage()">前往官网 ↗</button>
+    </div>
+    <div class="fd-tab" onclick="if(this.parentElement._justDragged)return;toggleFloat('siteSection')">官网</div>
+  </section>
+
+  <!-- 设置磁贴（与官网磁贴同款，点击跳动后进设置） -->
+  <section id="settingsTile">
+    <div class="card"><div class="card-header"><span class="mono">设置</span></div></div>
+    <div class="fd-tab" onclick="if(this.parentElement._justDragged)return;openSettingsTile()">设置</div>
+  </section>
+
   <!-- 浏览结果 -->
   <!-- 底部弹出弹窗遮罩 -->
   <div id="browseOverlay" class="overlay" onclick="closeBrowse()" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
@@ -805,7 +435,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
       <span class="mono" id="browseTitle" style="color:var(--pink-deep);">列表</span>
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="mono" id="browseCount" style="color:var(--ink-light);"></span>
-        <button onclick="openBrowse(S.browseType, true)" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
+        <button class="js-refresh" onclick="openBrowse(S.browseType, true)" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
         <button onclick="closeBrowse()" style="font-size:12px; padding:4px 12px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">关闭</button>
       </div>
     </div>
@@ -831,7 +461,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
         <span class="mono">查询结果</span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span class="mono" id="resultLabel"></span>
-          <button onclick="runQuery(true)" style="font-size:11px; padding:3px 10px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
+          <button class="js-refresh" onclick="runQuery(true)" style="font-size:11px; padding:3px 10px; border:1px solid var(--green); background:transparent; color:var(--green); border-radius:4px; cursor:pointer;">刷新</button>
         </div>
       </div>
       <div class="cache-notice hidden" id="cacheNotice">离线缓存 · 未登录无法刷新</div>
@@ -849,12 +479,18 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
     <div class="settings-kicker">JWXT · PERSONAL SPACE</div>
     <h2>设置与偏好</h2>
     <p>把课表和应用调整成你习惯的样子</p>
-    <span class="settings-version">VERSION 0.9.8</span>
+    <span class="settings-version" id="appVNum">V187</span>
   </div>
 
   <section class="settings-group card">
     <div class="settings-section-head"><span class="settings-icon">◈</span><div><h3>外观</h3><p>主题与显示方式</p></div></div>
     <div class="set-row appearance-row"><div class="set-label">外观模式<small class="set-desc">自动随安卓系统切换</small></div><div class="seg appearance-seg" role="group" aria-label="外观模式"><button type="button" id="theme-system" onclick="setThemeMode('system')">自动</button><button type="button" id="theme-light" onclick="setThemeMode('light')">浅色</button><button type="button" id="theme-dark" onclick="setThemeMode('dark')">深色</button></div></div>
+    <div class="set-row"><div class="set-label">启动页面<small class="set-desc">打开 App 后先看到哪一页</small></div><div class="seg" role="group" aria-label="启动页面"><button type="button" id="startpage-home" onclick="setStartPage('home')">首页</button><button type="button" id="startpage-schedule" onclick="setStartPage('schedule')">课表</button></div></div>
+  </section>
+
+  <section class="settings-group card">
+    <div class="settings-section-head"><span class="settings-icon">↗</span><div><h3>官网跳转</h3><p>「前往官网」按钮的打开方式</p></div></div>
+    <div class="set-row"><div class="set-label">打开方式<small class="set-desc">应用内：带着当前登录态直接看；外部浏览器：交给浏览器打开</small></div><div class="seg" role="group" aria-label="官网跳转方式"><button type="button" id="openmode-inapp" onclick="setOpenMode('inapp')">应用内</button><button type="button" id="openmode-browser" onclick="setOpenMode('browser')">外部浏览器</button></div></div>
   </section>
 
   <section class="settings-group card">
@@ -879,7 +515,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
   </section>
 
   <section class="settings-group card about-card">
-    <div class="about-brand"><span class="about-symbol">C</span><div><span class="settings-kicker">CAMPUS COMPANION</span><h3>CICP 教务查询</h3><p>课程与教务，随时查看。</p></div><span class="about-version">v0.9.8 · Claude</span></div>
+    <div class="about-brand"><span class="about-symbol">C</span><div><span class="settings-kicker">CAMPUS COMPANION</span><h3>CICP 教务查询</h3><p>课程与教务，随时查看。</p></div><span class="about-version">v0.9.8 · V187</span></div>
     <div class="about-features"><div><strong>离线可用</strong><span>查过的信息，随时查看</span></div><div><strong>账户隔离</strong><span>个人缓存分开保存</span></div></div>
     <p class="about-copy">独立学习项目，数据来自中央司法警官学院教务系统。应用查询结果以学校教务系统为准。</p>
     <div class="about-footer"><span>由豆包与 Codex 协作开发<br><small>开源许可 · MIT</small></span><button type="button" class="set-btn" onclick="openRepo()">查看源码 ↗</button></div>
@@ -887,15 +523,7 @@ body.schedule-result .demo-course { position:absolute; border-radius:8px; border
 </section>
 
 <!-- 底部液态玻璃导航栏 -->
-<nav id="bottomNav" class="bottomnav">
-  <div class="glass-slide"></div>
-  <button class="nav-item active" data-tab="home" onclick="showTab('home')">
-    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>首页</span>
-  </button>
-  <button class="nav-item" data-tab="settings" onclick="showTab('settings')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.15-1.42l2.1-1.5-2-3.46-2.46 1a7 7 0 0 0-2.46-1.43L13.6 2.6h-3.2l-.43 2.59a7 7 0 0 0-2.46 1.43l-2.46-1-2 3.46 2.1 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .15 1.42l-2.1 1.5 2 3.46 2.46-1a7 7 0 0 0 2.46 1.43l.43 2.59h3.2l.43-2.59a7 7 0 0 0 2.46-1.43l2.46 1 2-3.46-2.1-1.5A7 7 0 0 0 19 12z"/></svg><span>设置</span>
-  </button>
-</nav>
+
 
 <script src="ui/experience.js"></script>
 <script>
@@ -923,7 +551,7 @@ const TYPES = [
   {v:'electives', l:'选课结果'},
   {v:'empty', l:'空教室'},
 ];
-const NEEDS_NAME = ['teacher','classroom','class','course'];
+const NEEDS_NAME = ['teacher','classroom','class','course','courselist'];
 const NEEDS_WEEK = ['teacher','classroom','self','class','course','empty'];
 const NEEDS_SEM = ['score','electives','exam'];
 const WEEKDAYS = ['周一','周二','周三','周四','周五','周六','周日'];
@@ -951,7 +579,7 @@ function toggleCacheInfo() {
 }
 
 // 展开面板和收起标签共同排布，每次从内容重新测量，清除旧尺寸。
-const FLOAT_PANEL_IDS = ['todaySection','browseNav','querySection','cacheInfoSection'];
+const FLOAT_PANEL_IDS = ['todaySection','browseNav','querySection','cacheInfoSection','siteSection','settingsTile'];
 function resetFloatLayout() {
   FLOAT_PANEL_IDS.forEach(function(id){var el=document.getElementById(id);if(!el)return;el.classList.remove('open','avoid-left','avoid-right');['top','height','maxHeight','transform','transition'].forEach(function(k){el.style[k]='';});});
   syncFloatingPanels();layoutOpenFloats();
@@ -976,6 +604,16 @@ function toggleDockFloat(id) {
   layoutOpenFloats();
 }
 function toggleFloat(id) { toggleDockFloat(id); }
+function openSettingsTile() {
+  var el = document.getElementById('settingsTile');
+  if (el) {
+    el.classList.remove('tile-bounce');
+    void el.offsetWidth;
+    el.classList.add('tile-bounce');
+    setTimeout(function () { el.classList.remove('tile-bounce'); }, 460);
+  }
+  setTimeout(function () { showTab('settings'); }, 380);
+}
 function collapseFloats() { resetFloatLayout(); }
 window.addEventListener('resize', layoutOpenFloats);
 window.addEventListener('DOMContentLoaded', function() {
@@ -987,7 +625,7 @@ window.addEventListener('DOMContentLoaded', function() {
     if (heading) heading.addEventListener('click', function(event) {
       if (!el.classList.contains('panel-floating')) return;
       event.stopImmediatePropagation();
-      if(document.body.classList.contains('in-result'))toggleDockFloat(id);else{clearTimeout(el._headerClickTimer);el._headerClickTimer=setTimeout(function(){toggleDockFloat(id);},350);}
+      clearTimeout(el._headerClickTimer);el._headerClickTimer=setTimeout(function(){if(Date.now()-(window._dblGuard||0)<800)return;toggleDockFloat(id);},360);
     }, true);
     if (card) new MutationObserver(queueFloatLayout).observe(card, {childList:true,subtree:true,characterData:true,attributes:true});
   });
@@ -996,10 +634,14 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 // 浮窗拖动：展开后从标题拖动，收起时拖动标签可调整停靠边
 function initFloatDrag() {
-  ['todaySection','cacheInfoSection','querySection','browseNav'].forEach(function(id) {
+  ['todaySection','cacheInfoSection','querySection','browseNav','siteSection','settingsTile'].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     var sx=0, sy=0, ox=0, oy=0, dragging=false, moved=false;
+    var holdTimer=null, holdOk=false;
+    function clearHold(){if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}}
+    function liftOn(){ el.classList.add('panel-lift'); }
+    function liftOff(){ el.classList.remove('panel-lift'); }
     function start(x,y,e) {
       var isResult = el.classList.contains('panel-floating');
       var r = el.getBoundingClientRect();
@@ -1010,8 +652,13 @@ function initFloatDrag() {
       } else {
         if (!el.classList.contains('open')) {
           // 收起状态：整个浮窗都可以拖（轻点还是会触发 toggle）
-          dragging=true; moved=false; sx=x; sy=y; ox=0; oy=0;
-          el.style.transition='none';
+          holdOk=false; clearHold(); sx=x; sy=y;
+          var _x2=x,_y2=y;
+          holdTimer=setTimeout(function(){
+            holdOk=true; dragging=true; moved=false; sx=_x2; sy=_y2; ox=0; oy=0;
+            el.style.transition='none'; liftOn();
+            if (navigator.vibrate) try{navigator.vibrate(12);}catch(e){}
+          }, 320);
           return;
         }
         // 展开状态：从四角拖 或 从卡片标题区域拖
@@ -1025,15 +672,25 @@ function initFloatDrag() {
         var onHeader2 = e && e.target && e.target.closest && e.target.closest('.card-header');
         if (!inCorner && !onHeader2) return;
       }
-      dragging=true; moved=false; sx=x; sy=y;
-      el.style.transition='none';
-      var tr = el.style.transform || '';
-      var m = tr.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
-      ox = m ? parseFloat(m[1]) : 0;
-      oy = m ? parseFloat(m[2]) : 0;
+      holdOk=false;
+      clearHold(); sx=x; sy=y;
+      var _sx=x,_sy=y;
+      holdTimer=setTimeout(function(){
+        holdOk=true; dragging=true; moved=false; sx=_sx; sy=_sy;
+        el.style.transition='none';
+        var tr = el.style.transform || '';
+        var m2 = tr.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        ox = m2 ? parseFloat(m2[1]) : 0;
+        oy = m2 ? parseFloat(m2[2]) : 0;
+        liftOn();
+        if (navigator.vibrate) try{navigator.vibrate(12);}catch(e){}
+      }, 320);
     }
     function move(x,y,e) {
-      if (!dragging) return;
+      if (!dragging) {
+        if (holdTimer && (Math.abs(x-sx)>14 || Math.abs(y-sy)>14)) clearHold();
+        return;
+      }
       var dx = x-sx, dy = y-sy;
       if (Math.abs(dx)>3 || Math.abs(dy)>3) { moved=true; el._justDragged = true; }
       if (!moved) return;
@@ -1041,6 +698,8 @@ function initFloatDrag() {
       if (e && e.cancelable) e.preventDefault();
     }
     function end() {
+      clearHold();
+      liftOff();
       if (!dragging) return;
       dragging=false;
       if (!moved) { el.style.transition = ''; return; }
@@ -1070,14 +729,7 @@ function initFloatDrag() {
     el.addEventListener('mousedown', function(e){ start(e.clientX, e.clientY, e); });
     window.addEventListener('mousemove', function(e){ move(e.clientX, e.clientY); });
     window.addEventListener('mouseup', end);
-    // 双击收起
-    el.addEventListener('dblclick', function(e){
-      if(!e.target.closest('.card-header')||e.target.closest('button,input,select,a')||Date.now()-(el._lastTouchDouble||0)<500)return;
-      e.preventDefault();clearTimeout(el._headerClickTimer);
-      if(!document.body.classList.contains('in-result'))dockHomePanel(id);
-      else {el.classList.remove('open');layoutOpenFloats();}
-      el.style.transform='';
-    });
+    // 双击收起统一由 experience.js 的 pointerup 判定处理，这里不再重复绑定
   });
 }
 
@@ -1093,22 +745,15 @@ function setStyleMode() {
   document.documentElement.removeAttribute('data-style');
   try {localStorage.removeItem('jwxt_style');}catch(e){}
 }
-function toggleStyle() {
-  const glass = document.documentElement.getAttribute('data-style') === 'classic';
-  setStyleMode(glass ? 'glass' : 'classic');
-}
-function toggleStyleClassic() {
-  setStyleMode(document.documentElement.getAttribute('data-style') === 'classic' ? 'glass' : 'classic');
-}
-
 function restoreTheme() {
   var preference='system';try {preference=localStorage.getItem('jwxt_theme')||'system';}catch(e){}
   setThemeMode(preference);setStyleMode('glass');
 }
 
 // ==== 底部导航 & 设置面板 ====
-function showTab(which) {
-  var settings=which==='settings';document.getElementById('settingsSection').classList.toggle('hidden',!settings);
+function showTab(which, skipHistory) {
+  var settings=which==='settings';
+  if (settings && !skipHistory) { try { if (!history.state || !history.state.jwxtSettings) history.pushState({ jwxtSettings: 1 }, '', '#settings'); } catch (e) {} }document.getElementById('settingsSection').classList.toggle('hidden',!settings);
   document.body.classList.toggle('show-settings',settings);
   document.getElementById('main').inert=settings;
   document.getElementById('mainTopbar').inert=settings;
@@ -1271,9 +916,44 @@ async function doLogin() {
     localStorage.setItem('jwxt_creds', JSON.stringify({account: acc}));
     localStorage.setItem('jwxt_login', '1');
     localStorage.setItem('jwxt_active_account', accountScope(acc));
+    // 登录前如果点过官网，登录成功后直接把那个页面打开
+    if (window.__pendingOfficialUrl) {
+      var pu = window.__pendingOfficialUrl;
+      window.__pendingOfficialUrl = '';
+      setTimeout(function () {
+        try { if (window.Android && Android.openInApp) Android.openInApp(pu); } catch (e) {}
+      }, 500);
+    }
     return true;
   }
   throw new Error('登录失败');
+}
+
+function applyLoggedInUI() {
+  try {
+    var sd0 = document.getElementById('statusDot');
+    if (sd0) { sd0.className = 'status-dot ok'; sd0.style.background = ''; }
+    var st = document.getElementById('statusText'); if (st) st.textContent = '已登录';
+    var lo = document.getElementById('logoutBtn'); if (lo) { lo.style.display = 'flex'; lo.innerHTML = ICO_LOGOUT; }
+    var lb = document.getElementById('loginBtn'); if (lb) lb.style.display = 'none';
+    var hint = document.getElementById('loginHint'); if (hint) hint.textContent = '已登录';
+    var sdr = document.getElementById('statusDotResult'); if (sdr) sdr.style.background = 'var(--green)';
+    var rlb = document.getElementById('resultLogoutBtn'); if (rlb) { rlb.innerHTML = ICO_LOGOUT; rlb.onclick = doLogout; rlb.title = '退出'; }
+  } catch (e) {}
+}
+
+// 静默校验会话：Cookie 由原生保存，能直接复用就不用重新登录
+function silentSessionCheck() {
+  try {
+    if (!window.Android || !Android.httpRequest) return false;
+    if (localStorage.getItem('jwxt_login') !== '1') return false;
+    var h = Android.httpRequest('GET', BASE + '/jsxsd/framework/mainV_index.jsp', '');
+    if (typeof h !== 'string' || h.length < 500) return false;
+    if (looksLikeLoginPage(h)) return false;
+    S.loggedIn = true;
+    applyLoggedInUI();
+    return true;
+  } catch (e) { return false; }
 }
 
 function looksLikeLoginPage(html) {
@@ -1284,12 +964,23 @@ function looksLikeLoginPage(html) {
 }
 
 function showLogin() {
-  document.getElementById('loginSection').style.display = '';
+  if (window.Android && Android.showNativeLogin) {
+    try { Android.showNativeLogin(); return; } catch(e) {}
+  }
+  var sec = document.getElementById('loginSection');
+  var mask = document.getElementById('loginMask');
+  var inResult = document.body.classList.contains('in-result');
+  sec.classList.toggle('popup-login', inResult);
+  sec.style.display = '';
+  if (mask) mask.style.display = inResult ? 'block' : 'none';
   document.getElementById('loginBtn').style.display = 'none';
-  document.getElementById('account').focus();
+  setTimeout(function(){ try{ document.getElementById('account').focus(); }catch(e){} }, 60);
 }
 function hideLogin() {
-  document.getElementById('loginSection').style.display = 'none';
+  var sec = document.getElementById('loginSection');
+  var mask = document.getElementById('loginMask');
+  sec.style.display = 'none'; sec.classList.remove('popup-login');
+  if (mask) mask.style.display = 'none';
   if (!S.loggedIn) document.getElementById('loginBtn').style.display = '';
 }
 
@@ -1298,7 +989,7 @@ async function doLoginNow() {
     document.getElementById('loginHint').textContent = '登录中...';
     await doLogin();
     // 登录成功，隐藏登录面板
-    document.getElementById('loginSection').style.display = 'none';
+    hideLogin();
     document.getElementById('loginBtn').style.display = 'none';
     alert('登录成功，现在可以查询最新数据了');
   } catch(e) {
@@ -1306,6 +997,15 @@ async function doLoginNow() {
     alert(e.message);
   }
 }
+
+
+window.__nativeLogin = function(u, p) {
+  try {
+    document.getElementById('account').value = u || '';
+    document.getElementById('password').value = p || '';
+  } catch(e) {}
+  doLoginNow();
+};
 
 var ICO_LOGIN = experienceIcon('login');
 var ICO_LOGOUT = experienceIcon('logout');
@@ -1335,7 +1035,11 @@ function accountScope(account) {
   return (h >>> 0).toString(36);
 }
 function activeAccountScope() {
-  try { return localStorage.getItem('jwxt_active_account') || ''; } catch(e) { return ''; }
+  try {
+    var scope=localStorage.getItem('jwxt_active_account');if(scope)return scope;
+    var saved=JSON.parse(localStorage.getItem('jwxt_creds')||'{}');
+    if(saved.account){scope=accountScope(saved.account);localStorage.setItem('jwxt_active_account',scope);return scope;}
+  }catch(e){}return '';
 }
 function semesterStartDate() {
   var saved = '';
@@ -1412,10 +1116,10 @@ function parseSchedule(html, type) {
   for (let ri = start; ri < rows.length; ri++) {
     const cells = rows[ri].querySelectorAll('td');
     if (!cells.length) continue;
-    const rowName = cells[0].textContent.trim();
+    const rowName = txtOf(cells[0]);
     if (!rowName || rowName === '\u00a0') continue;
     for (let ci = 1; ci < cells.length; ci++) {
-      const txt = cells[ci].textContent.trim();
+      const txt = txtOf(cells[ci]);
       if (!txt || txt === '\u00a0') continue;
       const dayIdx = Math.floor((ci-1)/7);
       const perIdx = (ci-1)%7;
@@ -1427,23 +1131,37 @@ function parseSchedule(html, type) {
         const c = {name: lines[i]||'', teacher:'', classroom:'', classes:'', week:'', weekday: dayIdx+1, weekdayName: WEEKDAYS[dayIdx], period: pd.n, periodLabel: pd.l};
         i++;
         if (i < lines.length && /^[\(（].*[\)）]$/.test(lines[i]) && !lines[i].includes('周')) { c.name += '(' + lines[i].replace(/^[\(（]|[\)）]$/g,'') + ')'; i++; }
-        if (i < lines.length && !/^[\(（]/.test(lines[i]) && !/^[\u4e00-\u9fa5]{2,4}$/.test(lines[i])) { c.classes = lines[i]; i++; }
-        if (i < lines.length && /^[\u4e00-\u9fa5]{2,4}$/.test(lines[i])) { c.teacher = lines[i]; i++; }
-        if (i < lines.length && /^[\(（].*周.*[\)）]$/.test(lines[i])) { c.week = lines[i].replace(/^[\(（]|[\)）]$/g,''); i++; }
-        if (i < lines.length && !c.classroom) {
-          const isRm = /\d/.test(lines[i]) || /教|室|馆|楼/.test(lines[i]);
-          if (isRm) { c.classroom = lines[i]; i++; }
+        // 逐行按字段归类：周次 / 教室 / 班级 / 教师。顺序不敏感，同一格里的剩余行不会被拆成另一门课
+        while (i < lines.length) {
+          var L = lines[i];
+          if (!c.week && /周/.test(L)) { c.week = L.replace(/^[\(（]|[\)）]$/g, ''); i++; continue; }
+          if (!c.classroom && (/^\s*\d/.test(L) || /馆|楼/.test(L) || /教室|实验室|机房|操场/.test(L))) { c.classroom = L; i++; continue; }
+          if (!c.classes && /班|级|队|系|专业|学院/.test(L)) { c.classes = L; i++; continue; }
+          if (!c.teacher && (isTeacherLine(L) || /^[\u4e00-\u9fa5·]{2,4}$/.test(L) || splitNameRun(L))) {
+            var tnames = [L]; i++;
+            var guard = 0;
+            while (i < lines.length && guard < 4 && /^[\u4e00-\u9fa5]{2,4}$/.test(lines[i]) && (!TEACHER_SET || TEACHER_SET.has(lines[i]))) {
+              tnames.push(lines[i]); i++; guard++;
+            }
+            c.teacher = normTeachers(tnames.join('、'));
+            continue;
+          }
+          break;
         }
         if (type === 'teacher') c.teacher = rowName;
         else if (type === 'class') c.classes = rowName;
         else if (type === 'course') c.name = rowName;
         else c.classroom = rowName;
-        // 课表格子偶发把课程名与教师名连在一起（无换行分隔），尝试拆出教师名
         if (!c.teacher && c.name && c.name.length >= 4) {
           var tn2 = matchTeacherFromName(c.name);
           if (tn2) { c.teacher = tn2; c.name = c.name.slice(0, c.name.length - tn2.length); }
         }
         if (c.name) courses.push(c);
+        if (i < lines.length) {
+          var nxt = lines[i];
+          var okNext = /班|级|周|馆|楼/.test(nxt) || /^\s*\d/.test(nxt) || /^[\u4e00-\u9fa5·]{2,4}$/.test(nxt);
+          if (!okNext) break;
+        }
       }
     }
   }
@@ -1456,7 +1174,162 @@ function parseSchedule(html, type) {
     if (seenK.has(k)) continue;
     seenK.add(k); uniq.push(c);
   }
-  return {courses: uniq, count: uniq.length};
+  // 修正：课程课表的班级列偶发把教师名塞进班级，或教师名没被识别
+  uniq.forEach(function (c) {
+    if (!c.teacher && c.classes) {
+      var t = String(c.classes).trim();
+      // 单元格里「班级」和「教师」粘成一行（如 矫正教育一班26闵奎元），拆出末尾的教师名
+      var m = t.match(/^(.*?(?:班|级|队)\s*\d{0,6})\s*([\u4e00-\u9fa5·]{2,4})$/);
+      if (m) { c.classes = m[1]; c.teacher = m[2]; return; }
+      if (TEACHER_SET && TEACHER_SET.has(t)) { c.teacher = t; c.classes = ''; return; }
+      if (/^[\u4e00-\u9fa5·]{2,4}$/.test(t)) { c.teacher = t; c.classes = ''; }
+    }
+  });
+  var merged = mergeSameCourse(uniq);
+  return {courses: merged, count: merged.length};
+}
+
+// 合并同一时段同名课程（不同周由不同老师上）：教师取并集、周次拼接、教室去重
+function unionTeachers(a, b) {
+  var arr = [];
+  [a, b].forEach(function(src){
+    if (!src) return;
+    String(src).split(/[、,，;；\/\s]+/).forEach(function(x){
+      x = x.trim();
+      if (x && arr.indexOf(x) < 0) arr.push(x);
+    });
+  });
+  return arr.join('、');
+}
+function mergeSameCourse(list) {
+  var map = {}, out = [];
+  (list || []).forEach(function(c){
+    var k = c.weekday + '|' + (c.period || c.periodLabel || '') + '|' + c.name;
+    var e = map[k];
+    if (!e) { map[k] = c; out.push(c); return; }
+    e.teacherAll = unionTeachers(e.teacherAll, c.teacher);
+    if (c.week && e.week !== c.week) e.week = e.week ? (e.week + '，' + c.week) : c.week;
+    if (!e.classroom && c.classroom) e.classroom = c.classroom;
+    else if (c.classroom && e.classroom && c.classroom !== e.classroom) e.classroom = e.classroom + '，' + c.classroom;
+  });
+  // 同一门课所有教师汇总到 teacherAll（只用于详情浮窗，格子仍显示当周教师）
+  var byName = {};
+  out.forEach(function(c){
+    if (!c.name) return;
+    byName[c.name] = unionTeachers(byName[c.name] || '', c.teacher);
+    byName[c.name] = unionTeachers(byName[c.name], c.teacherAll);
+  });
+  out.forEach(function(c){
+    if (!c.name) return;
+    c.teacherAll = unionTeachers(c.teacherAll, byName[c.name]);
+  });
+  return out;
+}
+
+// 取元素可见文本：innerText 会把 <br>/块级元素转成换行，textContent 会把它们粘在一起
+function txtOf(el) {
+  if (!el) return '';
+  var t = '';
+  try { t = el.innerText || ''; } catch(e) { t = ''; }
+  if (!t) t = el.textContent || '';
+  return t.replace(/\r/g, '\n').replace(/[ \t\u00a0]+/g, ' ').trim();
+}
+
+// 一行里可能是「张伟」「张伟、李娜」「张伟 李娜」这种多教师写法
+function isTeacherLine(line) {
+  if (!line) return false;
+  var t = String(line).replace(/^教师\s*[:：]?\s*/, '').trim();
+  if (!t || t.length > 24) return false;
+  var parts = t.split(/[、,，;；\/\|\s]+/).filter(function(x){ return x; });
+  if (parts.length < 2 || parts.length > 6) return false;
+  for (var i = 0; i < parts.length; i++) {
+    if (!/^[\u4e00-\u9fa5·]{2,4}$/.test(parts[i])) return false;
+  }
+  return true;
+}
+
+// 教师名归一：支持一格多教师（顿号/逗号/斜杠/空格分隔），去重后统一用「、」连接
+
+// 教师名单缓存（全校教师）与「张伟李娜」这种粘在一起的拆分
+var _TSET = null;
+function teacherSet() {
+  if (_TSET !== null) return _TSET;
+  try {
+    var tc = getCache('browse_teacher');
+    if (tc && tc.data && Array.isArray(tc.data.teachers) && tc.data.teachers.length) _TSET = new Set(tc.data.teachers);
+    else _TSET = false;
+  } catch(e) { _TSET = false; }
+  return _TSET;
+}
+var SUR2 = '赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳唐费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮卞齐康伍余元卜顾孟平黄和穆萧尹姚邵湛汪祁毛禹狄米贝明臧计伏成戴谈宋茅庞熊纪舒屈项祝董梁杜阮蓝闵席季麻强贾路娄危江童颜郭梅盛林刁钟徐邱骆高夏蔡田樊胡凌霍虞万支柯昝管卢莫经房裘缪干解应宗丁宣贲邓郁单杭洪包诸左石崔吉钮龚程嵇邢滑裴陆荣翁荀羊於惠甄曲家封芮羿储靳汲邴糜松井段富巫乌焦巴弓牧隗山谷车侯宓蓬全郗班仰秋仲伊宫宁仇栾暴甘厉戎祖武符刘景詹束龙叶幸司韶郜黎蓟薄印宿白怀蒲邰从鄂索咸籍赖卓蔺屠蒙池乔阴胥能苍双闻莘党翟谭贡劳逄姬申扶堵冉宰郦雍卻璩桑桂濮牛寿通边扈燕冀郏浦尚农温别庄晏柴瞿阎充慕连茹习宦艾鱼容向古易慎戈廖庾终暨居衡步都耿满弘匡国文寇广禄阙东欧殳沃利蔚越夔隆师巩厍聂晁勾敖融冷訾辛阚那简饶空曾毋沙乜养鞠须丰巢关蒯相查后荆红游竺权逯盖益桓';
+function splitNameRun(run) {
+  if (!run) return null;
+  run = String(run).replace(/\s+/g, '');
+  if (run.length < 4 || !/^[\u4e00-\u9fa5·]+$/.test(run)) return null;
+  var set = teacherSet(), out = [], i = 0, j;
+  if (set) {
+    while (i < run.length) {
+      var hit = '';
+      for (var ln = Math.min(4, run.length - i); ln >= 2; ln--) {
+        if (set.has(run.substr(i, ln))) { hit = run.substr(i, ln); break; }
+      }
+      if (!hit) return null;
+      out.push(hit); i += hit.length;
+    }
+    return out.length > 1 ? out : null;
+  }
+  // 没有教师名单时的兜底：回溯切分，每段 2~3 字且以常见姓氏开头
+  function cut(pos, acc) {
+    if (pos === run.length) return acc.length > 1 ? acc : null;
+    for (var ln = 3; ln >= 2; ln--) {
+      if (pos + ln > run.length) continue;
+      var seg = run.substr(pos, ln);
+      if (SUR2.indexOf(seg.charAt(0)) < 0) continue;
+      var r = cut(pos + ln, acc.concat([seg]));
+      if (r) return r;
+    }
+    return null;
+  }
+  return cut(0, []);
+}
+
+function normTeachers(raw) {
+  if (!raw) return '';
+  var arr = String(raw).split(/[、,，;；\/\|]+|\s{1,}/).map(function(x){ return x.trim(); }).filter(function(x){
+    return x && x.length <= 6 && /^[\u4e00-\u9fa5·]+$/.test(x);
+  });
+  var out = [];
+  for (var i = 0; i < arr.length; i++) {
+    var tokens = splitNameRun(arr[i]) || [arr[i]];
+    for (var t = 0; t < tokens.length; t++) { if (out.indexOf(tokens[t]) < 0) out.push(tokens[t]); }
+  }
+  return out.length ? out.join('、') : String(raw).trim();
+}
+
+// 跨周教师并集：同一门课不同周可能换老师，把其它周缓存里的教师也并进来
+function teacherUnionAcrossWeeks(name, baseTeacher) {
+  var out = [];
+  function add(src) {
+    if (!src) return;
+    String(src).split(/[、,，;；\/\s.。]+/).forEach(function (x) {
+      x = x.trim();
+      if (x && /^[\u4e00-\u9fa5·]{2,4}$/.test(x) && out.indexOf(x) < 0) out.push(x);
+    });
+  }
+  add(baseTeacher);
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (!k || k.indexOf(CK + 'self_') !== 0) continue;
+      var obj = JSON.parse(localStorage.getItem(k) || 'null');
+      var list = obj && obj.data && obj.data.courses;
+      if (!Array.isArray(list)) continue;
+      for (var j = 0; j < list.length; j++) {
+        if (list[j] && list[j].name === name) add(list[j].teacher);
+      }
+    }
+  } catch (e) {}
+  return out.join('、');
 }
 
 // 个人课表
@@ -1477,13 +1350,20 @@ function parseSelfSchedule(html, weekday, week) {
         const p = item.querySelector('p');
         if (!p) continue;
         const c = {
-          name: p.textContent.trim(), weekday: ci, weekdayName: WEEKDAYS[ci-1],
+          name: txtOf(p), weekday: ci, weekdayName: WEEKDAYS[ci-1],
           teacher: '', classroom: '', week: week ? '第'+week+'周' : '', periodLabel: label,
         };
-        item.querySelectorAll('p').forEach(pp => {
-          const t = pp.textContent.trim();
-          if (t.startsWith('教师')) c.teacher = t.replace(/^教师\s*[:：]\s*/,'').replace(/[.,，。]$/,'').trim();
-        });
+        (function(){
+          var ts = [];
+          item.querySelectorAll('p').forEach(function(pp){
+            var t = txtOf(pp);
+            if (t.indexOf('教师') === 0) {
+              var v = t.replace(/^教师\s*[:：]\s*/,'').replace(/[.,，。]$/,'').trim();
+              if (v) ts.push(v);
+            }
+          });
+          c.teacher = normTeachers(ts.join('、'));
+        })();
         // 节次提取：优先 .tch-name span（含"节"文本，如 "01~02~03节"）；其次 span.text；否则回退行label
         let nums = [];
         item.querySelectorAll('.tch-name span').forEach(s => {
@@ -1510,10 +1390,17 @@ function parseSelfSchedule(html, weekday, week) {
         // 教师：item-box 未取到时，从前置 span.box 短名视图取
         if (!c.teacher) {
           const box = item.previousElementSibling;
-          if (box) box.querySelectorAll('p').forEach(pp => {
-            const t = pp.textContent.trim();
-            if (t.indexOf('教师') >= 0) c.teacher = t.replace(/^教师\s*[:：]\s*/, '').replace(/[.,，。]+$/, '').trim();
-          });
+          if (box) {
+            var ts2 = [];
+            box.querySelectorAll('p').forEach(function(pp){
+              var t = txtOf(pp);
+              if (t.indexOf('教师') >= 0) {
+                var v = t.replace(/^教师\s*[:：]\s*/, '').replace(/[.,，。]+$/, '').trim();
+                if (v) ts2.push(v);
+              }
+            });
+            c.teacher = normTeachers(ts2.join('、'));
+          }
         }
         courses.push(c);
       }
@@ -1524,8 +1411,11 @@ function parseSelfSchedule(html, weekday, week) {
     const k = c.weekday + '|' + c.name + '|' + c.teacher + '|' + c.classroom + '|' + (c.period || c.periodLabel || '');
     if (seen.has(k)) return false; seen.add(k); return true;
   });
+  const mergedSelf = mergeSameCourse(uniq);
+  mergedSelf.forEach(function (c) { if (c.name) c.teacherAll = teacherUnionAcrossWeeks(c.name, unionTeachers(c.teacher, c.teacherAll)); });
   const wd = parseInt(weekday);
-  return {courses: wd ? uniq.filter(c => c.weekday === wd) : uniq, count: uniq.length};
+  const outSelf = wd ? mergedSelf.filter(c => c.weekday === wd) : mergedSelf;
+  return {courses: outSelf, count: outSelf.length};
 }
 
 // 成绩
@@ -1611,6 +1501,8 @@ function parseList(html, type) {
       if (n.length>=2 && n.length<=15 && /^[\u4e00-\u9fa5·\s]+$/.test(n)) names.add(n);
     } else if (type === 'class') {
       if (n.length>=2 && n.length<=40 && n.includes('班')) names.add(n);
+    } else if (type === 'course') {
+      if (n.length>=2 && n.length<=40 && !/^\d+$/.test(n)) names.add(n);
     } else {
       if (n.length>=2 && n.length<=30 && /[\d楼馆室教\-]/.test(n)) names.add(n);
     }
@@ -1618,7 +1510,111 @@ function parseList(html, type) {
   const arr = Array.from(names).sort((a,b) => a.localeCompare(b,'zh-CN'));
   if (type === 'teacher') return {teachers: arr};
   if (type === 'class') return {classes: arr.map(n => ({name: n, grade: (n.match(/(\d{2})/)||['',''])[1]}))};
+  if (type === 'course') return {courses: arr};
   return {classrooms: arr};
+}
+
+// 教室名归一：「一教-1-107(矫正教育系机动教室1）」与「1-107(矫正教育系机动教室1）」视为同一间
+function roomKey(s) {
+  if (!s) return '';
+  var t = String(s).replace(/\s+/g, '');
+  var m = t.match(/(\d+-\d+[^（(]*)/);
+  return m ? m[1] : t;
+}
+
+// 「课程课表」接口能列出某门课所有班级/教师/周次；用它补全被服务器截断的教师名
+function parseKcBlocks(html) {
+  var out = [], re = /<div id='' class="kbcontent1">([\s\S]*?)<\/div>/g, m;
+  html = html || '';
+  while ((m = re.exec(html)) !== null) {
+    var t = m[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+    var lines = t.split('\n').map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+    for (var i = 1; i < lines.length; i++) {
+      var mm = /^[（(]([\d,\-，]+)周[）)]$/.exec(lines[i]);
+      if (mm) {
+        out.push({ cls: lines.slice(1, i - 1).join(' / '), teacher: lines[i - 1], weeks: mm[1], room: lines[i + 1] || '' });
+        break;
+      }
+    }
+  }
+  return out;
+}
+function userClass() {
+  try { var v = localStorage.getItem('jwxt_class'); if (v) return v; } catch (e) {}
+  try {
+    var h = httpGet('/jsxsd/grxx/xsxx');
+    var m = String(h).match(/班级\s*[：:]\s*([^\s<|]{2,20})/);
+    if (m) { try { localStorage.setItem('jwxt_class', m[1]); } catch (e) {} return m[1]; }
+  } catch (e) {}
+  return '';
+}
+function teacherCacheGet() {
+  try { return JSON.parse(localStorage.getItem('jwxt_tfull3') || '{}') || {}; } catch (e) { return {}; }
+}
+function teacherCacheSet(m) {
+  try { localStorage.setItem('jwxt_tfull3', JSON.stringify(m || {})); } catch (e) {}
+}
+// 补全「教师：杜丙立,..」这类被服务器截断的名字：最多 4 门，结果长期缓存
+function completeTruncatedTeachers(res, html, sem) {
+  try {
+    var str = typeof html === 'string' ? html : '';
+    var re = /<span[^>]*class='box'[^>]*>\s*<p>([^<]*)<\/p>\s*<p>教师[：:]([^<]*)<\/p>[\s\S]{0,900}?<div class='item-box'\s*>\s*<p>([^<]*)<\/p>/g;
+    var m, need = [];
+    while ((m = re.exec(str)) !== null) {
+      var tch = (m[2] || '').trim();
+      var full = (m[3] || '').trim();
+      if (full && /[,，]|\.\./.test(tch) && need.indexOf(full) < 0) need.push(full);
+    }
+    if (!need.length) return;
+    var cache = teacherCacheGet(), dirty = false, budget = 4, cls = '';
+    need.forEach(function (nm) {
+      var k = (sem || '') + '|' + nm;
+      var old = cache[k];
+      if (old && typeof old === 'object' && old.plan && old.plan.length) return;
+      if (budget <= 0) return;
+      budget--;
+      try {
+        if (!cls) cls = userClass();
+        var body = 'xnxqh=' + sem + '&kbjcmsid=' + KBJCMSID + '&skyx=&zzdKcSX=&kcid=&kcmc=' + encodeURIComponent(nm) + '&zc1=1&zc2=20&jc1=&jc2=';
+        var h2 = httpPost('/jsxsd/kbcx/kbxx_kc_ifr', body);
+        var blocks = parseKcBlocks(typeof h2 === 'string' ? h2 : '');
+        var mine = blocks.filter(function (b) { return cls && b.cls.indexOf(cls) >= 0; });
+        var pick = mine.length ? mine : blocks;
+        var names = [], plan = [];
+        pick.forEach(function (b) {
+          var t = normTeachers(b.teacher);
+          if (!t) return;
+          t.split('、').forEach(function (x) { if (x && names.indexOf(x) < 0) names.push(x); });
+          plan.push({ weeks: b.weeks, teacher: t, room: b.room || '' });
+        });
+        if (names.length) { cache[k] = { all: names.join('、'), plan: plan }; dirty = true; }
+      } catch (e) {}
+    });
+    if (dirty) teacherCacheSet(cache);
+    (res && res.courses || []).forEach(function (c) {
+      var rec = cache[(sem || '') + '|' + c.name];
+      if (!rec) return;
+      var allName = (typeof rec === 'string') ? rec : rec.all;
+      c.teacherAll = unionTeachers(c.teacherAll, unionTeachers(c.teacher, allName));
+      if (rec.plan && rec.plan.length) {
+        c.teacherPlan = rec.plan;
+        var wk = (String(c.week || '').match(/\d+/) || [])[0];
+        if (wk) {
+          var hit = rec.plan.filter(function (pl) {
+            return weekInRange('第' + pl.weeks + '周', parseInt(wk, 10));
+          });
+          if (!hit.length) hit = rec.plan;
+          if (hit.length === 1) c.teacher = hit[0].teacher;
+          else if (hit.length > 1) {
+            var myRoom = roomKey(c.classroom);
+            var same = hit.filter(function (pl) { return myRoom && roomKey(pl.room) === myRoom; });
+            c.teacher = (same.length ? same : hit).map(function (pl) { return pl.teacher; })
+              .filter(function (v, i, a) { return a.indexOf(v) === i; }).join('、');
+          }
+        }
+      }
+    });
+  } catch (e) {}
 }
 
 // ============ 查询执行 ============
@@ -1628,7 +1624,9 @@ async function doQuery(type, params) {
     case 'self': {
       const rq = weekMonday(params.week||'1');
       const html = httpGet('/jsxsd/framework/mainV_index_loadkb.htmlx?rq='+rq+'&sjmsValue='+KBJCMSID+'&xnxqid='+sem+'&xswk=false');
-      return parseSelfSchedule(html, params.weekday, params.week);
+      var _res = parseSelfSchedule(html, params.weekday, params.week);
+      try { completeTruncatedTeachers(_res, html, sem); } catch (e) {}
+      return _res;
     }
     case 'teacher': {
       const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&jszc=&skjsid=&skjs='+encodeURIComponent(params.name||'')+'&zc1='+(params.week||'1')+'&zc2='+(params.week||'20')+'&jc1=&jc2=';
@@ -1641,6 +1639,10 @@ async function doQuery(type, params) {
     case 'class': {
       const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&sknj=&skzy=&skbjid=&skbj='+encodeURIComponent(params.name||'')+'&zc1='+(params.week||'1')+'&zc2='+(params.week||'20')+'&jc1=&jc2=';
       return parseSchedule(httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', body), 'class');
+    }
+    case 'courselist': {
+      const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&zzdKcSX=&kcid=&kcmc='+encodeURIComponent(params.name||'')+'&zc1=1&zc2=20&jc1=&jc2=';
+      return parseSchedule(httpPost('/jsxsd/kbcx/kbxx_kc_ifr', body), 'course');
     }
     case 'course': {
       const body = 'xnxqh='+sem+'&kbjcmsid='+KBJCMSID+'&skyx=&zzdKcSX=&kcid=&kcmc='+encodeURIComponent(params.name||'')+'&zc1='+(params.week||'1')+'&zc2='+(params.week||'20')+'&jc1=&jc2=';
@@ -1898,11 +1900,21 @@ function buildEmptyRooms(rooms, allRooms, week) {
 // ============ 缓存 ============
 const CK = 'jwxt_cache_';
 function activePersonalCachePrefix() { return CK + 'self_u' + (activeAccountScope() || 'guest') + '_' + currentSemester() + '_'; }
+function isActivePersonalCacheKey(key) {
+  if(!key)return false;if(key.indexOf(activePersonalCachePrefix())===0)return true;
+  var prefix=CK+'self_u'+(activeAccountScope()||'guest')+'_';
+  if(key.indexOf(prefix)!==0||!/^w\d+(?:_d[1-7])?$/.test(key.slice(prefix.length)))return false;
+  try{var item=JSON.parse(localStorage.getItem(key)||'null');return !!(item&&item.t&&semesterForDate(new Date(item.t))===currentSemester());}catch(e){return false;}
+}
 function hasCachePrefix(prefix) {
   for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(prefix) === 0) return true; }
   return false;
 }
 function cacheKey(type, params) {
+  params=Object.assign({},params||{});
+  // The same normalization applies to query, reload, week swipe and day view.
+  if(type==='self'&&!params.semester&&typeof currentSemester==='function')params.semester=currentSemester();
+  if(params.week)params.week=String(parseInt(params.week,10)||params.week);
   var k = type;
   if (['self','score','gpa','progress','exam','electives'].indexOf(type) >= 0 && typeof activeAccountScope === 'function') k += '_u' + (activeAccountScope() || 'guest');
   if (params && params.name) k += '_' + params.name;
@@ -1912,10 +1924,24 @@ function cacheKey(type, params) {
   return k;
 }
 function getCache(k) {
-  try { const r = localStorage.getItem(CK+k); return r ? JSON.parse(r) : null; } catch { return null; }
+  function read(key){try{var item=JSON.parse(localStorage.getItem(CK+key)||'null');return item&&item.data!=null&&!item.data.error?item:null;}catch(e){return null;}}
+  var cached=read(k);if(cached)return cached;
+  // Whole-week caches can satisfy a day filter without a new network request.
+  var day=k.match(/_d([1-7])$/);
+  if(day){cached=getCache(k.replace(/_d[1-7]$/,''));if(cached&&Array.isArray(cached.data.courses))return Object.assign({},cached,{data:Object.assign({},cached.data,{courses:cached.data.courses.filter(function(c){return Number(c.weekday)===Number(day[1]);})})});}
+  // Recover only account-scoped, current-semester caches from the old key format.
+  var old=k.match(/^self_u([^_]+)_(\d{4}-\d{4}-[12])(_w\d+(?:_d\d)?)$/);
+  if(old&&old[1]===(activeAccountScope()||'guest')&&old[2]===currentSemester()){
+    cached=read('self_u'+old[1]+old[3]);
+    if(cached&&cached.t&&semesterForDate(new Date(cached.t))===old[2])return cached;
+  }
+  return null;
 }
+function semesterForDate(date){var y=date.getMonth()>=7?date.getFullYear():date.getFullYear()-1;return y+'-'+(y+1)+'-'+(date.getMonth()>=7?'1':'2');}
 function setCache(k, v) {
-  try { localStorage.setItem(CK+k, JSON.stringify({data: v, t: Date.now()})); } catch {}
+  if(v==null||v.error)return false;
+  try {localStorage.setItem(CK+k,JSON.stringify({data:v,t:Date.now()}));return true;}
+  catch(e){scheduleTip('查询成功，但离线缓存保存失败。请检查存储空间或清理不需要的缓存。');return false;}
 }
 
 // ============ 页面切换 ============
@@ -1969,6 +1995,11 @@ function goBack() {
 }
 // 监听返回键
 window.addEventListener('popstate', function(e) {
+  if (document.body.classList.contains('show-settings')) {
+    try { history.replaceState({ view: S.view || 'main' }, '', location.pathname); } catch (err) {}
+    showTab('home', true);
+    return;
+  }
   if (e.state && e.state.view) {
     showView(e.state.view, false);
   } else {
@@ -1989,15 +2020,22 @@ function init() {
   } catch (e) {}
 
   try {
+    // 底部手势条：WebView 里 env(safe-area-inset-bottom) 常为 0，用视口差值兜底
+    var sab = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sab')) || 0;
+    if (!sab && window.Android) {
+      var gap = (window.screen.height || 0) - (window.innerHeight || 0) - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sb')) || 0);
+      sab = gap > 0 && gap < 80 ? gap : 24;
+      document.documentElement.style.setProperty('--sab', sab + 'px');
+    }
+  } catch (e) {}
+  try {
     const c = JSON.parse(localStorage.getItem('jwxt_creds') || '{}');
     // 只回填账号；密码从不落盘，需重新登录时手动输入
     if (c.account) document.getElementById('account').value = c.account;
   } catch {}
 
-  // 登录标记不能证明原生 Cookie 仍有效；每次启动都要求重新登录验证。
-  try {
-    localStorage.removeItem('jwxt_login');
-  } catch (e) {}
+  // 启动时静默校验原生 Cookie 是否仍然有效，有效就直接进入已登录状态
+  try { silentSessionCheck(); } catch (e) {}
 
   // 根据登录状态设置结果页按钮
   var initRlb = document.getElementById('resultLogoutBtn');
@@ -2042,6 +2080,7 @@ function init() {
   // 设置面板初始化
   document.getElementById('semesterStartInput').value = semesterStartDate();
   document.getElementById('semesterWeeksInput').value = semesterWeekCount();
+  syncOpenModeUI();
   const nsw = document.getElementById('notifySwitch');
   if (nsw) nsw.classList.toggle('on', (localStorage.getItem('jwxt_notify_on') || '1') !== '0');
   refreshSettingsCache();
@@ -2052,6 +2091,11 @@ function init() {
   refreshOngoing();
   initFloatDrag();
   initWeekSwipe();
+  syncStartPageUI();
+  try {
+    if (startPage() === 'schedule' && window.__gotoSchedule) window.__gotoSchedule();
+  } catch (e) {}
+  document.body.classList.remove('booting');
 }
 
 // 每次打开 App 刷新"今日课程"常驻通知（ongoing，一直显示在通知栏，点击跳本周课表）
@@ -2085,7 +2129,7 @@ function refreshOngoing() {
     const seen = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -2116,7 +2160,7 @@ window.__gotoSchedule = function() {
     let best = null, bestT = -1;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const raw = localStorage.getItem(k);
       const obj = raw ? JSON.parse(raw) : null;
       if (obj && obj.data && obj.t > bestT) { bestT = obj.t; best = obj.data; }
@@ -2130,6 +2174,35 @@ window.__gotoSchedule = function() {
     document.getElementById('resultLabel').textContent = '我的课表 (本周)';
     renderResult('self', best);
   } catch (e) {}
+};
+
+function setRefreshBusy(on) {
+  document.querySelectorAll('.js-refresh').forEach(function (b) {
+    b.classList.toggle('busy', on);
+    if (b.tagName === 'BUTTON') b.disabled = on;
+  });
+}
+var __runQueryRaw = runQuery;
+runQuery = async function (forceRefresh) {
+  // 只有用户主动点刷新（forceRefresh）才显示刷新反馈；进页面读缓存不算刷新
+  if (!forceRefresh) return __runQueryRaw(forceRefresh);
+  var t0 = Date.now();
+  setRefreshBusy(true);
+  scheduleTip('正在刷新…');
+  var ok = true;
+  try {
+    return await __runQueryRaw(forceRefresh);
+  } catch (e) {
+    ok = false;
+    scheduleTip('刷新失败');
+    throw e;
+  } finally {
+    var wait = Math.max(0, 450 - (Date.now() - t0));
+    setTimeout(function () {
+      setRefreshBusy(false);
+      if (ok && forceRefresh && window.S && S.loggedIn) scheduleTip('已更新');
+    }, wait);
+  }
 };
 
 // 首页"今日课程"横向滚动（读本人课表各周缓存中今天(weekday)的课）
@@ -2146,7 +2219,7 @@ function renderTodayCourses() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (!k || k.indexOf(activePersonalCachePrefix()) !== 0) continue;
+      if (!isActivePersonalCacheKey(k)) continue;
       const obj = JSON.parse(localStorage.getItem(k) || 'null');
       const data = obj && obj.data;
       if (!data || !data.courses) continue;
@@ -2233,6 +2306,7 @@ function onTypeChange() {
 
 // ============ 查询 ============
 async function runQuery(forceRefresh) {
+  document.getElementById('cacheNotice').textContent='离线缓存 · 刷新可获取最新数据';
   var type = S.queryType;
   var params = {};
   if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
@@ -2249,7 +2323,7 @@ async function runQuery(forceRefresh) {
   var ck = cacheKey(type, params);
   var cached = getCache(ck);
 
-  var debug = '调试: type='+type+' ck='+ck+' 缓存='+(cached?'有':'无')+' 登录='+(S.loggedIn?'是':'否');
+  var debug = '';
 
   // 有缓存：直接显示缓存，不要后台拉新
   if (cached && !forceRefresh) {
@@ -2261,7 +2335,20 @@ async function runQuery(forceRefresh) {
     try {
       renderResult(type, cached.data);
     } catch(err) {
-      document.getElementById('resultContent').innerHTML = '<div class="error-box">渲染错误: '+esc(err.message)+'<br><br>'+debug+'<br>数据类型: '+typeof cached.data+'<br>数据内容预览: '+esc(JSON.stringify(cached.data).substring(0,200))+'</div>';
+      document.getElementById('resultContent').innerHTML = '<div class="error-box">渲染出错，请点刷新重试<br><span style="font-size:12px;opacity:.7">'+esc(err.message)+'</span></div>';
+    }
+    return;
+  }
+
+  // 未登录：有缓存才进结果页展示缓存，没缓存就留在原地弹登录，不跳空页面
+  if (!S.loggedIn) {
+    if (cached) {
+      showView('result', true);
+      renderResult(type, cached.data);
+      scheduleTip('请先登录后刷新，当前显示离线缓存');
+    } else {
+      showLogin();
+      scheduleTip('登录后即可查询' + (type === 'self' ? '你的课表' : '这一项'));
     }
     return;
   }
@@ -2270,23 +2357,19 @@ async function runQuery(forceRefresh) {
   showView('result', true);
   document.getElementById('resultContent').innerHTML = '<div style="padding:20px; text-align:center;">查询中... 类型: '+type+'</div>';
 
-  if (!S.loggedIn) {
-    if (cached) { renderResult(type, cached.data); scheduleTip('请先登录后刷新，当前显示离线缓存'); }
-    if (!cached) {
-      document.getElementById('resultContent').innerHTML = '<div class="error-box" style="padding:20px;">未登录且无缓存数据<br><br>'+debug+'<br><br>请展开上方登录面板，输入学号密码后点"登录并刷新"</div>';
-    }
-    return;
-  }
-
   try {
     const data = await doQuery(type, params);
-    setCache(ck, data);
+    if(data&&data.error)throw new Error(data.error);
+    const saved=setCache(ck, data);
     document.getElementById('cacheNotice').classList.add('hidden');
     var typeName2 = '';
     for (var ti = 0; ti < TYPES.length; ti++) { if (TYPES[ti].v === type) { typeName2 = TYPES[ti].l; break; } }
     document.getElementById('resultLabel').textContent = typeName2;
     renderResult(type, data);
+    if(!saved){document.getElementById('cacheNotice').textContent='本次查询未能保存离线缓存';document.getElementById('cacheNotice').classList.remove('hidden');}
+    checkCacheStatus();renderTodayCourses();
   } catch(e) {
+    if(cached){document.getElementById('cacheNotice').classList.remove('hidden');renderResult(type,cached.data);scheduleTip('刷新失败，已保留并显示离线缓存');return;}
     // 出错时，先显示错误信息，不管有没有缓存
     document.getElementById('cacheNotice').classList.remove('hidden');
     document.getElementById('resultContent').innerHTML = '<div class="error-box" style="padding:20px;">查询出错: '+esc(e.message)+'<br><br>类型: '+type+'<br>参数: '+esc(JSON.stringify(params))+'</div>';
@@ -2327,7 +2410,8 @@ function showEmptyDetail(building, dayIdx, slotIdx) {
 }
 function renderResult(type, data) {
   const el = document.getElementById('resultContent');
-  S.lastType = type; S.lastData = data;
+  S.lastType = type;
+  try { localStorage.setItem('jwxt_queryType', type); } catch (e) {} S.lastData = data;
   document.body.classList.add('in-result');
   const isSchedule = ['self','teacher','classroom','class','course'].indexOf(type) >= 0;
   document.body.classList.toggle('schedule-result', isSchedule);
@@ -2337,7 +2421,7 @@ function renderResult(type, data) {
   collapseFloats();
 
   // 统一更新顶栏标题
-  var TYPE_NAMES = {self:'我的课表', teacher:'教师课表', classroom:'教室课表', class:'班级课表', course:'课程课表',
+  var TYPE_NAMES = {self:'我的课表', teacher:'教师课表', classroom:'教室课表', class:'班级课表', course:'课程课表', courselist:'课程列表',
     score:'成绩查询', gpa:'绩点计算', progress:'学习进度', exam:'考试安排', profile:'学籍卡片',
     elective:'选课轮次', electives:'选课结果', calendar:'教学周历', empty:'空教室'};
   var tbT = document.getElementById('tbResultTitle');
@@ -2374,7 +2458,6 @@ function renderResult(type, data) {
   } else if (type === 'progress') {
     if (!data.rows || !data.rows.length) {
       var errMsg = data.error || '无进度数据';
-      if (data.debug) errMsg += '<br><br>调试信息：<br>' + data.debug;
       if (data.raw) errMsg += '<br><br>原始返回：<pre style="font-size:10px; text-align:left; white-space:pre-wrap;">' + esc(data.raw) + '</pre>';
       el.innerHTML = '<div class="empty-text">' + errMsg + '</div>';
       return;
@@ -2433,7 +2516,6 @@ function renderResult(type, data) {
   } else if (type === 'electives') {
     if (!data.electives || !data.electives.length) {
       var errMsg = data.error || '无选课结果';
-      if (data.debug) errMsg += '<br><br>调试信息：<br>' + data.debug;
       if (data.raw) errMsg += '<br><br>原始返回：<pre style="font-size:10px; text-align:left; white-space:pre-wrap;">' + esc(data.raw) + '</pre>';
       el.innerHTML = '<div class="empty-text">' + errMsg + '</div>';
       return;
@@ -2534,32 +2616,49 @@ function renderResult(type, data) {
       document.body.appendChild(m);
     }
 
+  } else if (type === 'courselist') {
+    renderCourseList(data);
   } else {
     renderScheduleResult(type, data);
   }
 }
 
-function setScheduleView(v) {
-  S.scheduleView = v;
-  const type = S.queryType;
-  const params = {};
-  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
-  if (NEEDS_WEEK.indexOf(type) >= 0) {
-    const wkEl = document.getElementById('queryWeek');
-    let wk = wkEl.value.trim();
-    if (!wk) wk = String(currentWeek());   // 默认查询本周
-    params.week = wk;
-    params.weekday = document.getElementById('queryWeekday').value;
-  }
-  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
-  const ck = cacheKey(type, params);
-  const cached = getCache(ck);
-  if (cached) renderResult(type, cached.data);
-  else alert('无缓存数据，请先查询');
+function renderCourseList(data) {
+  const el = document.getElementById('resultContent');
+  const list = (data && data.courses) || [];
+  if (!list.length) { el.innerHTML = '<div class="empty-text">没有查到课程</div>'; return; }
+  const map = {};
+  list.forEach(function (c) {
+    const k = c.name || '';
+    if (!k) return;
+    if (!map[k]) map[k] = {name:k, teachers:[], rooms:[], weeks:[], times:[], classes:[]};
+    const it = map[k];
+    const add = function (arr, v) { if (v && arr.indexOf(v) < 0) arr.push(v); };
+    add(it.teachers, c.teacher);
+    add(it.rooms, c.classroom);
+    add(it.weeks, c.week);
+    add(it.classes, c.classes);
+    add(it.times, (c.weekdayName || '') + (c.periodLabel || ''));
+  });
+  const arr = Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return a.name.localeCompare(b.name, 'zh'); });
+  let h = '<div class="cl-head">共 ' + arr.length + ' 门课程</div><div class="cl-list">';
+  arr.forEach(function (it) {
+    h += '<div class="cl-item"><div class="cl-name">' + esc(it.name) + '</div>';
+    const meta = [];
+    if (it.teachers.length) meta.push('教师　' + it.teachers.join('、'));
+    if (it.classes.length) meta.push('班级　' + it.classes.slice(0, 3).join('、') + (it.classes.length > 3 ? ' 等' : ''));
+    if (it.rooms.length) meta.push('地点　' + it.rooms.slice(0, 3).join('、'));
+    if (it.times.length) meta.push('时间　' + it.times.slice(0, 5).join('、') + (it.times.length > 5 ? ' 等' : ''));
+    if (it.weeks.length) meta.push('周次　' + it.weeks.slice(0, 2).join('、'));
+    meta.forEach(function (m) { h += '<div class="cl-meta">' + esc(m) + '</div>'; });
+    h += '</div>';
+  });
+  el.innerHTML = h + '</div>';
 }
 
 function setScheduleForm(v) {
   S.scheduleForm=v;
+  if(v==='list') S.listDay = new Date().getDay() || 7;
   var button=document.getElementById('tbToggleForm');if(button){button.title=v==='list'?'切换周课表':'只看今天';button.setAttribute('aria-label',button.title);}
   if(v==='list'&&(scheduleWeek()!==currentWeek()||document.getElementById('querySemester').value!==currentSemester()||(document.getElementById('queryWeekday').value&&Number(document.getElementById('queryWeekday').value)!==(new Date().getDay()||7)))){
     document.getElementById('queryWeek').value=String(currentWeek());document.getElementById('querySemester').value=currentSemester();document.getElementById('queryWeekday').value='';runQuery();return;
@@ -2588,7 +2687,7 @@ function initWeekSwipe() {
   let sx = 0, sy = 0, dx = 0, axis = null, active = false, adjacent = null, moved = false;
   function reset() { el.style.transform = ''; ghost.style.display = 'none'; ghost.innerHTML = ''; active = false; axis = null; adjacent = null; }
   function start(x, y) {
-    if (!document.body.classList.contains('schedule-result') || S.scheduleForm === 'list') return;
+    if (!document.body.classList.contains('schedule-result')) return;
     sx = x; sy = y; dx = 0; axis = null; active = true; moved = false;
   }
   function move(x, y, e) {
@@ -2597,6 +2696,13 @@ function initWeekSwipe() {
     if (!axis && Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
     if (!axis) axis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
     if (axis !== 'h') return;
+    if (S.scheduleForm === 'list') { // 单列：跟手位移
+      moved = true;
+      el.style.transition = 'none';
+      el.style.transform = 'translateX('+dx*0.55+'px)';
+      if (e.cancelable) e.preventDefault();
+      return;
+    }
     moved = true; const w = scheduleWeek() + (dx < 0 ? 1 : -1);
     const width = el.clientWidth || window.innerWidth;
     if (!adjacent || adjacent.week !== w) {
@@ -2611,9 +2717,50 @@ function initWeekSwipe() {
   }
   function end() {
     if (!active) return;
+    if (S.scheduleForm === 'list') { // 单列：左右切天
+      const width2 = el.clientWidth || window.innerWidth;
+      const sw = axis === 'h' && Math.abs(dx) > width2 * .18;
+      if (!sw) { el.style.transition='transform .22s cubic-bezier(.22,.61,.36,1)'; el.style.transform=''; active=false; axis=null; setTimeout(function(){el.style.transition='';},240); return; }
+      const dir = dx < 0 ? 1 : -1;   // 左滑=下一天，右滑=前一天
+      el.style.transition = 'transform .24s cubic-bezier(.22,.61,.36,1)';
+      el.style.transform = 'translateX(' + (-dir * width2) + 'px)';
+      active = false; axis = null;
+      setTimeout(function(){
+        el.style.transition='none'; el.style.transform='';
+        setListDay(listDay() + dir);
+        requestAnimationFrame(function(){ el.style.transition=''; });
+      }, 250);
+      return;
+    }
     const w = adjacent && adjacent.week;
-    const shouldSwitch = axis === 'h' && Math.abs(dx) > (el.clientWidth || window.innerWidth) * .18;
-    reset(); if (shouldSwitch && w >= 1) switchScheduleWeek(w);
+    const width = el.clientWidth || window.innerWidth;
+    const shouldSwitch = axis === 'h' && Math.abs(dx) > width * .18 && w >= 1;
+    if (!shouldSwitch) {
+      if (moved) {
+        // 未达阈值：顺滑回弹
+        el.style.transition = 'transform .22s cubic-bezier(.22,.61,.36,1)';
+        el.style.transform = '';
+        ghost.style.transition = 'transform .22s cubic-bezier(.22,.61,.36,1)';
+        ghost.style.transform = 'translateX(' + (dx < 0 ? width : -width) + 'px)';
+        const g = ghost;
+        setTimeout(function(){ g.style.display='none'; g.innerHTML=''; g.style.transition=''; g.style.transform=''; }, 230);
+      } else { reset(); }
+      active = false; axis = null; adjacent = null;
+      return;
+    }
+    // 达阈值：整屏顺滑滑过去，动画结束后再换数据
+    const dir = dx < 0 ? -1 : 1;
+    el.style.transition = 'transform .24s cubic-bezier(.22,.61,.36,1)';
+    el.style.transform = 'translateX(' + (dir * width) + 'px)';
+    ghost.style.transition = 'transform .24s cubic-bezier(.22,.61,.36,1)';
+    ghost.style.transform = 'translateX(0px)';
+    active = false; axis = null; adjacent = null;
+    setTimeout(function(){
+      el.style.transition = 'none'; el.style.transform = '';
+      ghost.style.display = 'none'; ghost.innerHTML = ''; ghost.style.transition = ''; ghost.style.transform = '';
+      switchScheduleWeek(w);
+      requestAnimationFrame(function(){ el.style.transition = ''; });
+    }, 250);
   }
   el.addEventListener('touchstart', e => start(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
   el.addEventListener('touchmove', e => move(e.touches[0].clientX, e.touches[0].clientY, e), {passive:false});
@@ -2646,58 +2793,87 @@ function pickWeek(w) {
 }
 
 // 结果区"查询"按钮：读 resWeek/resWeekday，写回主表单，读缓存重渲染
-function applyResParam() {
-  const type = S.queryType;
-  const params = {};
-  if (NEEDS_NAME.indexOf(type) >= 0) params.name = document.getElementById('queryName').value.trim();
-  if (NEEDS_WEEK.indexOf(type) >= 0) {
-    const rw = document.getElementById('resWeek');
-    const rwd = document.getElementById('resWeekday');
-    let wk = rw ? rw.value.trim() : '';
-    if (!wk) wk = String(currentWeek());
-    params.week = wk;
-    params.weekday = rwd ? rwd.value : '';
-    const qw = document.getElementById('queryWeek'); if (qw) qw.value = wk;
-    const qwd = document.getElementById('queryWeekday'); if (qwd) qwd.value = params.weekday;
-  }
-  if (NEEDS_SEM.indexOf(type) >= 0) params.semester = document.getElementById('querySemester').value;
-  const ck = cacheKey(type, params);
-  const cached = getCache(ck);
-  if (cached) renderResult(type, cached.data);
-  else alert('该周次/星期无缓存，请先登录后查询一次');
-}
-
 // 周导航：±1 周（不依赖结果区输入框，直接读写主查询表单）
-function resWeekNav(delta) {
-  if (!document.body.classList.contains('schedule-result')) return false;
-  return switchScheduleWeek(scheduleWeek() + delta);
+// 官网对应页面：按当前结果类型映射到教务系统对应模块
+function officialUrl() {
+  var t = (window.S && (S.lastType || S.queryType)) || '';
+  if (!t) { try { t = localStorage.getItem('jwxt_queryType') || ''; } catch (e) {} }
+  switch (t) {
+    case 'self': return BASE + '/jsxsd/framework/xsMain.jsp';
+    case 'score':
+    case 'gpa': return BASE + '/jsxsd/kscj/cjcx_list';
+    case 'teacher': return BASE + '/jsxsd/kbcx/kbxx_teacher';
+    case 'classroom': return BASE + '/jsxsd/kbcx/kbxx_classroom';
+    case 'class': return BASE + '/jsxsd/kbcx/kbxx_xzb';
+    case 'course': return BASE + '/jsxsd/kbcx/kbxx_kc';
+    default: return BASE + '/jsxsd/framework/xsMain.jsp';
+  }
+}
+function openMode() {
+  try { return localStorage.getItem('jwxt_open_mode') === 'browser' ? 'browser' : 'inapp'; } catch (e) { return 'inapp'; }
+}
+function setOpenMode(m) {
+  try { localStorage.setItem('jwxt_open_mode', m === 'browser' ? 'browser' : 'inapp'); } catch (e) {}
+  syncOpenModeUI();
+}
+function startPage() {
+  try { return localStorage.getItem('jwxt_start_page') === 'schedule' ? 'schedule' : 'home'; } catch (e) { return 'home'; }
+}
+function setStartPage(v) {
+  try { localStorage.setItem('jwxt_start_page', v === 'schedule' ? 'schedule' : 'home'); } catch (e) {}
+  syncStartPageUI();
+}
+function syncStartPageUI() {
+  var m = startPage();
+  var a = document.getElementById('startpage-home'), b = document.getElementById('startpage-schedule');
+  if (a) a.classList.toggle('on', m === 'home');
+  if (b) b.classList.toggle('on', m === 'schedule');
+}
+function syncOpenModeUI() {
+  var m = openMode();
+  var a = document.getElementById('openmode-inapp'), b = document.getElementById('openmode-browser');
+  if (a) a.classList.toggle('on', m === 'inapp');
+  if (b) b.classList.toggle('on', m === 'browser');
+}
+function openOfficialPage() {
+  var url = officialUrl();
+  var mode = openMode();
+  if (mode === 'browser') {
+    try { if (window.Android && Android.openBrowser) { Android.openBrowser(url); return; } } catch (e) {}
+    try { window.open(url, '_blank'); } catch (e) {}
+    return;
+  }
+  var logged = !!(window.S && S.loggedIn);
+  try { if (!logged) logged = localStorage.getItem('jwxt_login') === '1'; } catch (e) {}
+  // 本地记录的登录态可能已经过期，先用真会话探一下目标页
+  if (logged) {
+    try {
+      if (window.Android && Android.httpRequest) {
+        var probe = Android.httpRequest('GET', url, '');
+        if (typeof probe === 'string' && probe.length > 0 && looksLikeLoginPage(probe)) {
+          logged = false;
+          S.loggedIn = false;
+          try { localStorage.removeItem('jwxt_login'); } catch (e) {}
+        }
+      }
+    } catch (e) {}
+  }
+  if (!logged) {
+    window.__pendingOfficialUrl = url;
+    scheduleTip('登录已过期，重新登录后会直接打开官网');
+    showLogin();
+    return;
+  }
+  try {
+    if (window.Android && Android.openInApp) { Android.openInApp(url); return; }
+  } catch (e) {}
+  try {
+    if (window.Android && Android.openBrowser) { Android.openBrowser(url); return; }
+  } catch (e) {}
+  try { window.open(url, '_blank'); } catch (e) {}
 }
 
 // 用外部浏览器打开教务系统课表官网
-function openWebSchedule() {
-  try {
-    if (window.Android && Android.openBrowser) { Android.openBrowser(BASE); }
-    else { window.open(BASE, '_blank'); }
-  } catch (e) {}
-}
-
-function courseCard(idx, cls) {
-  var c = (S.lastCourses || [])[idx] || {};
-  let h = '<div class="course-card '+cls+'"';
-  h += ' onclick="showCourseByIndex('+idx+')"';
-  h += ' ontouchstart="detailPressStart(event)" ontouchend="detailPressEnd(event)" ontouchmove="detailPressMove()"';
-  h += '>';
-  h += '<div class="period">'+esc(c.periodLabel||'')+'</div>';
-  h += '<div class="name">'+esc(c.name||'')+'</div>';
-  h += '<div class="info">';
-  if (c.teacher) h += '教师: '+esc(c.teacher)+'<br>';
-  if (c.classroom) h += '教室: '+esc(c.classroom)+'<br>';
-  if (c.classes) h += '班级: '+esc(c.classes)+'<br>';
-  if (c.week) h += '周次: '+esc(c.week);
-  h += '</div></div>';
-  return h;
-}
-
 // 全局：解析课程节次范围
 function courseSpan(c) {
   var p = (c.period || '').toString();
@@ -2736,7 +2912,7 @@ function showCourseByIndex(idx) {
   // 解析节次信息
   var sp = courseSpan(c);
   var fields = [
-    ['教师', c.teacher],
+    ['教师', c.teacher || c.teacherAll],
     ['教室', c.classroom],
     ['班级', c.classes],
     ['周次', c.week],
@@ -2752,6 +2928,23 @@ function showCourseByIndex(idx) {
     }
   });
   h += '</div>';
+  // 分段授课：不同周由不同教师授课时，逐段列出教师与教室
+  if (c.teacherPlan && c.teacherPlan.length) {
+    c.teacherPlan = c.teacherPlan.slice().sort(function (a, b) {
+      var pa = parseInt(String(a.weeks || '').split(/[,\-，]/)[0], 10) || 99;
+      var pb = parseInt(String(b.weeks || '').split(/[,\-，]/)[0], 10) || 99;
+      return pa - pb;
+    });
+    h += '<div style="margin-top:14px;">';
+    h += '<div style="font-size:10px; color:var(--ink-light); font-family:var(--mono); letter-spacing:0.1em; margin-bottom:6px;">分段授课</div>';
+    c.teacherPlan.forEach(function (pl) {
+      h += '<div style="background:var(--cream-2); border-left:3px solid var(--pink-deep); padding:8px 10px; border-radius:0 6px 6px 0; margin-bottom:6px;">';
+      h += '<div style="font-size:14px; font-weight:500;">' + esc(pl.teacher || '') + '</div>';
+      h += '<div style="font-size:11px; color:var(--ink-light); margin-top:2px;">' + esc('第' + (pl.weeks || '') + '周' + (pl.room ? ' · ' + pl.room : '')) + '</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
   document.getElementById('detailBody').innerHTML = h;
   document.getElementById('detailOverlay').style.display = 'block';
   document.getElementById('detailSection').classList.remove('hidden');
@@ -2792,24 +2985,6 @@ function doCopy(text) {
   } catch(e2) { return false; }
 }
 
-// 长按复制（辅助；WebView 系统长按可能拦截，主要复制入口在详情弹窗）
-var _pressTimer = null, _pressMoved = false;
-function detailPressStart(e) {
-  _pressMoved = false;
-  _pressTimer = setTimeout(function() {
-    if (_pressMoved) return;
-    var el = e.currentTarget;
-    var name = el.querySelector('.name') ? el.querySelector('.name').textContent : '';
-    var roomEl = el.querySelector('.room-line');
-    var room = roomEl ? roomEl.textContent.trim() : '';
-    var text = room ? (name + ' · ' + room) : name;
-    var ok = doCopy(text);
-    alert(ok ? ('已复制：' + text) : '复制失败');
-  }, 500);
-}
-function detailPressEnd(e) { clearTimeout(_pressTimer); }
-function detailPressMove() { _pressMoved = true; clearTimeout(_pressTimer); }
-
 function closeDetail() {
   document.getElementById('detailOverlay').style.display = 'none';
   document.getElementById('detailSection').classList.add('hidden');
@@ -2818,7 +2993,7 @@ function closeDetail() {
 
 // ============ 浏览列表 ============
 async function openPicker() {
-  const map = {teacher: 'teacher', class: 'class', classroom: 'classroom'};
+  const map = {teacher: 'teacher', class: 'class', classroom: 'classroom', course: 'course'};
   const b = map[S.queryType];
   if (b) openBrowse(b);
 }
@@ -2827,12 +3002,12 @@ async function openBrowse(type, forceRefresh) {
   S.browseType = type;
   document.getElementById('browseSection').classList.remove('hidden');
   document.getElementById('browseOverlay').style.display = 'block';
-  document.getElementById('browseTitle').textContent = {teacher:'全校教师', class:'全校班级', classroom:'全校教室'}[type];
+  document.getElementById('browseTitle').textContent = {teacher:'全校教师', class:'全校班级', classroom:'全校教室', course:'全校课程'}[type];
 
   // 先读缓存（仅当缓存里确有内容才直接用，空/失败缓存不拦截刷新）
   const browseCacheKey = 'browse_'+type+'_'+currentSemester();
   const cached = getCache(browseCacheKey);
-  const cacheList = cached && (cached.data.teachers || cached.data.classes || cached.data.classrooms);
+  const cacheList = cached && (cached.data.teachers || cached.data.classes || cached.data.classrooms || cached.data.courses);
   if (cacheList && cacheList.length && !forceRefresh) {
     S.browseData = cached.data;
     S.browseFiltered = cached.data;
@@ -2841,7 +3016,10 @@ async function openBrowse(type, forceRefresh) {
   }
 
   if (!S.loggedIn) {
-    document.getElementById('browseContent').innerHTML = '<div class="error-box">未登录且无缓存数据<br><br>点右上角「登录」查询一次后，即可离线查看全校列表</div>';
+    document.getElementById('browseSection').classList.add('hidden');
+    document.getElementById('browseOverlay').style.display = 'none';
+    showLogin();
+    scheduleTip('登录后即可查看全校列表');
     return;
   }
 
@@ -2855,12 +3033,15 @@ async function openBrowse(type, forceRefresh) {
     } else if (type === 'class') {
       const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&sknj=&skzy=&skbjid=&skbj=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', body), 'class');
+    } else if (type === 'course') {
+      const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&zzdKcSX=&kcid=&kcmc=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
+      data = parseList(httpPost('/jsxsd/kbcx/kbxx_kc_ifr', body), 'course');
     } else {
       const body = 'xnxqh='+currentSemester()+'&kbjcmsid='+KBJCMSID+'&skyx=&xqid=1&jzwid=&jxlvalue=&skjsid=&skjs=&jsid=&zc1=1&zc2='+semesterWeekCount()+'&jc1=&jc2=';
       data = parseList(httpPost('/jsxsd/kbcx/kbxx_classroom_ifr', body), 'classroom');
     }
     // 只在实际解析到内容时才写入缓存，避免把空/失败结果污染缓存
-    const list = data && (data.teachers || data.classes || data.classrooms);
+    const list = data && (data.teachers || data.classes || data.classrooms || data.courses);
     if (list && list.length) {
       setCache(browseCacheKey, data);
       S.browseData = data;
@@ -2892,6 +3073,7 @@ function renderBrowse() {
   if (Array.isArray(data)) {
     if (S.browseType === 'teacher') data = {teachers: data};
     else if (S.browseType === 'class') data = {classes: data};
+    else if (S.browseType === 'course') data = {courses: data};
     else data = {classrooms: data};
   }
   S.browseFiltered = data;
@@ -2945,6 +3127,15 @@ function renderBrowse() {
     });
     el.innerHTML = h;
 
+  } else if (S.browseType === 'course') {
+    const courses = data.courses || [];
+    document.getElementById('browseCount').textContent = courses.length + ' 门';
+    let h = '<div class="class-chips" style="padding:4px 0;">';
+    courses.forEach(function (n) {
+      h += '<div class="class-chip" onclick="pickValue(\'' + esc(n) + '\')">' + esc(n) + '</div>';
+    });
+    el.innerHTML = h + '</div>';
+
   } else {
     const rooms = data.classrooms || [];
     document.getElementById('browseCount').textContent = rooms.length + ' 间';
@@ -2984,6 +3175,9 @@ function filterBrowse() {
   } else if (S.browseType === 'class') {
     var classes = data.classes || [];
     S.browseFiltered = {classes: classes.filter(function(c) { return c.name.toLowerCase().includes(kw); })};
+  } else if (S.browseType === 'course') {
+    var courses = data.courses || [];
+    S.browseFiltered = {courses: courses.filter(function(n) { return String(n).toLowerCase().includes(kw); })};
   } else {
     var classrooms = data.classrooms || (Array.isArray(data) ? data : []);
     S.browseFiltered = {classrooms: classrooms.filter(function(r) { return r.toLowerCase().includes(kw); })};
@@ -3101,12 +3295,14 @@ function scheduleCache(w) {
 }
 function switchScheduleWeek(w) {
   if (!Number.isInteger(w) || w < 1) return false;
+  document.getElementById('queryWeek').value = String(w);
   const cached = scheduleCache(w);
   if (!cached || !cached.data || !Array.isArray(cached.data.courses) || cached.data.error) {
-    scheduleTip('第'+w+'周暂无缓存，请在查询参数中选择该周并查询');
-    return false;
+    // 没有缓存也切过去，显示空的课表
+    scheduleTip('第'+w+'周暂无缓存，可点查询拉取本周数据');
+    renderResult(S.queryType, {courses:[], week:w, emptyWeek:true});
+    return true;
   }
-  document.getElementById('queryWeek').value = String(w);
   renderResult(S.queryType, cached.data);
   return true;
 }
@@ -3132,18 +3328,38 @@ function scheduleFill(hex) {
   if(document.documentElement&&document.documentElement.getAttribute('data-theme')==='dark')return 'rgb('+[n>>16&255,n>>8&255,n&255].map(function(v){return Math.round(24+(v-24)*.15);}).join(',')+')';
   return 'rgb('+[n >> 16 & 255,n >> 8 & 255,n & 255].map(v => Math.round(v+(255-v)*.86)).join(',')+')';
 }
+function gridTeacher(c) {
+  var t = (c && (c.teacher || '')) + '';
+  t = t.replace(/[,，]\s*\.{2,}/g, '').replace(/,\s*$/,'').trim();
+  if (!t || t === '..') return '';
+  var parts = t.split(/[,，、\s]+/).filter(Boolean);
+  if (!parts.length) return '';
+  return parts.length > 1 ? parts[0] + '等' : parts[0];
+}
 function formatGridCourseName(name) {
-  var chars=Array.from(name||''),rows=[];for(var i=0;i<chars.length;i+=3)rows.push('<span>'+esc(chars.slice(i,i+3).join(''))+'</span>');return rows.join('');
+  var chars=Array.from(name||''),rows=[];for(var i=0;i<chars.length;i+=4)rows.push('<span>'+esc(chars.slice(i,i+4).join(''))+'</span>');return rows.join('');
+}
+// 单列模式当前查看的星期（1-7），默认今天
+function listDay() {
+  if (!S.listDay) { S.listDay = new Date().getDay() || 7; }
+  return S.listDay;
+}
+function setListDay(d) {
+  S.listDay = ((d - 1 + 7) % 7) + 1;
+  renderResult(S.queryType, S.lastData);
 }
 function todayScheduleEntries(data,w,now) {
-  var wd=now.getDay()||7;
+  var wd = listDay();
   if(w!==currentWeek())return [];
   return (data.courses||[]).map(function(c,i){return {c:c,i:i};}).filter(function(x){return Number(x.c.weekday)===wd&&(!x.c.week||weekInRange(x.c.week,w));}).sort(function(a,b){return (courseSpan(a.c)||{s:99}).s-(courseSpan(b.c)||{s:99}).s;});
 }
 function renderTodayScheduleList(data,w) {
-  var now=new Date(),entries=todayScheduleEntries(data,w,now),date=now.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
-  var html='<div class="today-schedule-list"><header class="today-list-head"><div><span class="eyebrow">TODAY</span><h2>今天的课程</h2><p>'+esc(date)+' · 第'+currentWeek()+'周</p></div><span class="today-list-count">'+entries.length+' 门</span></header>';
-  if(!entries.length)html+='<div class="today-list-empty">'+esc(data.error||'今天没有课程安排')+'<p>单列模式只展示今天，其他日期请切换周课表。</p></div>';
+  var now=new Date(), base=new Date(SEMESTER_START);
+  base.setDate(base.getDate()+(w-1)*7+(listDay()-1));
+  var isToday = listDay()===(new Date().getDay()||7)&&w===currentWeek();
+  var entries=todayScheduleEntries(data,w,now),date=base.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+  var html='<div class="today-schedule-list"><header class="today-list-head"><div><span class="eyebrow">'+(isToday?'TODAY':'DAY')+'</span><h2>'+(isToday?'今天的课程':'周'+['一','二','三','四','五','六','日'][listDay()-1]+'的课程')+'</h2><p>'+esc(date)+' · 第'+currentWeek()+'周</p></div><span class="today-list-count">'+entries.length+' 门</span></header>';
+  if(!entries.length)html+='<div class="today-list-empty">'+esc(data.error||'这一天没有课程安排')+'<p>左右滑动可切换相邻日期。</p></div>';
   entries.forEach(function(item){var c=item.c,span=courseSpan(c),color=scheduleColor(c.name),start=span&&SCHEDULE_TIMES[span.s-1],end=span&&SCHEDULE_TIMES[span.e-1];
     html+='<button type="button" class="today-list-course" onclick="showCourseByIndex('+item.i+')" style="--course-accent:'+color+'"><div class="today-list-time"><strong>'+esc(start?start[0]:'待定')+'</strong><span>'+esc(end?end[1]:'')+'</span><small>'+esc(span?'第'+span.s+'–'+span.e+'节':c.periodLabel||'节次待确认')+'</small></div><div class="today-list-detail"><h3>'+esc(c.name||'未命名课程')+'</h3><dl><div><dt>教室</dt><dd>'+esc(c.classroom||'待确认')+'</dd></div><div><dt>教师</dt><dd>'+esc(c.teacher||'待确认')+'</dd></div><div><dt>班级</dt><dd>'+esc(c.classes||'待确认')+'</dd></div></dl><span class="today-list-week">'+esc(c.week||'本周')+'</span></div></button>';
   });return html+'</div>';
@@ -3166,7 +3382,9 @@ function buildSchedulePane(data, w, preview, missing) {
   courses.forEach((c,i) => {
     const sp = courseSpan(c); if (!sp || sp.s < 1 || sp.e < sp.s || sp.e > SCHEDULE_TIMES.length || c.weekday < 1 || c.weekday > 7 || !c.weekday) return;
     const color = scheduleColor(c.name);
-    h += '<button class="demo-course" '+(preview?'tabindex="-1"':'onclick="showCourseByIndex('+i+')"')+' aria-label="'+esc((c.name||'')+' 第'+sp.s+'-'+sp.e+'节')+'" style="top:'+(sp.s-1)*78+'px;height:'+((sp.e-sp.s+1)*78-4)+'px;left:calc('+((c.weekday-1)*100/7)+'% + 2px);width:calc('+(100/7)+'% - 4px);background:'+scheduleFill(color)+';border-color:'+color+';color:'+color+'"><div class="cn">'+formatGridCourseName(c.name||'')+'</div>';
+    h += '<button class="demo-course" '+(preview?'tabindex="-1"':'onclick="showCourseByIndex('+i+')"')+' aria-label="'+esc((c.name||'')+' 第'+sp.s+'-'+sp.e+'节'+(c.teacher?' '+c.teacher:''))+'" style="top:'+(sp.s-1)*78+'px;height:'+((sp.e-sp.s+1)*78-4)+'px;left:calc('+((c.weekday-1)*100/7)+'% + 1px);width:calc('+(100/7)+'% - 2px);background:'+scheduleFill(color)+';border-color:'+color+';color:'+color+'"><div class="cn">'+formatGridCourseName(c.name||'')+'</div>';
+    var ctName = gridTeacher(c);
+    if (ctName) h += '<div class="ct">'+esc(ctName)+'</div>';
     if (c.classroom) h += '<div class="cs">@'+esc(c.classroom)+'</div>';
     h += '</button>';
   });
@@ -3184,7 +3402,7 @@ function renderScheduleResult(type, data) {
   document.getElementById('tbIconList').style.display = S.scheduleForm === 'list' ? '' : 'none';
   const el = document.getElementById('resultContent');
   if (S.scheduleForm !== 'list') {
-    el.innerHTML = buildSchedulePane(data,w,false,false);
+    el.innerHTML = buildSchedulePane(data,w,false,!!data.emptyWeek);
     const unplaced = courses.filter(c => !courseSpan(c));
     if (unplaced.length) {
       const notice = document.createElement('div'); notice.className = 'demo-unplaced';
@@ -3196,10 +3414,20 @@ function renderScheduleResult(type, data) {
   el.innerHTML = renderTodayScheduleList(data,w);
 }
 
-init();
+try { init(); } finally { setTimeout(function(){ document.body.classList.remove('booting'); }, 400); }
 onTypeChange();
 document.getElementById('loginBtn').innerHTML=ICO_LOGIN;document.getElementById('logoutBtn').innerHTML=ICO_LOGOUT;
 initExperience();
+(function () {
+  var tile = document.getElementById('settingsTile');
+  if (!tile) return;
+  var tab = tile.querySelector('.fd-tab');
+  if (tab) tab.onclick = function (e) {
+    e.stopPropagation();
+    if (tile._justDragged) return;
+    openSettingsTile();
+  };
+})();
 </script>
 </body>
 </html>

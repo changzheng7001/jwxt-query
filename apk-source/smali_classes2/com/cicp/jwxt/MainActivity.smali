@@ -19,7 +19,7 @@
 
 # direct methods
 .method static bridge synthetic -$$Nest$fgetcookieStore(Lcom/cicp/jwxt/MainActivity;)Ljava/lang/StringBuilder;
-    .locals 0
+    .registers 1
 
     iget-object p0, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
 
@@ -27,7 +27,7 @@
 .end method
 
 .method static bridge synthetic -$$Nest$fputcookieStore(Lcom/cicp/jwxt/MainActivity;Ljava/lang/StringBuilder;)V
-    .locals 0
+    .registers 2
 
     iput-object p1, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
 
@@ -35,7 +35,7 @@
 .end method
 
 .method public constructor <init>()V
-    .locals 1
+    .registers 2
 
     .line 20
     invoke-direct {p0}, Landroid/app/Activity;-><init>()V
@@ -50,108 +50,41 @@
     return-void
 .end method
 
+.method private dispatchSystemTheme()V
+    .registers 4
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    if-eqz v0, :cond_a
+
+    const-string v1, "window.onSystemThemeChanged&&window.onSystemThemeChanged()"
+
+    const/4 v2, 0x0
+
+    invoke-virtual {v0, v1, v2}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
+    :cond_a
+    return-void
+.end method
+
 
 # virtual methods
-.method private dispatchSystemTheme()V
-    .locals 3
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
-    if-eqz v0, :theme_done
-    const-string v1, "window.onSystemThemeChanged&&window.onSystemThemeChanged()"
-    const/4 v2, 0x0
-    invoke-virtual {v0, v1, v2}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
-    :theme_done
-    return-void
-.end method
+.method public gotoSchedule()V
+    .registers 4
 
-.method public onConfigurationChanged(Landroid/content/res/Configuration;)V
-    .locals 0
-    invoke-super {p0, p1}, Landroid/app/Activity;->onConfigurationChanged(Landroid/content/res/Configuration;)V
-    invoke-direct {p0}, Lcom/cicp/jwxt/MainActivity;->dispatchSystemTheme()V
-    return-void
-.end method
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
 
-# 持久化保存会话cookie(写入SharedPreferences,App重启后可恢复)
-.method public saveCookies()V
-    .locals 4
+    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
 
-    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
+    const/4 v0, 0x0
 
-    if-eqz v0, :done
+    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
 
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->length()I
-
-    move-result v1
-
-    if-lez v1, :done
-
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v0
-
-    const-string v1, "jwxt"
-
-    const/4 v2, 0x0
-
-    invoke-virtual {p0, v1, v2}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
-
-    move-result-object v1
-
-    invoke-interface {v1}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
-
-    move-result-object v1
-
-    const-string v2, "cookies"
-
-    invoke-interface {v1, v2, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
-
-    move-result-object v1
-
-    invoke-interface {v1}, Landroid/content/SharedPreferences$Editor;->apply()V
-
-    :done
-    return-void
-.end method
-
-# 启动时恢复持久化会话cookie
-.method public restoreCookies()V
-    .locals 4
-
-    const-string v0, "jwxt"
-
-    const/4 v1, 0x0
-
-    invoke-virtual {p0, v0, v1}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
-
-    move-result-object v0
-
-    const-string v1, "cookies"
-
-    const-string v2, ""
-
-    invoke-interface {v0, v1, v2}, Landroid/content/SharedPreferences;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v0
-
-    if-eqz v0, :done
-
-    invoke-virtual {v0}, Ljava/lang/String;->isEmpty()Z
-
-    move-result v1
-
-    if-nez v1, :done
-
-    new-instance v1, Ljava/lang/StringBuilder;
-
-    invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    iput-object v1, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
-
-    :done
     return-void
 .end method
 
 .method public onBackPressed()V
-    .locals 1
+    .registers 2
 
     .line 139
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
@@ -160,25 +93,35 @@
 
     move-result v0
 
-    if-eqz v0, :cond_0
+    if-eqz v0, :cond_e
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
 
     invoke-virtual {v0}, Landroid/webkit/WebView;->goBack()V
 
-    goto :goto_0
+    goto :goto_11
 
     .line 140
-    :cond_0
+    :cond_e
     invoke-super {p0}, Landroid/app/Activity;->onBackPressed()V
 
     .line 141
-    :goto_0
+    :goto_11
+    return-void
+.end method
+
+.method public onConfigurationChanged(Landroid/content/res/Configuration;)V
+    .registers 2
+
+    invoke-super {p0, p1}, Landroid/app/Activity;->onConfigurationChanged(Landroid/content/res/Configuration;)V
+
+    invoke-direct {p0}, Lcom/cicp/jwxt/MainActivity;->dispatchSystemTheme()V
+
     return-void
 .end method
 
 .method protected onCreate(Landroid/os/Bundle;)V
-    .locals 5
+    .registers 7
     .param p1, "savedInstanceState"    # Landroid/os/Bundle;
 
     .line 119
@@ -189,21 +132,19 @@
 
     invoke-virtual {p0, v0}, Lcom/cicp/jwxt/MainActivity;->setContentView(I)V
 
-    # 初始沉浸式状态栏（UI 线程）：状态栏透明 + 内容延伸到状态栏 + 深色图标（默认浅色主题）
     invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
 
     move-result-object v1
 
-    # 关键：清除 FLAG_TRANSLUCENT_STATUS 并设置 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS，setStatusBarColor 才生效
-    const v2, 0x04000000
+    const v2, 0x4000000
 
     invoke-virtual {v1, v2}, Landroid/view/Window;->clearFlags(I)V
 
-    const/high16 v2, 0x80000000
+    const/high16 v2, -0x80000000
 
     invoke-virtual {v1, v2}, Landroid/view/Window;->addFlags(I)V
 
-    const v2, 0x00000000
+    const v2, 0x0
 
     invoke-virtual {v1, v2}, Landroid/view/Window;->setStatusBarColor(I)V
 
@@ -215,7 +156,7 @@
 
     move-result v2
 
-    const/16 v3, 0x0500
+    const/16 v3, 0x500
 
     or-int/2addr v2, v3
 
@@ -260,10 +201,12 @@
 
     .line 128
     const/4 v1, 0x0
+
     invoke-virtual {v0, v1}, Landroid/webkit/WebSettings;->setAllowUniversalAccessFromFileURLs(Z)V
 
     .line 129
     const/4 v1, 0x0
+
     invoke-virtual {v0, v1}, Landroid/webkit/WebSettings;->setAllowFileAccessFromFileURLs(Z)V
 
     .line 131
@@ -296,7 +239,6 @@
     invoke-virtual {v1, v2}, Landroid/webkit/WebView;->setWebChromeClient(Landroid/webkit/WebChromeClient;)V
 
     .line 134
-    # 恢复持久化会话cookie(重启免登录)
     invoke-virtual {p0}, Lcom/cicp/jwxt/MainActivity;->restoreCookies()V
 
     iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
@@ -306,24 +248,63 @@
     invoke-virtual {v1, v2}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
 
     .line 135
-    # 请求通知权限(Android 13+/API33+)
     sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
-    const/16 v3, 0x21
-    if-lt v2, v3, :perm_done
-    const/4 v2, 0x1
-    new-array v2, v2, [Ljava/lang/String;
-    const/4 v3, 0x0
-    const-string v4, "android.permission.POST_NOTIFICATIONS"
-    aput-object v4, v2, v3
-    const/16 v3, 0x7d1
-    invoke-virtual {p0, v2, v3}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
-    :perm_done
 
+    const/16 v3, 0x21
+
+    if-lt v2, v3, :cond_90
+
+    const/4 v2, 0x1
+
+    new-array v2, v2, [Ljava/lang/String;
+
+    const/4 v3, 0x0
+
+    const-string v4, "android.permission.POST_NOTIFICATIONS"
+
+    aput-object v4, v2, v3
+
+    const/16 v3, 0x7d1
+
+    invoke-virtual {p0, v2, v3}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
+
+    :cond_90
+    return-void
+.end method
+
+.method public onRequestPermissionsResult(I[Ljava/lang/String;[I)V
+    .registers 8
+
+    invoke-super {p0, p1, p2, p3}, Landroid/app/Activity;->onRequestPermissionsResult(I[Ljava/lang/String;[I)V
+
+    const/16 v0, 0x7d1
+
+    if-ne p1, v0, :cond_17
+
+    array-length v1, p3
+
+    if-lez v1, :cond_17
+
+    const/4 v1, 0x0
+
+    aget v1, p3, v1
+
+    if-eqz v1, :cond_17
+
+    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+
+    const-string v2, "window.__retryNotif&&window.__retryNotif()"
+
+    const/4 v3, 0x0
+
+    invoke-virtual {v1, v2, v3}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+
+    :cond_17
     return-void
 .end method
 
 .method protected onResume()V
-    .locals 6
+    .registers 7
 
     invoke-super {p0}, Landroid/app/Activity;->onResume()V
 
@@ -339,7 +320,7 @@
 
     move-result-object v1
 
-    if-eqz v1, :cond_done
+    if-eqz v1, :cond_32
 
     const-string v2, "schedule"
 
@@ -347,9 +328,8 @@
 
     move-result v1
 
-    if-eqz v1, :cond_done
+    if-eqz v1, :cond_32
 
-    # 延迟到网页加载完成后跳转到我的课表结果（避免冷启动时 JS 未就绪导致跳转落空）
     new-instance v2, Landroid/os/Handler;
 
     invoke-direct {v2}, Landroid/os/Handler;-><init>()V
@@ -370,46 +350,84 @@
 
     invoke-virtual {v1, v2}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
 
-    :cond_done
+    :cond_32
     return-void
 .end method
 
-.method public gotoSchedule()V
-    .locals 3
+.method public restoreCookies()V
+    .registers 5
 
-    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
-
-    const-string v2, "window.__gotoSchedule&&window.__gotoSchedule()"
-
-    const/4 v0, 0x0
-
-    invoke-virtual {v1, v2, v0}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
-
-    return-void
-.end method
-.method public onRequestPermissionsResult(I[Ljava/lang/String;[I)V
-    .locals 4
-
-    invoke-super {p0, p1, p2, p3}, Landroid/app/Activity;->onRequestPermissionsResult(I[Ljava/lang/String;[I)V
-
-    const/16 v0, 0x7d1
-    if-ne p1, v0, :cond_done
-
-    array-length v1, p3
-    if-lez v1, :cond_done
+    const-string v0, "jwxt"
 
     const/4 v1, 0x0
-    aget v1, p3, v1
-    if-eqz v1, :cond_done
 
-    iget-object v1, p0, Lcom/cicp/jwxt/MainActivity;->webView:Landroid/webkit/WebView;
+    invoke-virtual {p0, v0, v1}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
 
-    const-string v2, "window.__retryNotif&&window.__retryNotif()"
+    move-result-object v0
 
-    const/4 v3, 0x0
+    const-string v1, "cookies"
 
-    invoke-virtual {v1, v2, v3}, Landroid/webkit/WebView;->evaluateJavascript(Ljava/lang/String;Landroid/webkit/ValueCallback;)V
+    const-string v2, ""
 
-    :cond_done
+    invoke-interface {v0, v1, v2}, Landroid/content/SharedPreferences;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_1e
+
+    invoke-virtual {v0}, Ljava/lang/String;->isEmpty()Z
+
+    move-result v1
+
+    if-nez v1, :cond_1e
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    iput-object v1, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
+
+    :cond_1e
+    return-void
+.end method
+
+.method public saveCookies()V
+    .registers 5
+
+    iget-object v0, p0, Lcom/cicp/jwxt/MainActivity;->cookieStore:Ljava/lang/StringBuilder;
+
+    if-eqz v0, :cond_22
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->length()I
+
+    move-result v1
+
+    if-lez v1, :cond_22
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    const-string v1, "jwxt"
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v1, v2}, Lcom/cicp/jwxt/MainActivity;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+
+    move-result-object v1
+
+    invoke-interface {v1}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v1
+
+    const-string v2, "cookies"
+
+    invoke-interface {v1, v2, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v1
+
+    invoke-interface {v1}, Landroid/content/SharedPreferences$Editor;->apply()V
+
+    :cond_22
     return-void
 .end method

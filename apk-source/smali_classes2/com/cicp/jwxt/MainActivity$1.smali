@@ -5,12 +5,14 @@
 # interfaces
 .implements Ljava/lang/Runnable;
 
+
 # instance fields
 .field final synthetic this$0:Lcom/cicp/jwxt/MainActivity;
 
+
 # direct methods
 .method public constructor <init>(Lcom/cicp/jwxt/MainActivity;)V
-    .locals 0
+    .registers 2
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -19,9 +21,10 @@
     return-void
 .end method
 
+
 # virtual methods
 .method public run()V
-    .locals 1
+    .registers 2
 
     iget-object v0, p0, Lcom/cicp/jwxt/MainActivity$1;->this$0:Lcom/cicp/jwxt/MainActivity;
 

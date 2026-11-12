@@ -42,13 +42,13 @@ test('cache grouping isolates accounts, survives damaged data and escapes cache 
  const info=ctx.cacheInventory(data,'123');assert.equal(info.total,3);assert.equal(info.hidden,1);assert.equal(info.groups['我的课表'].length,1);assert.equal(info.groups['公共课表与教室'][0].damaged,true);const rendered=ctx.renderCacheInventory(info);assert.ok(!rendered.includes('<img'));assert.ok(!rendered.includes('456'));assert.ok(rendered.includes('&lt;img'));
 });
 test('today list excludes other weekdays, other weeks and week-range mismatches',()=>{
- const {ctx}=context();ctx.currentWeek=()=>8;ctx.weekInRange=(range,w)=>range==='1-20周';vm.runInContext(fn('courseSpan')+'\n'+fn('todayScheduleEntries')+'\n'+fn('formatGridCourseName'),ctx);
+ const {ctx}=context();ctx.currentWeek=()=>8;ctx.weekInRange=(range,w)=>range==='1-20周';ctx.listDay=()=>1;ctx.SEMESTER_START=new Date('2026-08-31T00:00:00');vm.runInContext(fn('courseSpan')+'\n'+fn('todayScheduleEntries')+'\n'+fn('formatGridCourseName'),ctx);
  const data={courses:[{name:'late',weekday:1,period:'0304',week:'1-20周'},{name:'Tuesday',weekday:2,period:'0102'},{name:'wrong week',weekday:1,period:'0102',week:'9-10周'},{name:'early',weekday:1,period:'0102'}]};
  const list=ctx.todayScheduleEntries(data,8,new Date('2026-10-19T12:00:00'));assert.deepEqual(Array.from(list,x=>x.c.name),['early','late']);assert.equal(ctx.todayScheduleEntries(data,9,new Date('2026-10-19T12:00:00')).length,0);
- assert.equal(ctx.formatGridCourseName('刑事诉讼法学'),'<span>刑事诉</span><span>讼法学</span>');assert.ok(!ctx.formatGridCourseName('<img>').includes('<img>'));
+ assert.equal(ctx.formatGridCourseName('刑事诉讼法学'),'<span>刑事诉讼</span><span>法学</span>');assert.ok(!ctx.formatGridCourseName('<img>').includes('<img>'));
 });
 test('today cards show time, room, teacher and class without exposing another day',()=>{
- const {ctx}=context();ctx.currentWeek=()=>8;ctx.weekInRange=()=>true;ctx.scheduleColor=()=>'#336644';ctx.SCHEDULE_TIMES=[['08:00','08:45'],['08:55','09:40']];ctx.Date=class extends Date{constructor(...args){super(...(args.length?args:['2026-10-19T12:00:00']));}};
+ const {ctx}=context();ctx.currentWeek=()=>8;ctx.weekInRange=()=>true;ctx.scheduleColor=()=>'#336644';ctx.SCHEDULE_TIMES=[['08:00','08:45'],['08:55','09:40']];ctx.listDay=()=>1;ctx.SEMESTER_START=new Date('2026-08-31T00:00:00');ctx.Date=class extends Date{constructor(...args){super(...(args.length?args:['2026-10-19T12:00:00']));}};
  vm.runInContext(fn('courseSpan')+'\n'+fn('todayScheduleEntries')+'\n'+fn('renderTodayScheduleList'),ctx);
  const view=ctx.renderTodayScheduleList({courses:[{name:'刑事诉讼法',weekday:1,period:'0102',classroom:'一教101',teacher:'测试教师',classes:'测试班级',week:'1-20周'},{name:'不应显示的周二课程',weekday:2,period:'0102'}]},8);
  for(const value of ['08:00','09:40','一教101','测试教师','测试班级','第1–2节'])assert.ok(view.includes(value));assert.ok(!view.includes('不应显示的周二课程'));

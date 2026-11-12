@@ -131,7 +131,7 @@ cd cicp-jwxt-android
 
 ## 待解决问题
 
-以下为截至 V188 的状态，按影响排序。欢迎提 Issue 指认或补充。
+以下为截至 V189 的状态，按影响排序。欢迎提 Issue 指认或补充。
 
 ### 1. 官网页面在手机端仍是 PC 布局（V188 已改造，待真机确认）
 
@@ -170,12 +170,22 @@ App 内打开的教务页面本身是为电脑大屏设计的，侧栏固定 275
 
 为让任意版本可互相覆盖安装，`versionCode` 固定 `1000`，版本高低只能看设置页的 V 序号。副作用是系统设置里看不出升级顺序，也无法用版本号做灰度或强制更新判断。属于侧载分发场景下的有意取舍，暂不改。
 
-### 7. 构建链需要手工同步 smali
+### 7. 打包源与发布版存在漂移（V189 已对齐）
 
-`apk-source/` 走 apktool 构建，只认 smali 目录；`java/` 下的源码**不参与打包**。V187 就因此埋了一个坑：`InAppOpen` 和 `CookieWebClient` 只有 java 源码、没有 smali，装上去点「前往官网」必然 `NoClassDefFoundError`。
+`apk-source/` 走 apktool 构建，只认 smali 目录；`java/` 下的源码**不参与打包**。这个目录长期落后于实际发布的 APK，V188 就因此翻车：装上去点登录直接闪退、底部浮条出现透明区。
 
-- V188 已补：用 `javac`（android.jar 作 classpath）→ `d8` → `baksmali` 把这两个类转成 smali 补进 `smali_classes2/`
-- 仍需注意：以后每次改 `apk-source/java/` 下的类，都必须重跑一遍这套转换，否则 APK 里的类不会更新
+对齐 V187 发布版后，实际缺失/不一致的是这几处：
+
+| 项 | 发布版 | 仓库里的 apk-source |
+|---|---|---|
+| Manifest | 有 `networkSecurityConfig` | **缺失**（明文 HTTP 被拦，登录失败） |
+| `apktool.yml` | `targetSdkVersion 35` | 34（**丧失 edge-to-edge，底部露出系统导航栏**） |
+| `res/xml/network_security_config.xml` | 存在 | **整个文件缺失** |
+| `res/values/public.xml` | 5 条声明 | 只有 2 条 |
+
+- V189 已补：以上四项全部对齐；`InAppOpen` / `CookieWebClient` 的 smali 用 `javac`（android.jar 作 classpath）→ `d8` → `baksmali` 生成并补进 `smali_classes2/`
+- 校验方法：把新包反编译后与上一版逐文件 `diff`，应只剩本次有意修改的文件
+- 仍需注意：以后改 `apk-source/java/` 下的类，必须重跑一遍 smali 转换；改资源或包配置时，先与上一版 APK 反编译结果比对，避免再次漂移
 
 ### 8. 打包链路没有自动化（无 CI）
 
@@ -195,15 +205,16 @@ App 内打开的教务页面本身是为电脑大屏设计的，侧栏固定 275
 | 2026-11-11 | v174–v180 | 官网跳转对应关系整理成表；教务页上下留白改为注入页面内部生效；移除底部导航栏，设置改为右侧磁贴；设置页改用系统返回 |
 | 2026-11-12 | v181–v185 | 刷新反馈只在手动刷新触发；预留用户自定义 CSS/JS 注入（暂未启用）；手机端适配放弃整页 zoom，改为主文档注入 + 资源透传，修掉页面点不动 |
 | 2026-11-12 | v186–v187 | 会话过期不再弹自建提示页，直接复用「未登录即弹登录框」的流程，登录成功后回跳原目标页 |
-| 2026-11-12 | v188 | 补齐构建链缺失的两个类（`InAppOpen` / `CookieWebClient` 之前没有 smali，点「前往官网」会崩）；官网手机适配补 viewport 并覆盖 iframe 子页；官网跳转带查询条件回填；教师名解析改为自动预拉全校教师名单 |
+| 2026-11-12 | v188 | 补齐构建链缺失的两个类；官网手机适配补 viewport 并覆盖 iframe 子页；官网跳转带查询条件回填；教师名解析改为自动预拉全校教师名单。**该版打包源与发布版漂移，点登录闪退、底部浮条露出透明区，已废弃** |
+| 2026-11-12 | v189 | 打包源对齐 V187 发布版：补 `networkSecurityConfig` 与 `res/xml` 配置、`public.xml` 补全 5 条声明、`targetSdkVersion` 回到 35 恢复 edge-to-edge；反编译校验后与 V187 仅差本次有意修改的文件 |
 
 ## 版本
 
-当前版本：**v0.9.8（构建序号 V188）**（测试版；1.0 为正式版）
+当前版本：**v0.9.8（构建序号 V189）**（测试版；1.0 为正式版）
 
 - 对外展示用 `V序号`（设置页右上角、关于项），源码中用 `V__VNUM__` 占位，打包时替换
 - 安装包 `versionName` 固定 `0.9.8`，`versionCode` 固定 `1000`，新老构建可互相覆盖安装，方便回退验证
-- 最新构建下载：[v0.9.8-v188 Release](https://github.com/changzheng7001/jwxt-query/releases/tag/v0.9.8-v188)（预发布，含 APK）
+- 最新构建下载：[v0.9.8-v189 Release](https://github.com/changzheng7001/jwxt-query/releases/tag/v0.9.8-v189)（预发布，含 APK）
 
 ## 开发说明
 

@@ -22,12 +22,33 @@ import java.util.Map;
  */
 public class InAppOpen {
 
+    // 进入原站页之前的 WebView 原始设置（-1 表示还没记录过）
+    private static int sOrigTextZoom = -1;
+    private static int sOrigOverview = -1;
+    private static int sOrigWideViewport = -1;
+
     private static final String CICP_HOST = "jwxt.cicp.edu.cn";
     private static final String BASE = "https://" + CICP_HOST + "/";
     private static final String UA = "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
 
     public static void open(final Activity act, String rawUrl) {
         if (act == null) return;
+
+        // 原站页：交给独立的浏览器窗口（独立 Activity + 独立 WebView）。
+        // 不再和主界面共用 WebView，所以任何设置都污染不到改造页面，
+        // 退出即销毁，浏览历史也不会留在手机浏览器里。
+        if (rawUrl != null && rawUrl.contains("native=1")) {
+            try {
+                android.content.Intent it = new android.content.Intent(act, WebActivity.class);
+                it.putExtra("url", "https://jwxt.cicp.edu.cn/jsxsd/framework/xsMainV.htmlx");
+                act.startActivity(it);
+                return;
+            } catch (Throwable ignored) {
+            }
+        }
+
+        // 每次打开页面先把上一次的黑边摘掉；只有原站页会在后面重新装一条
+        removeStatusStrip(act);
         final StringBuilder diag = new StringBuilder();
         final String cookie = readCookies(act, diag);
         diag.append("cookieLen=").append(cookie.length()).append('\n');
@@ -144,6 +165,8 @@ public class InAppOpen {
                         if (rid > 0) sb = act.getResources().getDimensionPixelSize(rid);
                     } catch (Throwable ignored) {
                     }
+                    // 状态栏高度在这里取不到可靠值（Android 15 上 status_bar_height 常返回 0），
+                    // 顶部留白改由页面自己的 safe 区处理，这里保持 0，避免和页面留白叠加
                     int top = 0;
                     int bottom = 0;
                     CookieWebClient client = new CookieWebClient(CICP_HOST, cookie, top, bottom);
@@ -160,7 +183,29 @@ public class InAppOpen {
                         if (rid2 > 0) sb2 = act.getResources().getDimensionPixelSize(rid2);
                     } catch (Throwable ignored) {
                     }
-                    w.setPadding(0, 0, 0, 0);
+                    if (url != null && url.contains("native=1")) {
+                        // 原站页：不再动父容器留白、不加任何浮层 View、不改任何 WebSettings。
+                        // 顶部黑条已经改成页面内的 CSS（html 顶部内边距 + 黑底），
+                        // 随页面一起消失，退出时不会有任何痕迹留到改造页面。
+                        w.setPadding(0, 0, 0, 0);
+                        // 清掉旧版本可能残留在父容器上的留白
+                        try {
+                            android.view.ViewGroup pv = (android.view.ViewGroup) w.getParent();
+                            if (pv != null) pv.setPadding(0, 0, 0, 0);
+                        } catch (Throwable ignored) {
+                        }
+                        removeStatusStrip(act);
+                        removeDebugHud(act);
+                    } else {
+                        // 非原站页：清掉留白，并且主动把黑边摘掉，保证它不会出现在别的页面
+                        w.setPadding(0, 0, 0, 0);
+                        try {
+                            android.view.ViewGroup parent0 = (android.view.ViewGroup) w.getParent();
+                            if (parent0 != null) parent0.setPadding(0, 0, 0, 0);
+                        } catch (Throwable ignored) {
+                        }
+                        removeStatusStrip(act);
+                    }
                     w.setBackgroundColor(0xFFFFFFFF);
                     w.setClipToPadding(true);
                 } catch (Throwable ignored) {
@@ -196,7 +241,7 @@ public class InAppOpen {
                 + "<h3>" + title + "</h3><p>" + desc + "</p>"
                 + "<div class='btns'>"
                 + "<button onclick=\"try{Android.showNativeLogin()}catch(e){}\">重新登录</button>"
-                + "<button class='ghost' onclick=\"try{history.back()}catch(e){}\">返回应用</button>"
+                + "<button class='ghost' onclick=\"try{Android.backToApp()}catch(e){try{history.back()}catch(e2){}}\">返回应用</button>"
                 + "</div>"
                 + "<details><summary>诊断信息</summary><pre>" + d + "</pre>"
                 + "<p><a href='" + url + "'>直接打开原页面</a></p></details>"
@@ -356,7 +401,7 @@ public class InAppOpen {
         }
     }
 
-    private static String readCookies(Context ctx, StringBuilder diag) {
+    public static String readCookies(Context ctx, StringBuilder diag) {
         ArrayList<String> cand = new ArrayList<String>();
         try {
             Field f = ctx.getClass().getDeclaredField("cookieStore");
@@ -437,57 +482,167 @@ public class InAppOpen {
         }
     }
 
+    /** 诊断信息：写 logcat；仅在应用私有缓存留一份，不写公共 Download */
     private static void writeDiag(Context ctx, String s) {
-        byte[] data;
+        android.util.Log.w("JWXT", "official-page diag (" + (s == null ? 0 : s.length()) + " chars)");
         try {
-            data = s.getBytes("UTF-8");
-        } catch (Throwable t) {
-            return;
-        }
-        // 1) MediaStore 写入 Download（API29+ 无需权限）
-        try {
-            android.content.ContentValues cv = new android.content.ContentValues();
-            cv.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "jwxt_debug.txt");
-            cv.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/plain");
-            cv.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-            android.net.Uri uri = ctx.getContentResolver().insert(
-                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv);
-            if (uri != null) {
-                java.io.OutputStream os = ctx.getContentResolver().openOutputStream(uri, "wt");
-                if (os != null) {
-                    os.write(data);
-                    os.flush();
-                    os.close();
-                    return;
-                }
-            }
+            java.io.File dir = new java.io.File(ctx.getCacheDir(), "logs");
+            if (!dir.exists()) dir.mkdirs();
+            java.io.FileOutputStream out = new java.io.FileOutputStream(new java.io.File(dir, "jwxt_diag.txt"), false);
+            out.write(s == null ? new byte[0] : s.getBytes("UTF-8"));
+            out.close();
         } catch (Throwable ignored) {
-        }
-        // 2) 应用外部私有目录
-        try {
-            File d = ctx.getExternalFilesDir(null);
-            if (d != null) {
-                if (!d.exists()) d.mkdirs();
-                FileOutputStream out = new FileOutputStream(new File(d, "jwxt_debug.txt"), false);
-                out.write(data);
-                out.close();
-                return;
-            }
-        } catch (Throwable ignored) {
-        }
-        // 3) 直接写公共目录
-        String[] paths = new String[]{
-                Environment.getExternalStorageDirectory() + "/Download/jwxt_debug.txt",
-                "/sdcard/Download/jwxt_debug.txt"
-        };
-        for (int i = 0; i < paths.length; i++) {
-            try {
-                FileOutputStream out = new FileOutputStream(paths[i], false);
-                out.write(data);
-                out.close();
-                return;
-            } catch (Throwable ignored) {
-            }
         }
     }
+
+    /**
+     * 给原站页面加一条浏览器式顶栏：返回箭头 + 网址胶囊 + 关闭按钮，底部一条 1px 分隔线。
+     * 顶栏加在 decorView 上（WebView 已让出对应高度，不会遮挡网页内容）。
+     * 用 800ms 轮询 URL 的方式在离开原站页时自动移除，避免回到 App 主页后残留挡住顶栏。
+     */
+    /**
+     * 在状态栏位置放一条固定黑条：不随网页滚动或缩放变化，只作为「网页从哪开始」的边界。
+     * 高度即让出的状态栏高度，整宽铺满，WebView 的 padding 已经让开了这块，不会遮挡内容。
+     */
+
+    /**
+     * 诊断角标（临时）：屏幕左下角实时显示 WebView 的缩放比例、控件尺寸、可见性、当前地址。
+     * 用于判断「页面跳一下 / logo 变大」到底是 WebView 改了比例，还是页面自己改了布局。
+     */
+    private static void addDebugHud(final Activity act, final WebView w) {
+        try {
+            if (!(act.getWindow().getDecorView() instanceof android.widget.FrameLayout)) return;
+            final android.widget.FrameLayout root =
+                    (android.widget.FrameLayout) act.getWindow().getDecorView();
+            android.view.View old = root.findViewWithTag("jwxt_hud");
+            if (old != null) root.removeView(old);
+
+            final android.widget.TextView tv = new android.widget.TextView(act);
+            tv.setTag("jwxt_hud");
+            tv.setTextSize(11f);
+            tv.setTextColor(0xFFFFFFFF);
+            tv.setBackgroundColor(0xCC000000);
+            tv.setPadding(16, 10, 16, 10);
+            android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = android.view.Gravity.BOTTOM | android.view.Gravity.START;
+            lp.bottomMargin = 140;
+            lp.leftMargin = 24;
+            root.addView(tv, lp);
+
+            final Runnable r = new Runnable() {
+                public void run() {
+                    try {
+                        if (w.getVisibility() != android.view.View.VISIBLE) {
+                            android.view.View alive = root.findViewWithTag("jwxt_hud");
+                            if (alive != null) root.removeView(alive);
+                            return;
+                        }
+                        String u = w.getUrl();
+                        if (u != null) u = u.replace("https://jwxt.cicp.edu.cn", "");
+                        if (u != null && u.length() > 46) u = u.substring(0, 46);
+                        String txt = "scale=" + String.format(java.util.Locale.US, "%.3f", w.getScale())
+                                + "  size=" + w.getWidth() + "x" + w.getHeight()
+                                + "  vis=" + (w.getVisibility() == android.view.View.VISIBLE ? "Y" : "N")
+                                + "\n" + u;
+                        tv.setText(txt);
+                        w.postDelayed(this, 400);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            };
+            w.postDelayed(r, 400);
+        } catch (Throwable ignored) {
+        }
+    }
+
+
+    /**
+     * 离开原站页时把 WebView 恢复成进入前的样子。
+     * 之前所有 native 设置（黑边、角标、overview、textZoom、留白）都只设不清，
+     * 而"返回"根本不经过 open()，所以 else 里的清理从来没执行过 —— 这些痕迹就全被带回改造页面了。
+     */
+    private static void restoreNativeState(final Activity act, final WebView w) {
+        try { removeStatusStrip(act); } catch (Throwable ignored) { }
+        try { removeDebugHud(act); } catch (Throwable ignored) { }
+        try {
+            android.webkit.WebSettings ws = w.getSettings();
+            if (sOrigTextZoom > 0) ws.setTextZoom(sOrigTextZoom);
+            if (sOrigOverview >= 0) ws.setLoadWithOverviewMode(sOrigOverview == 1);
+            if (sOrigWideViewport >= 0) ws.setUseWideViewPort(sOrigWideViewport == 1);
+        } catch (Throwable ignored) { }
+        try {
+            android.view.ViewGroup p = (android.view.ViewGroup) w.getParent();
+            if (p != null) p.setPadding(0, 0, 0, 0);
+        } catch (Throwable ignored) { }
+    }
+
+
+    /** 摘掉诊断角标 */
+    private static void removeDebugHud(final Activity act) {
+        try {
+            if (!(act.getWindow().getDecorView() instanceof android.widget.FrameLayout)) return;
+            android.widget.FrameLayout root = (android.widget.FrameLayout) act.getWindow().getDecorView();
+            android.view.View v = root.findViewWithTag("jwxt_hud");
+            if (v != null) root.removeView(v);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 主动摘掉顶部黑边（离开原站页时调用，避免残留到其他页面） */
+    private static void removeStatusStrip(final Activity act) {
+        try {
+            if (!(act.getWindow().getDecorView() instanceof android.widget.FrameLayout)) return;
+            android.widget.FrameLayout root = (android.widget.FrameLayout) act.getWindow().getDecorView();
+            android.view.View v = root.findViewWithTag("jwxt_status_strip");
+            if (v != null) root.removeView(v);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void addStatusStrip(final Activity act, final WebView w, final int heightPx) {
+        try {
+            if (!(act.getWindow().getDecorView() instanceof android.widget.FrameLayout)) return;
+            final android.widget.FrameLayout root = (android.widget.FrameLayout) act.getWindow().getDecorView();
+            android.view.View oldStrip = root.findViewWithTag("jwxt_status_strip");
+            if (oldStrip != null) root.removeView(oldStrip);
+
+            android.view.View strip = new android.view.View(act);
+            strip.setTag("jwxt_status_strip");
+            strip.setBackgroundColor(0xFF000000);
+            android.widget.FrameLayout.LayoutParams lp =
+                    new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
+            lp.gravity = android.view.Gravity.TOP;
+            root.addView(strip, lp);
+
+            // 离开原站页时自动移除，避免回到 App 首页还留一条黑边
+            final Runnable watch = new Runnable() {
+                public void run() {
+                    try {
+                        String cur = w.getUrl();
+                        // 关键：WebView 是 Activity 里复用的同一个（webViewOf 反射取字段），
+                        // 从来不会「退役」，也不会自动变成 file://。回到改造页面时它是被
+                        // setVisibility(GONE) 隐藏的，但 getUrl() 还停在原站页地址上，
+                        // 所以之前只看 URL 永远摘不掉这条黑边。真正的信号是「WebView 不可见」。
+                        if (w.getVisibility() != android.view.View.VISIBLE || cur == null
+                                || cur.startsWith("file://") || !cur.contains("/jsxsd/")) {
+                            // 现查现摘：不依赖闭包里的旧引用，避免 View 已被替换后 removeView 空转
+                            android.view.View alive = root.findViewWithTag("jwxt_status_strip");
+                            if (alive != null) root.removeView(alive);
+                            // 黑边摘掉的同时，把 native 期间改过的 WebView 设置一并还原，
+                            // 否则 overview / textZoom / 留白 会跟着带回改造页面
+                            restoreNativeState(act, w);
+                            return;
+                        }
+                        w.postDelayed(this, 300);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            };
+            w.postDelayed(watch, 800);
+        } catch (Throwable ignored) {
+        }
+    }
+
 }

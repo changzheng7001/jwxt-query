@@ -21,6 +21,12 @@ public class CookieWebClient extends WebViewClient {
 
     private final String host;
     private final String cookie;
+    /**
+     * native 原站会话截止时间戳（实例字段，绝不能加 static）。
+     * 之前写成 static，结果打开一次原站页后 120 秒内，主 App 的所有页面请求都会被当成
+     * 「原站页」处理（摘 viewport、零注入），造成改造页与原站页互相污染。
+     */
+    private volatile long nativeUntil = 0L;
     private final int padTop;
     private final int padBottom;
     private String userCss = "";
@@ -43,7 +49,7 @@ public class CookieWebClient extends WebViewClient {
         try {
             boolean third = url != null && url.contains(host);
             view.setPadding(0, third ? padTop : 0, 0, third ? padBottom : 0);
-            view.setBackgroundColor(third ? 0xFFFFFFFF : 0x00000000);
+            view.setBackgroundColor(third ? 0xFFEEF0F4 : 0x00000000);
         } catch (Throwable ignored) {
         }
     }
@@ -80,6 +86,35 @@ public class CookieWebClient extends WebViewClient {
         super.onPageFinished(view, url);
     }
 
+    /** 移动端主框架页面，随 APK 打包在 assets 里，避免在 Java 里拼大段 HTML */
+    private String mobilePage;
+
+    private String loadMobilePage(WebView view) {
+        if (mobilePage != null) return mobilePage;
+        InputStream in = null;
+        try {
+            in = view.getContext().getAssets().open("jwxt-mobile.html");
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+            mobilePage = new String(bos.toByteArray(), "UTF-8");
+        } catch (Throwable t) {
+            mobilePage = null;
+        } finally {
+            try { if (in != null) in.close(); } catch (Throwable ignored) { }
+        }
+        return mobilePage;
+    }
+
+    /** 主框架是「侧栏菜单 + iframe」，手机上必须整页替换，压 CSS 救不回来 */
+    private static boolean isFrameworkPage(String url) {
+        if (url == null) return false;
+        // mobile=0 / native=1：用户主动要求查看原生官网页面，不替换为移动版
+        if (url.contains("mobile=0") || url.contains("native=1")) return false;
+        return url.contains("/framework/xsMainV.htmlx") || url.contains("/framework/xsMain.jsp");
+    }
+
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         try {
@@ -88,12 +123,40 @@ public class CookieWebClient extends WebViewClient {
             if (h == null || host == null || !h.equals(host)) return null;
             String method = request.getMethod();
             if (method != null && !"GET".equalsIgnoreCase(method)) return null;
+            // 主框架整页换成移动端版：抽屉菜单 + 我的桌面，子页面仍走原站
+            if (isFrameworkPage(url)) {
+                String page = loadMobilePage(view);
+                if (page != null) {
+                    try {
+                        return new WebResourceResponse("text/html", "UTF-8",
+                                new ByteArrayInputStream(page.getBytes("UTF-8")));
+                    } catch (Throwable ignored) {
+                        // 读不到就退回下面的原站 + 注入逻辑
+                    }
+                }
+            }
+            // native=1：原站页面彻底原样返回。不删 viewport、不插 viewport、不加 CSS、不加 JS，
+            // 一个字节都不改，和外部浏览器打开完全一致；留白只由 InAppOpen 在 WebView 上处理。
+            if (url.contains("native=1")) {
+                nativeUntil = System.currentTimeMillis() + 120000L;
+                // 摘掉页面自带的 device-width viewport，换成固定 1042 版面宽度：
+                // 这样 WebView 始终按 1042 布局（侧栏才会显示），再自动缩到屏宽（≈0.374）一屏可见。
+                // 页面自己的 CSS/JS/结构一律不动，只补一个 viewport + 一条侧栏保活。
+                return fetch(url, nativeInsetStyle(), true);
+            }
+            // native 会话期内的 iframe 子 frame 同样摘掉自带 viewport，其余原样。
+            // 严格限定在 /jsxsd/framework/ 路径：抽屉里点开的其他原站页（成绩、公告等）
+            // 在 120 秒窗口内仍然走正常的移动端注入，不会被这里误伤。
+            if (System.currentTimeMillis() < nativeUntil && url.contains("/jsxsd/framework/")) {
+                return fetch(url, nativeInsetStyle(), true);
+            }
             // HTML（含 iframe 子页）都注入适配样式；二进制资源在 fetch 里原样返回，不会损坏
-            String inject = insetStyle();
+            boolean nativeMode = url.contains("native=1");
+            String inject = nativeMode ? nativeInsetStyle() : insetStyle(url);
             // 目标查询页带回填条件：注入脚本把条件填进表单并提交，实现带参数跳转
-            String q = extractQuery(url);
+            String q = nativeMode ? null : extractQuery(url);
             if (q != null) inject = inject + prefillScript(q);
-            return fetch(url, inject);
+            return fetch(url, inject, true);
         } catch (Throwable t) {
             return null;
         }
@@ -203,18 +266,46 @@ public class CookieWebClient extends WebViewClient {
         + "body{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}";
 
     /** PC 页面普遍没有 viewport，必须补一个，否则 WebView 仍按 980px 逻辑宽度渲染 */
+    // 原站模式：只保留状态栏/手势条留白，版面完全交还原站，默认缩到最小、可双指放大
+    /** 供外部复用同一个移动 UA */
+    public static String UA() {
+        return UA;
+    }
+
+    private String nativeInsetStyle() {
+        // 全部做成页面内的东西，退出原站页时随页面一起消失，不残留到改造页面。
+        // viewport 回到与 V218 相同的写法（去掉 minimum-scale，那一条会让 WebView 改用屏幕宽布局、把侧栏收掉）。
+        return "<meta name=\"viewport\" content=\"width=1042,initial-scale=0.374,"
+            + "maximum-scale=3,user-scalable=yes\">"
+            + "<style id=\"jwxt-native\">"
+            // 顶部黑条：一条固定定位的黑色色块，不涂整页背景（上一版把 html 背景涂黑，导致大面积黑底）
+            + "html::before{content:'';position:fixed;top:0;left:0;width:100%;height:40px;"
+            + "background:#000;z-index:2147483647;pointer-events:none;}"
+            // 给内容让出这条黑边；背景保持白，不整页涂黑
+            + "html{background:#fff!important;}"
+            + "body{padding-top:40px!important;box-sizing:border-box!important;}"
+            // 侧栏保活
+            + ".sidebar{display:block!important;visibility:visible!important;opacity:1!important;"
+            + "transform:none!important;width:275px!important;max-width:none!important;position:relative!important;}"
+            + "</style>";
+    }
+
     private static final String VIEWPORT_META =
         "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes\">";
 
-    private String insetStyle() {
+    private String insetStyle(String url) {
         StringBuilder sb = new StringBuilder();
         // viewport 必须放在最前面，先于任何样式生效
         sb.append(VIEWPORT_META);
-        if (padTop > 0 || padBottom > 0) {
-            sb.append("<style id=\"jwxt-inset\">html{padding-top:").append(padTop)
-              .append("px!important;padding-bottom:").append(padBottom)
-              .append("px!important;box-sizing:border-box!important;background:#fff!important}")
-              .append("body{background:#fff!important}</style>");
+        // 状态栏留白：Android 15 上原生的 status_bar_height 取不到可靠值，
+        // 统一在页面侧给 32px 顶部留白，保证任何页面（含原站 PC 页）都不会顶到状态栏下面
+        sb.append("<style id=\"jwxt-inset\">")
+          .append("html{padding-top:32px!important;box-sizing:border-box!important;background:#EEF0F4!important}")
+          .append("body{padding-bottom:26px!important;box-sizing:border-box!important;background:#fff!important}")
+          .append("</style>");
+        if (padBottom > 0) {
+            sb.append("<style id=\"jwxt-inset-b\">html{padding-bottom:").append(padBottom)
+              .append("px!important;box-sizing:border-box!important}</style>");
         }
         sb.append("<style id=\"jwxt-mobile\">").append(MOBILE_CSS).append("</style>");
         if (userCss.length() > 0) sb.append("<style id=\"jwxt-user\">").append(userCss).append("</style>");
@@ -227,7 +318,7 @@ public class CookieWebClient extends WebViewClient {
         return sb.length() == 0 ? null : sb.toString();
     }
 
-    private WebResourceResponse fetch(String url, String injectCss) {
+    private WebResourceResponse fetch(String url, String injectCss, boolean stripViewport) {
         HttpURLConnection c = null;
         try {
             c = (HttpURLConnection) new URL(url).openConnection();
@@ -263,6 +354,10 @@ public class CookieWebClient extends WebViewClient {
             boolean isHtml = mime != null && mime.toLowerCase().indexOf("html") >= 0;
             if (injectCss != null && isHtml && raw.length > 0) {
                 String body = new String(raw, enc);
+                if (stripViewport) {
+                    // 原站模式：原页面自带的 viewport 会覆盖我们注入的，按 device-width 排版会挤掉侧栏和快捷入口
+                    body = body.replaceAll("(?is)<meta[^>]+name\\s*=\\s*[\\\"']viewport[\\\"'][^>]*>", "");
+                }
                 int at = body.toLowerCase().indexOf("<head");
                 int gt = at >= 0 ? body.indexOf('>', at) : -1;
                 if (gt > 0) body = body.substring(0, gt + 1) + injectCss + body.substring(gt + 1);

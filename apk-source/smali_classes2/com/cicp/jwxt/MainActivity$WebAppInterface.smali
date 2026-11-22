@@ -1069,7 +1069,7 @@
 .end method
 
 .method public openInApp(Ljava/lang/String;)V
-    .registers 3
+    .registers 4
     .annotation runtime Landroid/webkit/JavascriptInterface;
     .end annotation
 

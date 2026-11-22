@@ -196,7 +196,7 @@ public class InAppOpen {
                 + "<h3>" + title + "</h3><p>" + desc + "</p>"
                 + "<div class='btns'>"
                 + "<button onclick=\"try{Android.showNativeLogin()}catch(e){}\">重新登录</button>"
-                + "<button class='ghost' onclick=\"try{history.back()}catch(e){}\">返回应用</button>"
+                + "<button class='ghost' onclick=\"try{Android.backToApp()}catch(e){try{history.back()}catch(e2){}}\">返回应用</button>"
                 + "</div>"
                 + "<details><summary>诊断信息</summary><pre>" + d + "</pre>"
                 + "<p><a href='" + url + "'>直接打开原页面</a></p></details>"
@@ -356,7 +356,7 @@ public class InAppOpen {
         }
     }
 
-    private static String readCookies(Context ctx, StringBuilder diag) {
+    public static String readCookies(Context ctx, StringBuilder diag) {
         ArrayList<String> cand = new ArrayList<String>();
         try {
             Field f = ctx.getClass().getDeclaredField("cookieStore");
@@ -437,57 +437,16 @@ public class InAppOpen {
         }
     }
 
+    /** 诊断信息：写 logcat；仅在应用私有缓存留一份，不写公共 Download */
     private static void writeDiag(Context ctx, String s) {
-        byte[] data;
+        android.util.Log.w("JWXT", "official-page diag (" + (s == null ? 0 : s.length()) + " chars)");
         try {
-            data = s.getBytes("UTF-8");
-        } catch (Throwable t) {
-            return;
-        }
-        // 1) MediaStore 写入 Download（API29+ 无需权限）
-        try {
-            android.content.ContentValues cv = new android.content.ContentValues();
-            cv.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "jwxt_debug.txt");
-            cv.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/plain");
-            cv.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-            android.net.Uri uri = ctx.getContentResolver().insert(
-                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv);
-            if (uri != null) {
-                java.io.OutputStream os = ctx.getContentResolver().openOutputStream(uri, "wt");
-                if (os != null) {
-                    os.write(data);
-                    os.flush();
-                    os.close();
-                    return;
-                }
-            }
+            java.io.File dir = new java.io.File(ctx.getCacheDir(), "logs");
+            if (!dir.exists()) dir.mkdirs();
+            java.io.FileOutputStream out = new java.io.FileOutputStream(new java.io.File(dir, "jwxt_diag.txt"), false);
+            out.write(s == null ? new byte[0] : s.getBytes("UTF-8"));
+            out.close();
         } catch (Throwable ignored) {
-        }
-        // 2) 应用外部私有目录
-        try {
-            File d = ctx.getExternalFilesDir(null);
-            if (d != null) {
-                if (!d.exists()) d.mkdirs();
-                FileOutputStream out = new FileOutputStream(new File(d, "jwxt_debug.txt"), false);
-                out.write(data);
-                out.close();
-                return;
-            }
-        } catch (Throwable ignored) {
-        }
-        // 3) 直接写公共目录
-        String[] paths = new String[]{
-                Environment.getExternalStorageDirectory() + "/Download/jwxt_debug.txt",
-                "/sdcard/Download/jwxt_debug.txt"
-        };
-        for (int i = 0; i < paths.length; i++) {
-            try {
-                FileOutputStream out = new FileOutputStream(paths[i], false);
-                out.write(data);
-                out.close();
-                return;
-            } catch (Throwable ignored) {
-            }
         }
     }
 }

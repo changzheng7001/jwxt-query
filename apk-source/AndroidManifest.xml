@@ -8,5 +8,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+                  android:exported="false"
+                  android:name="com.cicp.jwxt.WebActivity"
+                  android:theme="@android:style/Theme.NoTitleBar"/>
     </application>
 </manifest>

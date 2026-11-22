@@ -1,7 +1,6 @@
-/* Shared appearance, dashboard docking and offline cache presentation. */
+/* Shared appearance, panel docking and offline cache presentation. */
 var themePreference = 'system';
 var systemAppearance;
-var homeDockedPanels = new Set();
 var floatingLayoutFrame = 0;
 
 function experienceIcon(name) {
@@ -40,8 +39,7 @@ function applyThemePreference() {
   document.documentElement.setAttribute('data-theme',dark?'dark':'');
   document.documentElement.style.colorScheme=dark?'dark':'light';
   var names={system:'跟随系统',light:'浅色模式',dark:'深色模式'};
-  var button=document.getElementById('themeBtn');
-  if(button){button.innerHTML=experienceIcon(themePreference);button.title=names[themePreference]+'（点击切换）';button.setAttribute('aria-label',button.title);}
+  /* 主题切换入口在设置页「外观模式」 */
   ['system','light','dark'].forEach(function(mode){var b=document.getElementById('theme-'+mode);if(b){b.classList.toggle('on',themePreference===mode);b.setAttribute('aria-pressed',String(themePreference===mode));}});
   try {if(window.Android && Android.setStatusTheme)Android.setStatusTheme(dark);}catch(e){}
   if(wasDark!==dark&&typeof S!=='undefined'&&S.view==='result'&&S.lastData&&typeof renderResult==='function')renderResult(S.queryType,S.lastData);
@@ -49,31 +47,16 @@ function applyThemePreference() {
 }
 window.onSystemThemeChanged=function(){if(themePreference==='system')applyThemePreference();};
 
-function saveHomePanels() {
-  try{localStorage.setItem('jwxt_home_panels',JSON.stringify(Array.from(homeDockedPanels)));}catch(e){}
-}
 function syncFloatingPanels() {
   FLOAT_PANEL_IDS.forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
-    var floating=(id==='siteSection'||id==='settingsTile')?true:(document.body.classList.contains('in-result')||homeDockedPanels.has(id));
+    /* 面板永远保持磁贴态（panel-floating 是“窄条磁贴”的样式来源，去掉会让卡片铺满屏），
+       open 时才展开；磁贴点开即弹出 */
+    var floating=true;
     el.classList.toggle('panel-floating',floating);
-    el.classList.toggle('home-docked',homeDockedPanels.has(id));
     if(!floating){el.classList.remove('open');['top','height','maxHeight','transform','transition'].forEach(function(k){el.style[k]='';});}
     var tab=el.querySelector('.fd-tab');if(tab)tab.setAttribute('aria-expanded',String(el.classList.contains('open')));
   });
-  var restore=document.getElementById('restoreHomePanels');if(restore)restore.hidden=!homeDockedPanels.size;
-}
-function dockHomePanel(id) {
-  var el=document.getElementById(id);if(!el||document.body.classList.contains('in-result'))return;
-  if(homeDockedPanels.has(id)){homeDockedPanels.delete(id);el.classList.remove('open');}
-  else{homeDockedPanels.add(id);el.classList.remove('open');}
-  saveHomePanels();syncFloatingPanels();layoutOpenFloats();
-}
-// 双击专用：无论当前状态，一律收起贴边，保证一次双击只改变一个面板
-function dockHomePanelForce(id) {
-  var el=document.getElementById(id);if(!el||document.body.classList.contains('in-result'))return;
-  homeDockedPanels.add(id);el.classList.remove('open');
-  saveHomePanels();syncFloatingPanels();layoutOpenFloats();
 }
 // 触摸双击识别（标题与收起标签都绑），双击时屏蔽单击
 function bindPanelDoubleTap(node,id){
@@ -93,31 +76,18 @@ function bindPanelDoubleTap(node,id){
     }else lastTap=now;
   });
 }
-// 双击：展开态→收起贴边；收起/贴边态→彻底展开并还原默认位置
+// 双击：展开 ↔ 收起（面板只存在于课表页）
 function doubleTapPanel(id) {
   var el=document.getElementById(id);if(!el)return;
-  if(document.body.classList.contains('in-result')){
-    if(el.classList.contains('open')){
-      el.classList.remove('open');
-    } else {
-      el.classList.add('open');
-      el.classList.remove('avoid-left','avoid-right','dock-left');
-      el.style.transform='';el.style.top='';el.style.height='';el.style.maxHeight='';el.style.transition='';
-    }
-    layoutOpenFloats();
-    return;
-  }
-  if(homeDockedPanels.has(id)){
-    homeDockedPanels.delete(id);
+  if(!document.body.classList.contains('in-result'))return;
+  if(el.classList.contains('open')){
     el.classList.remove('open');
+  } else {
+    el.classList.add('open');
+    el.classList.remove('avoid-left','avoid-right','dock-left');
     el.style.transform='';el.style.top='';el.style.height='';el.style.maxHeight='';el.style.transition='';
-    saveHomePanels();syncFloatingPanels();layoutOpenFloats();
-  }else{
-    dockHomePanelForce(id);
   }
-}
-function restoreHomePanels() {
-  homeDockedPanels.clear();saveHomePanels();syncFloatingPanels();layoutOpenFloats();
+  layoutOpenFloats();
 }
 function allocatePanelHeights(desired, available) {
   if(!desired.length)return [];
@@ -135,47 +105,52 @@ function cacheInventory(storage,scope) {
     var name=key.slice(11),type=name.split('_')[0],account=name.match(/_u([^_]+)(?:_|$)/);
     if(account&&account[1]!==String(scope||'guest')){hidden++;continue;}
     var raw=storage.getItem(key)||'',obj,damaged=false;try{obj=JSON.parse(raw);}catch(e){damaged=true;}
-    var category=account?(type==='self'?'我的课表':'成绩与学业'):/^(teacher|classroom|class|course|empty)$/.test(type)?'公共课表与教室':/^(teachers|classes|classrooms|browse)$/.test(type)?'全校名录':'其他数据';
+    /* 按查询类型各自独立分组：我的课表/教师/教室/班级/课程/成绩/绩点/进度/考试/选课/空教室/名录 */
+    var category=labels[type]||(type==='browse'?'全校名录':'其他数据');
     if(!groups[category])groups[category]=[];
     var semester=name.match(/\d{4}-\d{4}-[12]/),week=name.match(/_w(\d+)/),weekday=name.match(/_d(\d)/);
-    var tags=[];if(semester)tags.push(semester[0]);if(week)tags.push('第'+week[1]+'周');if(weekday)tags.push('星期'+['','一','二','三','四','五','六','日'][Number(weekday[1])]);
+    /* 整学期缓存（理论课表一次拉全学期）单独标注，否则会和按周缓存混成一堆“我的课表” */
+    var isAll=/_all$/.test(name);
+    var tags=[];if(semester&&!isAll)tags.push(semester[0]);
+    if(isAll)tags.push('整学期 · 全部周次');else if(week)tags.push('第'+week[1]+'周');
+    if(weekday)tags.push('星期'+['','一','二','三','四','五','六','日'][Number(weekday[1])]);
     var publicName=!account&&name.slice(type.length+1).split(/_\d{4}-|_w\d/)[0];
     if(publicName&&publicName!==name&&publicName.indexOf('browse')!==0)tags.unshift(publicName);
     var size=(key.length+raw.length)*2;
-    groups[category].push({label:labels[type]||'离线数据',detail:tags.join(' · ')||'本地离线副本',bytes:size,time:obj&&Number(obj.t)||0,damaged:damaged});
+    var hasAll=false;
+    if(type==='self'&&semester){ for(var ai=0;ai<storage.length;ai++){var ak=storage.key(ai);if(ak&&ak.indexOf('jwxt_cache_self_')===0&&ak.indexOf(semester[0])>0&&/_all$/.test(ak)){var au=storage.getItem(ak)||'';if(au.indexOf('"courses"')>0)hasAll=true;}} }
+    var label=(labels[type]||'离线数据')+(isAll?'（整学期）':(type==='self'&&week&&hasAll?'（旧版按周副本）':''));
+    if(type==='self'&&week&&hasAll)tags.push('可清空，不影响切周');
+    groups[category].push({label:label,detail:tags.join(' · ')||'本地离线副本',bytes:size,time:obj&&Number(obj.t)||0,damaged:damaged,semester:semester?semester[0]:''});
     bytes+=size;total++;
   }
   return {groups:groups,total:total,bytes:bytes,hidden:hidden};
 }
 function cacheSize(bytes){return bytes<1024?'少于 1 KB':bytes<1048576?(bytes/1024).toFixed(1)+' KB':(bytes/1048576).toFixed(1)+' MB';}
-function renderCacheInventory(info) {
+function renderCacheInventory(info,opts) {
+  opts=opts||{};
   var html='<div class="cache-stats"><div><strong>'+info.total+'</strong><span>离线副本</span></div><div><strong>'+cacheSize(info.bytes)+'</strong><span>估算占用</span></div></div>';
   if(!info.total)html+='<div class="cache-empty">还没有离线数据<br><small>查询成功后会自动保存，之后可离线查看。</small></div>';
-  Object.keys(info.groups).forEach(function(category,index){
-    var items=info.groups[category];html+='<details class="cache-category"'+(index===0?' open':'')+'><summary><span>'+esc(category)+'</span><span>'+items.length+' 份</span></summary><div class="cache-entries">';
-    items.sort(function(a,b){return b.time-a.time;}).forEach(function(item){var time=item.time?new Date(item.time).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'时间未知';html+='<div class="cache-entry"><div><b>'+esc(item.label)+'</b><small>'+esc(item.detail)+'</small></div><div class="cache-entry-meta"><span>'+cacheSize(item.bytes)+'</span><time>'+esc(item.damaged?'数据损坏，可重新查询':time)+'</time></div></div>';});
+  var CAT_ORDER=['我的课表','教师课表','教室课表','班级课表','课程课表','成绩查询','绩点计算','学习进度','考试安排','选课结果','空教室','教师名录','班级名录','教室名录','全校名录','其他数据'];
+  Object.keys(info.groups).sort(function(a,b){var ia=CAT_ORDER.indexOf(a),ib=CAT_ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);}).forEach(function(category,index){
+    var items=info.groups[category];html+='<details class="cache-category"'+((!opts.collapsed&&index===0)?' open':'')+'><summary><span>'+esc(category)+'</span><span>'+items.length+' 份</span></summary><div class="cache-entries">';
+    /* 类别内再按学期分堆：一个学期一堆，整学期缓存排在该学期第一条 */
+    var bySem={};items.forEach(function(item){var k=item.semester||'其他';if(!bySem[k])bySem[k]=[];bySem[k].push(item);});
+    Object.keys(bySem).sort().forEach(function(sem){
+      var rows=bySem[sem];
+      html+='<div class="cache-semester"><div class="cache-semester-head"><span>'+esc(sem==='其他'?'其他数据':sem)+'</span><span>'+rows.length+' 份</span></div>';
+      rows.sort(function(a,b){var allSort=(/整学期/.test(a.label)?0:1)-(/整学期/.test(b.label)?0:1);return allSort||b.time-a.time;}).forEach(function(item){var time=item.time?new Date(item.time).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'时间未知';html+='<div class="cache-entry"><div><b>'+esc(item.label)+'</b><small>'+esc(item.detail)+'</small></div><div class="cache-entry-meta"><span>'+cacheSize(item.bytes)+'</span><time>'+esc(item.damaged?'数据损坏，可重新查询':time)+'</time></div></div>';});
+      html+='</div>';
+    });
     html+='</div></details>';
   });
+  if(info.total>4)html+='<div class="cache-scroll-hint">↕ 面板内可上下滑动查看全部</div>';
   return html+'<p class="cache-local-note">保存在当前设备 · 个人数据按账户隔离</p>';
 }
 
 function initExperience() {
-  if(!document.getElementById('bookBackdrop'))document.body.insertAdjacentHTML('afterbegin','<svg id="bookBackdrop" viewBox="0 0 620 430" aria-hidden="true" focusable="false"><ellipse cx="312" cy="354" rx="230" ry="17" fill="currentColor" opacity=".07"/><path class="book-page" d="M77 157Q190 115 310 166Q429 115 543 157L530 326Q415 298 310 347Q205 298 91 326Z"/><path class="book-lines" d="M310 166v181M104 176Q201 149 286 179M102 194Q200 167 286 197M100 212Q199 185 286 215M98 230Q198 203 286 233M96 248Q197 221 286 251M335 180Q425 149 514 176M335 198Q425 167 516 194M335 216Q425 185 518 212M335 234Q425 203 520 230M335 252Q425 221 522 248"/><g transform="translate(310 166)"><g class="book-turn page-one"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22M23 77Q110 25 197 43"/></g><g class="book-turn page-two"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22"/></g><g class="book-turn page-three"><path class="book-page" d="M0 0Q115-70 230-35L218 143Q106 112 0 181Z"/><path class="book-lines" d="M23 14Q110-38 203-20M23 35Q110-17 201 1M23 56Q110 4 199 22"/></g></g></svg>');
-  var main=document.getElementById('main');
-  if(!document.getElementById('claudeDashboard')){
-    var dashboard=document.createElement('div');dashboard.id='claudeDashboard';dashboard.className='claude-dashboard';
-    var hero=document.createElement('section');hero.className='claude-hero';
-    hero.innerHTML='<div class="welcome-copy"><div class="claude-eyebrow"><span class="claude-mark" aria-hidden="true">✳</span> JWXT / 教务手札</div><h2>今天，安排从容。</h2><p>课表、成绩与校园信息，在这里理清。</p></div><button type="button" class="claude-hero-action"><span>查看我的课表</span>'+experienceIcon('arrow')+'</button>';
-    hero.querySelector('button').onclick=function(){selectType('self');runQuery();};
-    var grid=document.createElement('div');grid.className='claude-grid';
-    var primary=document.createElement('div');primary.className='claude-primary';var support=document.createElement('div');support.className='claude-support';
-    ['todaySection','querySection','browseNav','cacheInfoSection'].forEach(function(id){var el=document.getElementById(id);if(el)(id==='querySection'||id==='browseNav'?primary:support).appendChild(el);});
-    grid.append(primary,support);dashboard.append(hero,grid);var login=document.getElementById('loginSection');main.insertBefore(dashboard,login.nextSibling);
-    var hint=document.createElement('div');hint.className='panel-hint';hint.innerHTML='<span>双击面板标题可收起贴边，展开后再次双击可还原。</span><button type="button" id="restoreHomePanels" hidden>还原全部面板</button>';hint.querySelector('button').onclick=restoreHomePanels;dashboard.appendChild(hint);
-  }
   var grid=document.getElementById('typeGrid'),buttons={};grid.querySelectorAll('.type-btn').forEach(function(b){buttons[b.dataset.v]=b;});grid.replaceChildren();
-  [['常用课表',['self','teacher','classroom','class','course']],['学习与教务',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='claude-entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id]){var icon=document.createElement('span');icon.className='entry-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=experienceIcon(id);buttons[id].prepend(icon);grid.appendChild(buttons[id]);}});});
-  try{JSON.parse(localStorage.getItem('jwxt_home_panels')||'[]').forEach(function(id){if(FLOAT_PANEL_IDS.indexOf(id)>=0)homeDockedPanels.add(id);});}catch(e){}
+  [['常用课表',['self','teacher','classroom','class','course']],['学习与教务',['score','gpa','progress','exam','electives','empty']]].forEach(function(group){var title=document.createElement('div');title.className='entry-heading';title.textContent=group[0];grid.appendChild(title);group[1].forEach(function(id){if(buttons[id]){var icon=document.createElement('span');icon.className='entry-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=experienceIcon(id);buttons[id].prepend(icon);grid.appendChild(buttons[id]);}});});
   FLOAT_PANEL_IDS.forEach(function(id){
     var el=document.getElementById(id),header=el.querySelector('.card-header'),tab=el.querySelector('.fd-tab');
     header.title='双击收起贴边；再次双击展开并还原默认位置';

@@ -2,9 +2,13 @@
 
 中央司法警官学院教务系统查询工具，WebView 包装的 Android 应用。
 
+> 当前版本 **v0.9.96（构建序号 V278）** · 文档更新 2026-11-22 · [最新 Release](https://github.com/changzheng7001/jwxt-query/releases)
+
 ## 功能
 
 - 课表查询（本人 / 教师 / 教室 / 班级 / 课程）
+- 课表页「唐韵书声」皮肤：山水常驻背景、金色画框表头、底部古筝动图，浅色 / 深色共用一套结构只换变量
+- 同一格多门课时只画首门并标 `+N`（N 为门数），顶部提示「列表可看全部」
 - 成绩与绩点
 - 学习进度
 - 考试安排
@@ -13,7 +17,7 @@
 - 本地缓存，无网也能查看
 - 沉浸式状态栏（与页面融为一体的透明状态栏，随明暗主题切换）
 - 常驻"今日课程"通知（按教学周过滤，点击直达本人课表）
-- Claude 暖纸色界面配合亚克力面板，支持浅色 / 深色 / 跟随安卓系统
+- 暖纸色界面配合亚克力面板，支持浅色 / 深色 / 跟随安卓系统
 - 首页四面板双击标题收起贴边，再次双击浮窗标题可还原
 - 单列课表仅展示今天，含时间、节次、教师、教室与班级
 - 缓存按类别整理，显示份数、估算占用与更新时间
@@ -23,7 +27,7 @@
 - 启动直达课表：设置里可选「首页 / 课表」，选课表后冷启动直接进本周课表，不经过首页
 - 设置入口为右侧磁贴，点击有跳动反馈后进入；设置页改用系统返回退出
 - 刷新有明确反馈：仅在手动点刷新时转圈并提示「正在刷新…／已更新」，读缓存不触发
-- 版本标识用 V 序号显示（如 V187），安装包 versionName 固定 0.9.8、versionCode 固定 1000，任意版本可互换覆盖安装
+- 版本标识用 V 序号显示（如 V278），安装包 versionName 随构建递增（当前 0.9.96），versionCode 固定 1000，任意版本可互换覆盖安装
 
 ## 技术架构
 
@@ -77,24 +81,40 @@
 
 ## 维护与代码链说明
 
-- **前端唯一源文件**：日常修改 `jwxt-webapp/index.html`、`ui/` 和 `schedule-assets/`。`ui/app.css` 维护统一外观，`ui/experience.js` 维护系统主题、首页布局、面板与缓存展示。
-- **同步所有打包目标**：运行 `powershell -ExecutionPolicy Bypass -File scripts/sync-web-assets.ps1`，将页面与离线图片同步到 apktool 和 Android Studio 两份工程，避免 APK 与网页预览不一致。
-- **Android 原生改动**：标准工程改 `cicp-jwxt-android/`；反编译打包改 `apk-source/`，并保持 Java/Smali 行为一致。
-- **版本号约定**：前端版本标识写 `V__VNUM__` 占位，打包时替换为 `V序号`；`apktool.yml` 的 `versionCode` 固定 `1000`，`versionName` 固定 `0.9.8`，不再逐版递增，避免降级被系统拦截、也免得每次改版本号重新对齐打包。
+- **前端唯一源文件**：日常修改 `jwxt-webapp/index.html`、`js/*.js` 和 `schedule-assets/`。`ui/app.css` 维护统一外观，`ui/experience.js` 维护系统主题、首页布局、面板与缓存展示。
+- **同步所有打包目标**：改完 `jwxt-webapp/` 后必须同步到 `apk-source/assets/` 与 `cicp-jwxt-android/app/src/main/assets/` 两份工程，否则打出来的包与网页预览不一致。Linux/macOS 下：
+
+  ```bash
+  cp jwxt-webapp/index.html apk-source/assets/index.html
+  cp jwxt-webapp/js/*.js   apk-source/assets/js/
+  cp jwxt-webapp/ui/*.js jwxt-webapp/ui/app.css apk-source/assets/ui/
+  rsync -a --delete jwxt-webapp/schedule-assets/ apk-source/assets/schedule-assets/
+  # cicp-jwxt-android/app/src/main/assets/ 同样复制一份
+  ```
+
+- **Android 原生改动**：标准工程改 `cicp-jwxt-android/`；反编译打包改 `apk-source/`，并保持 Java/Smali 行为一致。`apk-source/java/` 不参与打包，改完必须重跑 `javac → d8 → baksmali` 回填 `smali_classes2/`。
+- **版本号约定**：设置页版本标识写 `V序号`，同时改 `index.html` 的 `vX.Y.Z · Vxxx` 与 `apk-source/apktool.yml` 的 `versionName`；`versionCode` 固定 `1000`，保证任意版本可互相覆盖安装、出问题能立刻回退。
+- **视觉改前先 grep `ui/app.css`**：历史上多次「改了 `index.html` 却不生效」都是这里残留的 `!important` 覆盖造成的。
 
 ## 如何构建
 
 ### 方式一：apktool 快速打包（日常迭代，无需 Android SDK）
 
-前端修改后先同步页面和图片，然后：
-
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/sync-web-assets.ps1
-java -jar apktool.jar b apk-source -o cicp-jwxt_new.apk
-java -jar uber-apk-signer.jar -a cicp-jwxt_new.apk --out signed
+java -jar .buildtools/apktool.jar b apk-source -o /tmp/out.apk
+java -jar .buildtools/uber-apk-signer.jar --apks /tmp/out.apk \
+  --ks <你的 keystore>.jks --ksAlias <alias> --ksPass <pass> --ksKeyPass <pass> --out /tmp/signed
+# 产物：/tmp/signed/out-aligned-signed.apk
 ```
 
-签名后的 APK 可直接安装。
+校验：
+
+```bash
+aapt dump badging /tmp/signed/*-aligned-signed.apk | head -1   # 版本号是否与包内 appVNum 一致
+apksigner verify --print-certs /tmp/signed/*-aligned-signed.apk   # 签名证书 SHA-256
+```
+
+`apktool.yml` 的 `versionCode` 固定 1000，不要改。
 
 ### 方式二：标准 Android Studio 工程
 
@@ -131,65 +151,48 @@ cd cicp-jwxt-android
 
 ## 待解决问题
 
-以下为截至 V189 的状态，按影响排序。欢迎提 Issue 指认或补充。
+以下为截至 V278 的状态，按影响排序。欢迎提 Issue 指认或补充。
 
-### 1. 官网页面在手机端仍是 PC 布局（V188 已改造，待真机确认）
+### 1. 班级查询按前缀匹配，会一次命中多个班
 
-App 内打开的教务页面本身是为电脑大屏设计的，侧栏固定 275px、内容区按桌面宽度排版。
+教务系统的 `skbj` 参数是**前缀匹配**：传「2026级」会命中 3 个班，同格课程数暴涨到 52~76 门。
 
-- V188 已做：给所有页面（含 iframe 子页）补 `<meta viewport>`，否则 WebView 仍按 980px 逻辑宽度渲染；移动端样式扩展到子页常见容器（`.container` / `.content` / `.mainbody` 等）与表单控件；宽表保持自然宽度、由页面横向滚动承载，不再强行压缩到屏幕宽
-- 仍需确认：深层子页的实际表现，以及个别页面用 JS 动态设宽的情况
-- 临时办法：设置里可切换为「外部浏览器」打开，交给浏览器自己缩放
+- 现状已做的兜底：查询结果按所选班名精筛；同格只画首门并标 `+N`；顶部提示「列表可看全部」
+- 未做的根治：查询阶段就弹出班名列表让用户选班，而不是先拉回一大堆再筛
 
-### 2. 官网跳转带不上查询参数（V188 已做注入回填）
+### 2. 底部动图体积 625KB
 
-点「前往官网」原本只能落到对应模块的**查询页**，带不出当前条件。原因是教务系统的查询结果是 POST 提交的，URL 里传不进去。
+课表页古筝动图为保持肉眼清晰度，保留了原始 750×440 / 80 帧，重新编码后 625KB，使安装包从 416KB 涨到约 1MB。
 
-- V188 已做：把条件编码进 URL 的 `__q` 参数，原生侧在目标页注入脚本，把学期/姓名/周次回填到 `Form1` 并自动提交，结果落到 `fcenter` iframe
-- 覆盖范围：教师 / 教室 / 班级 / 课程 四类课表查询页
-- 不支持：成绩页（`cjcx_list` 是直接列表页，没有查询表单可回填）；「我的课表」在官网没有独立结果页，仍回落到个人主页
+- 若要压体积，可降到 6fps 省约 200KB，代价是动作不如现在顺
+- 当前取舍：清晰度优先
 
-### 3. 会话过期后的回跳未全量验证
+### 3. 考试安排 / 选课结果没有真实数据可验
 
-会话过期时现在复用未登录流程：App 内弹登录框，登录成功后自动打开原目标页（`InAppOpen` 写 `window.__pendingOfficialUrl`，前端登录成功后读取并跳转）。这条链路在没有真实过期场景下不易复现，建议在自然过期时再确认一次。
+教务系统对该账号两个学期均返回「未查询到数据」，内容行渲染只能用合成样本验证，真实数据出现后需重抓复核。
 
-### 4. 教师名解析仍是启发式（V188 已增强）
+### 4. 教师名解析仍是启发式
 
 课程课表的格子会把「班级」和「教师」排成相邻行，个别课程还会粘成一行（如 `矫正教育一班26闵奎元`）。
 
-- V188 已做：解析课表前若全校教师名单缺失，自动空参拉一次 `kbxx_teacher_ifr`（教师名留空 + 周次 1~总周数），拿到全校教师集合后做**最长优先精确匹配**；顺带修了缓存 key 少学期后缀、永远读不到的问题
-- 仍可能出错：复姓、外聘标注、多教师混排；此时仍退回百家姓规则，识别不出的保留原文并标「待确认」
+- 已做：解析前若全校教师名单缺失，自动空参拉一次 `kbxx_teacher_ifr`，拿到全校教师集合后做最长优先精确匹配
+- 仍可能出错：复姓、外聘标注、多教师混排；此时退回百家姓规则，识别不出的保留原文并标「待确认」
 
-### 5. 用户自定义注入（V188 已启用并加隔离）
+### 5. 用户自定义注入
 
-读取 `Android/data/com.cicp.jwxt/files/jwxt-user.css` 与 `jwxt-user.js`，打开官网时注入，改完重开即生效。这两个文件其实一直在生效（早期 README 写的「只读取不使用」是过时描述）。
-
-- V188 已做：自定义 JS 用 `try/catch` 包一层，脚本报错只在控制台告警，不影响页面本身可用
+读取 `Android/data/com.cicp.jwxt/files/jwxt-user.css` 与 `jwxt-user.js`，打开官网时注入，改完重开即生效。自定义 JS 用 `try/catch` 包一层，报错只在控制台告警。
 
 ### 6. versionCode 固定带来的取舍
 
-为让任意版本可互相覆盖安装，`versionCode` 固定 `1000`，版本高低只能看设置页的 V 序号。副作用是系统设置里看不出升级顺序，也无法用版本号做灰度或强制更新判断。属于侧载分发场景下的有意取舍，暂不改。
+为让任意版本可互相覆盖安装，`versionCode` 固定 `1000`，版本高低只能看设置页的 V 序号。副作用是系统里看不出升级顺序，也无法用版本号做灰度或强制更新判断。属于侧载分发场景下的有意取舍，暂不改。
 
-### 7. 打包源与发布版存在漂移（V189 已对齐）
+### 7. 打包链路没有自动化（无 CI）
 
-`apk-source/` 走 apktool 构建，只认 smali 目录；`java/` 下的源码**不参与打包**。这个目录长期落后于实际发布的 APK，V188 就因此翻车：装上去点登录直接闪退、底部浮条出现透明区。
+发版靠手动跑脚本：同步 assets → apktool 打包 → uber-apk-signer 签名 → aapt 校验版本 → apksigner 校验证书 → 解包核对 md5。仓库里只有源码和 `.buildtools/` 两个 jar，没有流水线，换台机器要重搭环境。
 
-对齐 V187 发布版后，实际缺失/不一致的是这几处：
+### 8. 回归样本不入库
 
-| 项 | 发布版 | 仓库里的 apk-source |
-|---|---|---|
-| Manifest | 有 `networkSecurityConfig` | **缺失**（明文 HTTP 被拦，登录失败） |
-| `apktool.yml` | `targetSdkVersion 35` | 34（**丧失 edge-to-edge，底部露出系统导航栏**） |
-| `res/xml/network_security_config.xml` | 存在 | **整个文件缺失** |
-| `res/values/public.xml` | 5 条声明 | 只有 2 条 |
-
-- V189 已补：以上四项全部对齐；`InAppOpen` / `CookieWebClient` 的 smali 用 `javac`（android.jar 作 classpath）→ `d8` → `baksmali` 生成并补进 `smali_classes2/`
-- 校验方法：把新包反编译后与上一版逐文件 `diff`，应只剩本次有意修改的文件
-- 仍需注意：以后改 `apk-source/java/` 下的类，必须重跑一遍 smali 转换；改资源或包配置时，先与上一版 APK 反编译结果比对，避免再次漂移
-
-### 8. 打包链路没有自动化（无 CI）
-
-现在的发版流程是手动跑脚本：改 smali / 编译 java → d8 转 dex → 回填 assets → 自签名 → 上传 → 校验 sha256。仓库里只有源码，没有流水线，别人 clone 下来没法一键出包，换台机器要重新搭环境（apktool、d8、android.jar、签名密钥）。
+`tests/fixtures/` 下的教务页面样本含真实师生姓名、学号与本人在读成绩，因此不提交到仓库（仓库是公开的）。本地跑 `node tests/*.test.cjs` 需要自行准备样本，逻辑测试本身含不依赖样本的用例。
 
 ## 时间线
 
@@ -207,27 +210,51 @@ App 内打开的教务页面本身是为电脑大屏设计的，侧栏固定 275
 | 2026-11-12 | v186–v187 | 会话过期不再弹自建提示页，直接复用「未登录即弹登录框」的流程，登录成功后回跳原目标页 |
 | 2026-11-12 | v188 | 补齐构建链缺失的两个类；官网手机适配补 viewport 并覆盖 iframe 子页；官网跳转带查询条件回填；教师名解析改为自动预拉全校教师名单。**该版打包源与发布版漂移，点登录闪退、底部浮条露出透明区，已废弃** |
 | 2026-11-12 | v189 | 打包源对齐 V187 发布版：补 `networkSecurityConfig` 与 `res/xml` 配置、`public.xml` 补全 5 条声明、`targetSdkVersion` 回到 35 恢复 edge-to-edge；反编译校验后与 V187 仅差本次有意修改的文件 |
+| 2026-11-13 → 11-20 | v190–v272 | 课表「唐韵书声」皮肤落地与多轮打磨、班级/教室/教师/课程课表查询链路、深色主题、缓存按类别分组、磁贴与面板交互。这一段逐版细节未逐条留档 |
+| 2026-11-20 | v273–v274 | 解析扩样本（班级 1691 / 教师 1721 / 教室 1689 条全部 0 空课程名、0 空教师名）；合并键并入 `classes`，同门课不同班不再被压成一条；班级查询按班名精筛 |
+| 2026-11-20 | v275–v276 | 表头一度被误放到顶栏（用户指出后回退）；清掉 `app.css` 三处 `!important` 覆盖——历次「表头看不见」的真凶在这里；底部动图恢复 750×440 原尺寸并贴齐右边缘 |
+| 2026-11-20 | v277 | 同格多课只画首门 + `+N` 角标与 28 字提示条；表头与顶栏统一为「同一套结构只换变量」；删除深色专用表头图 |
+| 2026-11-22 | v278 | 表头恢复原始 `tangyun-head.png` 无损金框图；深色压暗改用 `--head-scrim` 变量（与顶栏同值 0.62）；修 `background-image: transparent` 非法值导致表头图不渲染的 bug |
 
 ## 版本
 
-当前版本：**v0.9.8（构建序号 V189）**（测试版；1.0 为正式版）
+当前版本：**v0.9.96（构建序号 V278）**，2026-11-22 更新（测试版；1.0 为正式版）
 
-- 对外展示用 `V序号`（设置页右上角、关于项），源码中用 `V__VNUM__` 占位，打包时替换
-- 安装包 `versionName` 固定 `0.9.8`，`versionCode` 固定 `1000`，新老构建可互相覆盖安装，方便回退验证
-- 最新构建下载：[v0.9.8-v189 Release](https://github.com/changzheng7001/jwxt-query/releases/tag/v0.9.8-v189)（预发布，含 APK）
+- 对外展示用 `V序号`（设置页右上角），源码同步写 `vX.Y.Z · Vxxx`
+- 安装包 `versionName` 随构建递增（当前 `0.9.96`），`versionCode` 固定 `1000`，新老构建可互相覆盖安装，方便回退验证
+- 最新构建在 [Releases](https://github.com/changzheng7001/jwxt-query/releases) 页面，APK 作为 Release 附件分发，不进 git
 
 ## 开发说明
 
-本项目主要由 AI 智能体协作开发完成：早期界面与打包链路由 [豆包工作](https://www.doubao.com) 协助，v0.9.8 的 Claude 风格界面由 Codex 协作实现，v145 起的官网跳转与手机适配迭代由 Amoo（STEPX Neo 内置助手）完成。
+本项目主要由 AI 智能体协作开发完成，各阶段接手的工具如下：
 
-### Amoo 开发带来的便利
+| 阶段 | 时间 | 接手方 | 主要工作 |
+|---|---|---|---|
+| 早期 | — | [豆包工作](https://www.doubao.com) | 初版界面与打包链路 |
+| v0.9.8 | 2026-10 | Codex | Claude 暖纸色风格界面 |
+| v145–v189 | 2026-11-10 → 11-12 | Amoo（STEPX Neo 内置助手） | 官网免登录跳转、手机端适配、打包源对齐 |
+| **v190 起** | **2026-11-13 至今** | **豆包搭子工作模式（Doubao Agent）** | 课表「唐韵书声」皮肤、多类型课表、解析重构、深浅主题统一、每轮出包交付 |
 
-- **端到端闭环**：从改源码、重建 dex、签名、上传、下发到手机、校验 sha256，全流程在对话里完成，不用来回切工具
-- **真机即测**：打包后直接推到手机「下载」目录并校验哈希，用户装完给一张截图就能继续定位，反馈链路很短
-- **不依赖本地环境**：云侧完成 smali/java 编译与 d8 转换，无需本机装 Android SDK 或 Android Studio
-- **能读回执自证**：无法直接看界面时，让 App 把 Cookie 长度、返回码、页面标题写进下载目录或页面内提示，用真实回执替代猜测
-- **逐版可回退**：versionCode 固定 1000、版本靠 V 序号区分，任何一版都能直接覆盖安装，出问题可立刻回到上一版
-- **改动可追溯**：每版构建脚本、签名、产物 sha256 都留档，README 与 CHANGELOG 同步记录时间线
+**v190 之后固定使用的工具链**（后续沿用）：
+
+| 环节 | 工具 |
+|---|---|
+| 任务编排与代码修改 | 豆包搭子工作模式（Doubao Agent，读写工程源码） |
+| 打包 / 签名 | `apktool`（`.buildtools/apktool.jar`）+ `uber-apk-signer`（zipalign + 自签名） |
+| 包校验 | Android SDK build-tools 的 `aapt dump badging`、`apksigner verify --print-certs` |
+| 视觉回归 | Playwright + 无头 Chromium，注入 mock `window.Android.httpRequest` 喂真实页面样本，深浅两套截图 |
+| 像素级比对 | Python + Pillow，按 device px 采样，替代肉眼看缩略图 |
+| 逻辑回归 | `node tests/schedule.test.cjs`、`node tests/experience.test.cjs`（共 17 项） |
+| 发布 | 本机 `gh` CLI（clone → commit → push，Release 附件上传 APK） |
+
+### 这套流程带来的便利
+
+- **端到端闭环**：改源码 → 同步两份 assets → 打包 → 签名 → aapt/apksigner 校验 → 解包 md5 核对 → 交付，全在对话里完成
+- **真机即测**：交付一张 APK 卡片，用户装完回一张截图就能继续定位，反馈链路很短
+- **不依赖本地环境**：云侧完成打包与签名，无需本机装 Android Studio
+- **能读回执自证**：无法直接看界面时，用无头浏览器截图和像素采样替代猜测；强断言不靠肉眼
+- **逐版可回退**：versionCode 固定 1000，任何一版都能直接覆盖安装，出问题可立刻回到上一版
+- **改动可追溯**：README 与 CHANGELOG 同步记录时间线，每轮出包都核对包内文件与源码逐字节一致
 
 ## 说明
 

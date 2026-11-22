@@ -4,13 +4,21 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const html = fs.readFileSync(path.join(__dirname,'../jwxt-webapp/index.html'),'utf8');
+const rawHtml = fs.readFileSync(path.join(__dirname,'../jwxt-webapp/index.html'),'utf8');
+const html = (() => {
+  const dir = path.join(__dirname,'../jwxt-webapp/js');
+  const parts = fs.existsSync(dir)
+    ? fs.readdirSync(dir).sort().map(f => fs.readFileSync(path.join(dir,f),'utf8'))
+    : [];
+  return rawHtml + '\n' + parts.join('\n');
+})();
+const code = html;
 function fn(name) {
-  const start = html.indexOf('function '+name+'(');
+  const start = code.indexOf('function '+name+'(');
   assert.ok(start >= 0, name+' exists');
   let i=html.indexOf('{',start)+1,depth=1;
   for (;depth;i++) { if(html[i]==='{')depth++;if(html[i]==='}')depth--; }
-  return html.slice(start,i);
+  return code.slice(start,i);
 }
 function context() {
   const elements={queryWeek:{value:''},queryWeekday:{value:''},querySemester:{value:'2026-2027-1'},queryName:{value:''},weekPicker:{style:{}},weekPickerMask:{style:{}}};
@@ -62,6 +70,6 @@ test('grid course names wrap in groups of four while retaining the full accessib
   assert.ok(pane.includes('<div class="cn"><span>刑事诉讼</span><span>法学</span></div>'));assert.ok(pane.includes('aria-label="刑事诉讼法学 第1-2节"'));
 });
 test('front-end, packaged HTML and all bundled assets stay identical',()=>{
-  const root=path.join(__dirname,'..');assert.equal(html,fs.readFileSync(path.join(root,'apk-source/assets/index.html'),'utf8'));
+  const root=path.join(__dirname,'..');assert.equal(rawHtml,fs.readFileSync(path.join(root,'apk-source/assets/index.html'),'utf8'));
   for(const name of fs.readdirSync(path.join(root,'jwxt-webapp/schedule-assets')))assert.deepEqual(fs.readFileSync(path.join(root,'jwxt-webapp/schedule-assets',name)),fs.readFileSync(path.join(root,'apk-source/assets/schedule-assets',name)));
 });

@@ -18,6 +18,10 @@
 
 .field private final host:Ljava/lang/String;
 
+.field private mobilePage:Ljava/lang/String;
+
+.field private volatile nativeUntil:J
+
 .field private final padBottom:I
 
 .field private final padTop:I
@@ -31,54 +35,68 @@
 .method public constructor <init>(Ljava/lang/String;Ljava/lang/String;)V
     .registers 4
 
-    .line 31
+    .line 37
     const/4 v0, 0x0
 
     invoke-direct {p0, p1, p2, v0, v0}, Lcom/cicp/jwxt/CookieWebClient;-><init>(Ljava/lang/String;Ljava/lang/String;II)V
 
-    .line 32
+    .line 38
     return-void
 .end method
 
 .method public constructor <init>(Ljava/lang/String;Ljava/lang/String;II)V
-    .registers 6
+    .registers 7
 
-    .line 34
+    .line 40
     invoke-direct {p0}, Landroid/webkit/WebViewClient;-><init>()V
 
-    .line 26
+    .line 29
+    const-wide/16 v0, 0x0
+
+    iput-wide v0, p0, Lcom/cicp/jwxt/CookieWebClient;->nativeUntil:J
+
+    .line 32
     const-string v0, ""
 
     iput-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
 
-    .line 27
+    .line 33
     iput-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
 
-    .line 35
+    .line 41
     iput-object p1, p0, Lcom/cicp/jwxt/CookieWebClient;->host:Ljava/lang/String;
 
-    .line 36
-    if-nez p2, :cond_e
+    .line 42
+    if-nez p2, :cond_12
 
     move-object p2, v0
 
-    :cond_e
+    :cond_12
     iput-object p2, p0, Lcom/cicp/jwxt/CookieWebClient;->cookie:Ljava/lang/String;
 
-    .line 37
+    .line 43
     iput p3, p0, Lcom/cicp/jwxt/CookieWebClient;->padTop:I
 
-    .line 38
+    .line 44
     iput p4, p0, Lcom/cicp/jwxt/CookieWebClient;->padBottom:I
 
-    .line 39
+    .line 45
     return-void
+.end method
+
+.method public static UA()Ljava/lang/String;
+    .registers 1
+
+    .line 272
+    const-string v0, "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+
+    return-object v0
 .end method
 
 .method private applyInset(Landroid/webkit/WebView;Ljava/lang/String;)V
     .registers 6
 
-    .line 44
+    .line 50
     const/4 v0, 0x0
 
     if-eqz p2, :cond_f
@@ -96,17 +114,17 @@
 
     goto :goto_10
 
-    .line 47
+    .line 53
     :catchall_d
     move-exception p1
 
-    goto :goto_26
+    goto :goto_28
 
-    .line 44
+    .line 50
     :cond_f
     move p2, v0
 
-    .line 45
+    .line 51
     :goto_10
     if-eqz p2, :cond_15
 
@@ -130,35 +148,35 @@
     :goto_1c
     invoke-virtual {p1, v0, v1, v0, v2}, Landroid/webkit/WebView;->setPadding(IIII)V
 
-    .line 46
-    if-eqz p2, :cond_22
+    .line 52
+    if-eqz p2, :cond_24
 
-    const/4 v0, -0x1
+    const v0, -0x110f0c
 
-    :cond_22
+    :cond_24
     invoke-virtual {p1, v0}, Landroid/webkit/WebView;->setBackgroundColor(I)V
-    :try_end_25
-    .catchall {:try_start_3 .. :try_end_25} :catchall_d
+    :try_end_27
+    .catchall {:try_start_3 .. :try_end_27} :catchall_d
 
-    .line 48
+    .line 54
     nop
 
-    .line 49
-    :goto_26
+    .line 55
+    :goto_28
     return-void
 .end method
 
 .method private static extractQuery(Ljava/lang/String;)Ljava/lang/String;
     .registers 6
 
-    .line 104
+    .line 167
     const/4 v0, 0x0
 
     if-nez p0, :cond_4
 
     return-object v0
 
-    .line 105
+    .line 168
     :cond_4
     const-string v1, "__q="
 
@@ -166,12 +184,12 @@
 
     move-result v1
 
-    .line 106
+    .line 169
     if-gez v1, :cond_d
 
     return-object v0
 
-    .line 107
+    .line 170
     :cond_d
     add-int/lit8 v1, v1, 0x4
 
@@ -179,14 +197,14 @@
 
     move-result-object p0
 
-    .line 108
+    .line 171
     const/16 v1, 0x26
 
     invoke-virtual {p0, v1}, Ljava/lang/String;->indexOf(I)I
 
     move-result v1
 
-    .line 109
+    .line 172
     const/4 v2, 0x0
 
     if-ltz v1, :cond_20
@@ -195,7 +213,7 @@
 
     move-result-object p0
 
-    .line 110
+    .line 173
     :cond_20
     const/16 v1, 0x23
 
@@ -203,14 +221,14 @@
 
     move-result v1
 
-    .line 111
+    .line 174
     if-ltz v1, :cond_2c
 
     invoke-virtual {p0, v2, v1}, Ljava/lang/String;->substring(II)Ljava/lang/String;
 
     move-result-object p0
 
-    .line 112
+    .line 175
     :cond_2c
     invoke-virtual {p0}, Ljava/lang/String;->length()I
 
@@ -228,7 +246,7 @@
 
     goto :goto_a1
 
-    .line 113
+    .line 176
     :cond_3b
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -238,7 +256,7 @@
 
     invoke-direct {v1, v3}, Ljava/lang/StringBuilder;-><init>(I)V
 
-    .line 114
+    .line 177
     nop
 
     :goto_45
@@ -248,12 +266,12 @@
 
     if-ge v2, v3, :cond_95
 
-    .line 115
+    .line 178
     invoke-virtual {p0, v2}, Ljava/lang/String;->charAt(I)C
 
     move-result v3
 
-    .line 116
+    .line 179
     const/16 v4, 0x41
 
     if-lt v3, v4, :cond_57
@@ -321,17 +339,17 @@
 
     if-ne v3, v4, :cond_92
 
-    .line 119
+    .line 182
     :cond_8f
     invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
 
-    .line 114
+    .line 177
     :cond_92
     add-int/lit8 v2, v2, 0x1
 
     goto :goto_45
 
-    .line 122
+    .line 185
     :cond_95
     invoke-virtual {v1}, Ljava/lang/StringBuilder;->length()I
 
@@ -349,19 +367,19 @@
     :goto_a0
     return-object v0
 
-    .line 112
+    .line 175
     :cond_a1
     :goto_a1
     return-object v0
 .end method
 
-.method private fetch(Ljava/lang/String;Ljava/lang/String;)Landroid/webkit/WebResourceResponse;
-    .registers 14
+.method private fetch(Ljava/lang/String;Ljava/lang/String;Z)Landroid/webkit/WebResourceResponse;
+    .registers 15
 
-    .line 231
+    .line 322
     nop
 
-    .line 233
+    .line 324
     const/4 v0, 0x0
 
     :try_start_2
@@ -375,37 +393,37 @@
 
     check-cast v1, Ljava/net/HttpURLConnection;
     :try_end_d
-    .catchall {:try_start_2 .. :try_end_d} :catchall_12a
+    .catchall {:try_start_2 .. :try_end_d} :catchall_134
 
-    .line 234
+    .line 325
     :try_start_d
     const-string v2, "GET"
 
     invoke-virtual {v1, v2}, Ljava/net/HttpURLConnection;->setRequestMethod(Ljava/lang/String;)V
 
-    .line 235
+    .line 326
     const/16 v2, 0x2ee0
 
     invoke-virtual {v1, v2}, Ljava/net/HttpURLConnection;->setConnectTimeout(I)V
 
-    .line 236
+    .line 327
     const/16 v2, 0x4650
 
     invoke-virtual {v1, v2}, Ljava/net/HttpURLConnection;->setReadTimeout(I)V
 
-    .line 237
+    .line 328
     const/4 v2, 0x1
 
     invoke-virtual {v1, v2}, Ljava/net/HttpURLConnection;->setInstanceFollowRedirects(Z)V
 
-    .line 238
+    .line 329
     const-string v3, "User-Agent"
 
     const-string v4, "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
 
     invoke-virtual {v1, v3, v4}, Ljava/net/HttpURLConnection;->setRequestProperty(Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 239
+    .line 330
     iget-object v3, p0, Lcom/cicp/jwxt/CookieWebClient;->cookie:Ljava/lang/String;
 
     invoke-virtual {v3}, Ljava/lang/String;->length()I
@@ -420,58 +438,58 @@
 
     invoke-virtual {v1, v3, v4}, Ljava/net/HttpURLConnection;->setRequestProperty(Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 240
+    .line 331
     :cond_36
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->getResponseCode()I
 
     move-result v3
     :try_end_3a
-    .catchall {:try_start_d .. :try_end_3a} :catchall_128
+    .catchall {:try_start_d .. :try_end_3a} :catchall_132
 
-    .line 241
+    .line 332
     const/16 v4, 0x190
 
     if-lt v3, v4, :cond_44
 
-    .line 277
+    .line 372
     if-eqz v1, :cond_43
 
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->disconnect()V
 
-    .line 241
+    .line 332
     :cond_43
     return-object v0
 
-    .line 242
+    .line 333
     :cond_44
     :try_start_44
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->getContentType()Ljava/lang/String;
 
     move-result-object v3
 
-    .line 243
+    .line 334
     const-string v4, "UTF-8"
 
-    .line 244
+    .line 335
     const/4 v5, 0x0
 
     if-eqz v3, :cond_7f
 
-    .line 245
+    .line 336
     const-string v6, ";"
 
     invoke-virtual {v3, v6}, Ljava/lang/String;->split(Ljava/lang/String;)[Ljava/lang/String;
 
     move-result-object v3
 
-    .line 246
+    .line 337
     aget-object v6, v3, v5
 
     invoke-virtual {v6}, Ljava/lang/String;->trim()Ljava/lang/String;
 
     move-result-object v6
 
-    .line 247
+    .line 338
     move v7, v2
 
     :goto_5a
@@ -479,14 +497,14 @@
 
     if-ge v7, v8, :cond_7e
 
-    .line 248
+    .line 339
     aget-object v8, v3, v7
 
     invoke-virtual {v8}, Ljava/lang/String;->trim()Ljava/lang/String;
 
     move-result-object v8
 
-    .line 249
+    .line 340
     invoke-virtual {v8}, Ljava/lang/String;->toLowerCase()Ljava/lang/String;
 
     move-result-object v9
@@ -499,7 +517,7 @@
 
     if-eqz v9, :cond_7b
 
-    .line 250
+    .line 341
     const/16 v3, 0x8
 
     invoke-virtual {v8, v3}, Ljava/lang/String;->substring(I)Ljava/lang/String;
@@ -510,12 +528,12 @@
 
     move-result-object v4
 
-    .line 251
+    .line 342
     move-object v3, v6
 
     goto :goto_7f
 
-    .line 247
+    .line 338
     :cond_7b
     add-int/lit8 v7, v7, 0x1
 
@@ -524,7 +542,7 @@
     :cond_7e
     move-object v3, v6
 
-    .line 255
+    .line 346
     :cond_7f
     :goto_7f
     if-eqz v3, :cond_8f
@@ -548,23 +566,23 @@
 
     move-result-object v3
 
-    .line 256
+    .line 347
     :cond_93
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->getInputStream()Ljava/io/InputStream;
 
     move-result-object p1
 
-    .line 257
+    .line 348
     new-instance v6, Ljava/io/ByteArrayOutputStream;
 
     invoke-direct {v6}, Ljava/io/ByteArrayOutputStream;-><init>()V
 
-    .line 258
+    .line 349
     const/16 v7, 0x2000
 
     new-array v7, v7, [B
 
-    .line 260
+    .line 351
     :goto_a0
     invoke-virtual {p1, v7}, Ljava/io/InputStream;->read([B)I
 
@@ -576,16 +594,16 @@
 
     goto :goto_a0
 
-    .line 261
+    .line 352
     :cond_aa
     invoke-virtual {p1}, Ljava/io/InputStream;->close()V
 
-    .line 262
+    .line 353
     invoke-virtual {v6}, Ljava/io/ByteArrayOutputStream;->toByteArray()[B
 
     move-result-object p1
 
-    .line 263
+    .line 354
     if-eqz v3, :cond_c1
 
     invoke-virtual {v3}, Ljava/lang/String;->toLowerCase()Ljava/lang/String;
@@ -607,53 +625,66 @@
     :cond_c1
     move v6, v5
 
-    .line 264
+    .line 355
     :goto_c2
-    if-eqz p2, :cond_118
+    if-eqz p2, :cond_122
 
-    if-eqz v6, :cond_118
+    if-eqz v6, :cond_122
 
     array-length v6, p1
 
-    if-lez v6, :cond_118
+    if-lez v6, :cond_122
 
-    .line 265
+    .line 356
     new-instance v6, Ljava/lang/String;
 
     invoke-direct {v6, p1, v4}, Ljava/lang/String;-><init>([BLjava/lang/String;)V
 
-    .line 266
+    .line 357
+    if-eqz p3, :cond_d8
+
+    .line 359
+    const-string p1, "(?is)<meta[^>]+name\\s*=\\s*[\\\"\']viewport[\\\"\'][^>]*>"
+
+    const-string p3, ""
+
+    invoke-virtual {v6, p1, p3}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v6
+
+    .line 361
+    :cond_d8
     invoke-virtual {v6}, Ljava/lang/String;->toLowerCase()Ljava/lang/String;
 
     move-result-object p1
 
-    const-string v7, "<head"
+    const-string p3, "<head"
 
-    invoke-virtual {p1, v7}, Ljava/lang/String;->indexOf(Ljava/lang/String;)I
-
-    move-result p1
-
-    .line 267
-    if-ltz p1, :cond_e1
-
-    const/16 v7, 0x3e
-
-    invoke-virtual {v6, v7, p1}, Ljava/lang/String;->indexOf(II)I
+    invoke-virtual {p1, p3}, Ljava/lang/String;->indexOf(Ljava/lang/String;)I
 
     move-result p1
 
-    goto :goto_e2
+    .line 362
+    if-ltz p1, :cond_eb
 
-    :cond_e1
+    const/16 p3, 0x3e
+
+    invoke-virtual {v6, p3, p1}, Ljava/lang/String;->indexOf(II)I
+
+    move-result p1
+
+    goto :goto_ec
+
+    :cond_eb
     const/4 p1, -0x1
 
-    .line 268
-    :goto_e2
-    if-lez p1, :cond_103
+    .line 363
+    :goto_ec
+    if-lez p1, :cond_10d
 
-    new-instance v7, Ljava/lang/StringBuilder;
+    new-instance p3, Ljava/lang/StringBuilder;
 
-    invoke-direct {v7}, Ljava/lang/StringBuilder;-><init>()V
+    invoke-direct {p3}, Ljava/lang/StringBuilder;-><init>()V
 
     add-int/2addr p1, v2
 
@@ -661,11 +692,11 @@
 
     move-result-object v2
 
-    invoke-virtual {v7, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {p3, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    move-result-object v2
+    move-result-object p3
 
-    invoke-virtual {v2, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {p3, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object p2
 
@@ -681,10 +712,10 @@
 
     move-result-object p1
 
-    goto :goto_114
+    goto :goto_11e
 
-    .line 269
-    :cond_103
+    .line 364
+    :cond_10d
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1}, Ljava/lang/StringBuilder;-><init>()V
@@ -701,62 +732,62 @@
 
     move-result-object p1
 
-    .line 270
-    :goto_114
+    .line 365
+    :goto_11e
     invoke-virtual {p1, v4}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
 
     move-result-object p1
 
-    .line 273
-    :cond_118
+    .line 368
+    :cond_122
     new-instance p2, Landroid/webkit/WebResourceResponse;
 
-    new-instance v2, Ljava/io/ByteArrayInputStream;
+    new-instance p3, Ljava/io/ByteArrayInputStream;
 
-    invoke-direct {v2, p1}, Ljava/io/ByteArrayInputStream;-><init>([B)V
+    invoke-direct {p3, p1}, Ljava/io/ByteArrayInputStream;-><init>([B)V
 
-    invoke-direct {p2, v3, v4, v2}, Landroid/webkit/WebResourceResponse;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/io/InputStream;)V
-    :try_end_122
-    .catchall {:try_start_44 .. :try_end_122} :catchall_128
+    invoke-direct {p2, v3, v4, p3}, Landroid/webkit/WebResourceResponse;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/io/InputStream;)V
+    :try_end_12c
+    .catchall {:try_start_44 .. :try_end_12c} :catchall_132
 
-    .line 277
-    if-eqz v1, :cond_127
+    .line 372
+    if-eqz v1, :cond_131
 
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->disconnect()V
 
-    .line 273
-    :cond_127
+    .line 368
+    :cond_131
     return-object p2
 
-    .line 274
-    :catchall_128
+    .line 369
+    :catchall_132
     move-exception p1
 
-    goto :goto_12c
+    goto :goto_136
 
-    :catchall_12a
+    :catchall_134
     move-exception p1
 
     move-object v1, v0
 
-    .line 275
-    :goto_12c
+    .line 370
+    :goto_136
     nop
 
-    .line 277
-    if-eqz v1, :cond_132
+    .line 372
+    if-eqz v1, :cond_13c
 
     invoke-virtual {v1}, Ljava/net/HttpURLConnection;->disconnect()V
 
-    .line 275
-    :cond_132
+    .line 370
+    :cond_13c
     return-object v0
 .end method
 
 .method private guessMime(Ljava/lang/String;)Ljava/lang/String;
     .registers 4
 
-    .line 162
+    .line 225
     if-nez p1, :cond_5
 
     const-string p1, ""
@@ -768,7 +799,7 @@
 
     move-result-object p1
 
-    .line 163
+    .line 226
     :goto_9
     const/16 v0, 0x3f
 
@@ -776,7 +807,7 @@
 
     move-result v0
 
-    .line 164
+    .line 227
     if-lez v0, :cond_16
 
     const/4 v1, 0x0
@@ -785,7 +816,7 @@
 
     move-result-object p1
 
-    .line 165
+    .line 228
     :cond_16
     const-string v0, ".css"
 
@@ -799,7 +830,7 @@
 
     return-object p1
 
-    .line 166
+    .line 229
     :cond_21
     const-string v0, ".js"
 
@@ -813,7 +844,7 @@
 
     return-object p1
 
-    .line 167
+    .line 230
     :cond_2c
     const-string v0, ".png"
 
@@ -827,7 +858,7 @@
 
     return-object p1
 
-    .line 168
+    .line 231
     :cond_37
     const-string v0, ".jpg"
 
@@ -847,7 +878,7 @@
 
     goto :goto_7d
 
-    .line 169
+    .line 232
     :cond_48
     const-string v0, ".gif"
 
@@ -861,7 +892,7 @@
 
     return-object p1
 
-    .line 170
+    .line 233
     :cond_53
     const-string v0, ".svg"
 
@@ -875,7 +906,7 @@
 
     return-object p1
 
-    .line 171
+    .line 234
     :cond_5e
     const-string v0, ".woff"
 
@@ -903,20 +934,20 @@
 
     goto :goto_7a
 
-    .line 172
+    .line 235
     :cond_77
     const-string p1, "text/html"
 
     return-object p1
 
-    .line 171
+    .line 234
     :cond_7a
     :goto_7a
     const-string p1, "font/woff2"
 
     return-object p1
 
-    .line 168
+    .line 231
     :cond_7d
     :goto_7d
     const-string p1, "image/jpeg"
@@ -924,170 +955,388 @@
     return-object p1
 .end method
 
-.method private insetStyle()Ljava/lang/String;
+.method private insetStyle(Ljava/lang/String;)Ljava/lang/String;
     .registers 6
 
-    .line 210
-    new-instance v0, Ljava/lang/StringBuilder;
+    .line 297
+    new-instance p1, Ljava/lang/StringBuilder;
 
-    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+    invoke-direct {p1}, Ljava/lang/StringBuilder;-><init>()V
 
-    .line 212
-    const-string v1, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes\">"
+    .line 299
+    const-string v0, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes\">"
 
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 213
-    iget v1, p0, Lcom/cicp/jwxt/CookieWebClient;->padTop:I
+    .line 302
+    const-string v0, "<style id=\"jwxt-inset\">"
 
-    if-gtz v1, :cond_12
-
-    iget v1, p0, Lcom/cicp/jwxt/CookieWebClient;->padBottom:I
-
-    if-lez v1, :cond_35
-
-    .line 214
-    :cond_12
-    const-string v1, "<style id=\"jwxt-inset\">html{padding-top:"
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    iget v2, p0, Lcom/cicp/jwxt/CookieWebClient;->padTop:I
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    .line 215
-    const-string v2, "px!important;padding-bottom:"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    iget v2, p0, Lcom/cicp/jwxt/CookieWebClient;->padBottom:I
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    .line 216
-    const-string v2, "px!important;box-sizing:border-box!important;background:#fff!important}"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    .line 217
-    const-string v2, "body{background:#fff!important}</style>"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    .line 219
-    :cond_35
-    const-string v1, "<style id=\"jwxt-mobile\">"
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    const-string v2, "html,body{width:auto!important;min-width:0!important;max-width:100%!important;}.new-main .main .sidebar,.sidebar{display:none!important;}.main,.new-main .main{margin-left:0!important;padding-left:0!important;width:100%!important;}.iframeClass,#iframeClass{padding-left:0!important;margin-left:0!important;width:100%!important;left:0!important;}.new-main .main .sidebar.shrink + .iframeClass{padding-left:0!important;}.top div{width:auto!important;}.container,.content,.main-content,.main_content,.mainbody,.mainBody,.wrap,.wrapper,.box,.panel,.contentbox,.new-main,.index-main{width:auto!important;min-width:0!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;}table{max-width:none!important;}.kbcontent1,.kbcontent,.kb,.td,.td1,.td2{white-space:normal!important;word-break:break-all!important;}input[type=text],input[type=password],input[type=search],select,textarea{max-width:100%!important;box-sizing:border-box!important;}img{max-width:100%!important;height:auto!important;}body{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    const-string v2, "</style>"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    .line 220
-    iget-object v1, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
-
-    invoke-virtual {v1}, Ljava/lang/String;->length()I
-
-    move-result v1
-
-    if-lez v1, :cond_5d
-
-    const-string v1, "<style id=\"jwxt-user\">"
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    iget-object v3, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
-
-    invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    .line 221
-    :cond_5d
-    iget-object v1, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
-
-    invoke-virtual {v1}, Ljava/lang/String;->length()I
-
-    move-result v1
-
-    if-lez v1, :cond_7e
-
-    .line 223
-    const-string v1, "<script id=\"jwxt-user-js\">try{"
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    iget-object v2, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
-
-    .line 224
-    const-string v3, "</script>"
-
-    const-string v4, "<\\/script>"
-
-    invoke-virtual {v2, v3, v4}, Ljava/lang/String;->replace(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
-
-    move-result-object v2
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v1
-
-    .line 225
-    const-string v2, "}catch(e){(function(){try{console.warn(\'[jwxt-user-js]\',e);}catch(_){}})();}</script>"
-
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    .line 227
-    :cond_7e
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->length()I
-
-    move-result v1
-
-    if-nez v1, :cond_86
-
-    const/4 v0, 0x0
-
-    goto :goto_8a
-
-    :cond_86
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object v0
 
-    :goto_8a
+    .line 303
+    const-string v1, "html{padding-top:32px!important;box-sizing:border-box!important;background:#EEF0F4!important}"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    .line 304
+    const-string v1, "body{padding-bottom:26px!important;box-sizing:border-box!important;background:#fff!important}"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    .line 305
+    const-string v1, "</style>"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 306
+    iget v0, p0, Lcom/cicp/jwxt/CookieWebClient;->padBottom:I
+
+    if-lez v0, :cond_36
+
+    .line 307
+    const-string v0, "<style id=\"jwxt-inset-b\">html{padding-bottom:"
+
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    iget v2, p0, Lcom/cicp/jwxt/CookieWebClient;->padBottom:I
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    .line 308
+    const-string v2, "px!important;box-sizing:border-box!important}</style>"
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 310
+    :cond_36
+    const-string v0, "<style id=\"jwxt-mobile\">"
+
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    const-string v2, "html,body{width:auto!important;min-width:0!important;max-width:100%!important;}.new-main .main .sidebar,.sidebar{display:none!important;}.main,.new-main .main{margin-left:0!important;padding-left:0!important;width:100%!important;}.iframeClass,#iframeClass{padding-left:0!important;margin-left:0!important;width:100%!important;left:0!important;}.new-main .main .sidebar.shrink + .iframeClass{padding-left:0!important;}.top div{width:auto!important;}.container,.content,.main-content,.main_content,.mainbody,.mainBody,.wrap,.wrapper,.box,.panel,.contentbox,.new-main,.index-main{width:auto!important;min-width:0!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;}table{max-width:none!important;}.kbcontent1,.kbcontent,.kb,.td,.td1,.td2{white-space:normal!important;word-break:break-all!important;}input[type=text],input[type=password],input[type=search],select,textarea{max-width:100%!important;box-sizing:border-box!important;}img{max-width:100%!important;height:auto!important;}body{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}"
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 311
+    iget-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
+
+    invoke-virtual {v0}, Ljava/lang/String;->length()I
+
+    move-result v0
+
+    if-lez v0, :cond_5c
+
+    const-string v0, "<style id=\"jwxt-user\">"
+
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    iget-object v2, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 312
+    :cond_5c
+    iget-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
+
+    invoke-virtual {v0}, Ljava/lang/String;->length()I
+
+    move-result v0
+
+    if-lez v0, :cond_7d
+
+    .line 314
+    const-string v0, "<script id=\"jwxt-user-js\">try{"
+
+    invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    iget-object v1, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
+
+    .line 315
+    const-string v2, "</script>"
+
+    const-string v3, "<\\/script>"
+
+    invoke-virtual {v1, v2, v3}, Ljava/lang/String;->replace(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    .line 316
+    const-string v1, "}catch(e){(function(){try{console.warn(\'[jwxt-user-js]\',e);}catch(_){}})();}</script>"
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 318
+    :cond_7d
+    invoke-virtual {p1}, Ljava/lang/StringBuilder;->length()I
+
+    move-result v0
+
+    if-nez v0, :cond_85
+
+    const/4 p1, 0x0
+
+    goto :goto_89
+
+    :cond_85
+    invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    :goto_89
+    return-object p1
+.end method
+
+.method private static isFrameworkPage(Ljava/lang/String;)Z
+    .registers 3
+
+    .line 112
+    const/4 v0, 0x0
+
+    if-nez p0, :cond_4
+
+    return v0
+
+    .line 114
+    :cond_4
+    const-string v1, "mobile=0"
+
+    invoke-virtual {p0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v1
+
+    if-nez v1, :cond_27
+
+    const-string v1, "native=1"
+
+    invoke-virtual {p0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v1
+
+    if-eqz v1, :cond_15
+
+    goto :goto_27
+
+    .line 115
+    :cond_15
+    const-string v1, "/framework/xsMainV.htmlx"
+
+    invoke-virtual {p0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v1
+
+    if-nez v1, :cond_25
+
+    const-string v1, "/framework/xsMain.jsp"
+
+    invoke-virtual {p0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result p0
+
+    if-eqz p0, :cond_26
+
+    :cond_25
+    const/4 v0, 0x1
+
+    :cond_26
+    return v0
+
+    .line 114
+    :cond_27
+    :goto_27
+    return v0
+.end method
+
+.method private loadMobilePage(Landroid/webkit/WebView;)Ljava/lang/String;
+    .registers 7
+
+    .line 93
+    iget-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->mobilePage:Ljava/lang/String;
+
+    if-eqz v0, :cond_7
+
+    iget-object p1, p0, Lcom/cicp/jwxt/CookieWebClient;->mobilePage:Ljava/lang/String;
+
+    return-object p1
+
+    .line 94
+    :cond_7
+    nop
+
+    .line 96
+    const/4 v0, 0x0
+
+    :try_start_9
+    invoke-virtual {p1}, Landroid/webkit/WebView;->getContext()Landroid/content/Context;
+
+    move-result-object p1
+
+    invoke-virtual {p1}, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+
+    move-result-object p1
+
+    const-string v1, "jwxt-mobile.html"
+
+    invoke-virtual {p1, v1}, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+
+    move-result-object p1
+    :try_end_17
+    .catchall {:try_start_9 .. :try_end_17} :catchall_40
+
+    .line 97
+    :try_start_17
+    new-instance v1, Ljava/io/ByteArrayOutputStream;
+
+    invoke-direct {v1}, Ljava/io/ByteArrayOutputStream;-><init>()V
+
+    .line 98
+    const/16 v2, 0x2000
+
+    new-array v2, v2, [B
+
+    .line 100
+    :goto_20
+    invoke-virtual {p1, v2}, Ljava/io/InputStream;->read([B)I
+
+    move-result v3
+
+    if-lez v3, :cond_2b
+
+    const/4 v4, 0x0
+
+    invoke-virtual {v1, v2, v4, v3}, Ljava/io/ByteArrayOutputStream;->write([BII)V
+
+    goto :goto_20
+
+    .line 101
+    :cond_2b
+    new-instance v2, Ljava/lang/String;
+
+    invoke-virtual {v1}, Ljava/io/ByteArrayOutputStream;->toByteArray()[B
+
+    move-result-object v1
+
+    const-string v3, "UTF-8"
+
+    invoke-direct {v2, v1, v3}, Ljava/lang/String;-><init>([BLjava/lang/String;)V
+
+    iput-object v2, p0, Lcom/cicp/jwxt/CookieWebClient;->mobilePage:Ljava/lang/String;
+    :try_end_38
+    .catchall {:try_start_17 .. :try_end_38} :catchall_3e
+
+    .line 105
+    if-eqz p1, :cond_4c
+
+    :try_start_3a
+    invoke-virtual {p1}, Ljava/io/InputStream;->close()V
+    :try_end_3d
+    .catchall {:try_start_3a .. :try_end_3d} :catchall_4a
+
+    goto :goto_4c
+
+    .line 102
+    :catchall_3e
+    move-exception v1
+
+    goto :goto_42
+
+    :catchall_40
+    move-exception p1
+
+    move-object p1, v0
+
+    .line 103
+    :goto_42
+    :try_start_42
+    iput-object v0, p0, Lcom/cicp/jwxt/CookieWebClient;->mobilePage:Ljava/lang/String;
+    :try_end_44
+    .catchall {:try_start_42 .. :try_end_44} :catchall_4f
+
+    .line 105
+    if-eqz p1, :cond_4c
+
+    :try_start_46
+    invoke-virtual {p1}, Ljava/io/InputStream;->close()V
+    :try_end_49
+    .catchall {:try_start_46 .. :try_end_49} :catchall_4a
+
+    goto :goto_4c
+
+    :catchall_4a
+    move-exception p1
+
+    .line 106
+    nop
+
+    .line 107
+    :cond_4c
+    :goto_4c
+    iget-object p1, p0, Lcom/cicp/jwxt/CookieWebClient;->mobilePage:Ljava/lang/String;
+
+    return-object p1
+
+    .line 105
+    :catchall_4f
+    move-exception v0
+
+    if-eqz p1, :cond_57
+
+    :try_start_52
+    invoke-virtual {p1}, Ljava/io/InputStream;->close()V
+    :try_end_55
+    .catchall {:try_start_52 .. :try_end_55} :catchall_56
+
+    goto :goto_57
+
+    :catchall_56
+    move-exception p1
+
+    .line 106
+    :cond_57
+    :goto_57
+    throw v0
+.end method
+
+.method private nativeInsetStyle()Ljava/lang/String;
+    .registers 2
+
+    .line 278
+    const-string v0, "<meta name=\"viewport\" content=\"width=1042,initial-scale=0.374,maximum-scale=3,user-scalable=yes\"><style id=\"jwxt-native\">html::before{content:\'\';position:fixed;top:0;left:0;width:100%;height:40px;background:#000;z-index:2147483647;pointer-events:none;}html{background:#fff!important;}body{padding-top:40px!important;box-sizing:border-box!important;}.sidebar{display:block!important;visibility:visible!important;opacity:1!important;transform:none!important;width:275px!important;max-width:none!important;position:relative!important;}</style>"
+
     return-object v0
 .end method
 
 .method private static prefillScript(Ljava/lang/String;)Ljava/lang/String;
     .registers 3
 
-    .line 127
+    .line 190
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
@@ -1112,7 +1361,7 @@
 
     move-result-object p0
 
-    .line 158
+    .line 221
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
@@ -1145,10 +1394,10 @@
 .method public onPageFinished(Landroid/webkit/WebView;Ljava/lang/String;)V
     .registers 5
 
-    .line 75
+    .line 81
     invoke-direct {p0, p1, p2}, Lcom/cicp/jwxt/CookieWebClient;->applyInset(Landroid/webkit/WebView;Ljava/lang/String;)V
 
-    .line 77
+    .line 83
     if-eqz p2, :cond_16
 
     :try_start_5
@@ -1170,42 +1419,42 @@
 
     goto :goto_16
 
-    .line 78
+    .line 84
     :catchall_14
     move-exception v0
 
     goto :goto_17
 
-    .line 79
+    .line 85
     :cond_16
     :goto_16
     nop
 
-    .line 80
+    .line 86
     :goto_17
     invoke-super {p0, p1, p2}, Landroid/webkit/WebViewClient;->onPageFinished(Landroid/webkit/WebView;Ljava/lang/String;)V
 
-    .line 81
+    .line 87
     return-void
 .end method
 
 .method public onPageStarted(Landroid/webkit/WebView;Ljava/lang/String;Landroid/graphics/Bitmap;)V
     .registers 4
 
-    .line 53
+    .line 59
     invoke-direct {p0, p1, p2}, Lcom/cicp/jwxt/CookieWebClient;->applyInset(Landroid/webkit/WebView;Ljava/lang/String;)V
 
-    .line 54
+    .line 60
     invoke-super {p0, p1, p2, p3}, Landroid/webkit/WebViewClient;->onPageStarted(Landroid/webkit/WebView;Ljava/lang/String;Landroid/graphics/Bitmap;)V
 
-    .line 55
+    .line 61
     return-void
 .end method
 
 .method public setUserScript(Ljava/lang/String;Ljava/lang/String;)V
     .registers 4
 
-    .line 176
+    .line 239
     const-string v0, ""
 
     if-nez p1, :cond_5
@@ -1215,7 +1464,7 @@
     :cond_5
     iput-object p1, p0, Lcom/cicp/jwxt/CookieWebClient;->userCss:Ljava/lang/String;
 
-    .line 177
+    .line 240
     if-nez p2, :cond_a
 
     move-object p2, v0
@@ -1223,123 +1472,258 @@
     :cond_a
     iput-object p2, p0, Lcom/cicp/jwxt/CookieWebClient;->userJs:Ljava/lang/String;
 
-    .line 178
+    .line 241
     return-void
 .end method
 
 .method public shouldInterceptRequest(Landroid/webkit/WebView;Landroid/webkit/WebResourceRequest;)Landroid/webkit/WebResourceResponse;
-    .registers 6
+    .registers 11
 
-    .line 86
-    const/4 p1, 0x0
+    .line 121
+    const-string v0, "UTF-8"
 
-    :try_start_1
+    const-string v1, "native=1"
+
+    const/4 v2, 0x0
+
+    :try_start_5
     invoke-interface {p2}, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
 
-    move-result-object v0
+    move-result-object v3
 
-    invoke-virtual {v0}, Landroid/net/Uri;->toString()Ljava/lang/String;
+    invoke-virtual {v3}, Landroid/net/Uri;->toString()Ljava/lang/String;
 
-    move-result-object v0
+    move-result-object v3
 
-    .line 87
+    .line 122
     invoke-interface {p2}, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
 
-    move-result-object v1
+    move-result-object v4
 
-    invoke-virtual {v1}, Landroid/net/Uri;->getHost()Ljava/lang/String;
+    invoke-virtual {v4}, Landroid/net/Uri;->getHost()Ljava/lang/String;
 
-    move-result-object v1
+    move-result-object v4
 
-    .line 88
-    if-eqz v1, :cond_53
+    .line 123
+    if-eqz v4, :cond_ba
 
-    iget-object v2, p0, Lcom/cicp/jwxt/CookieWebClient;->host:Ljava/lang/String;
+    iget-object v5, p0, Lcom/cicp/jwxt/CookieWebClient;->host:Ljava/lang/String;
 
-    if-eqz v2, :cond_53
+    if-eqz v5, :cond_ba
 
-    iget-object v2, p0, Lcom/cicp/jwxt/CookieWebClient;->host:Ljava/lang/String;
+    iget-object v5, p0, Lcom/cicp/jwxt/CookieWebClient;->host:Ljava/lang/String;
 
-    invoke-virtual {v1, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    invoke-virtual {v4, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 
-    move-result v1
+    move-result v4
 
-    if-nez v1, :cond_20
+    if-nez v4, :cond_25
 
-    goto :goto_53
+    goto/16 :goto_ba
 
-    .line 89
-    :cond_20
+    .line 124
+    :cond_25
     invoke-interface {p2}, Landroid/webkit/WebResourceRequest;->getMethod()Ljava/lang/String;
 
     move-result-object p2
 
-    .line 90
-    if-eqz p2, :cond_2f
+    .line 125
+    if-eqz p2, :cond_34
 
-    const-string v1, "GET"
+    const-string v4, "GET"
 
-    invoke-virtual {v1, p2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+    invoke-virtual {v4, p2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
 
     move-result p2
 
-    if-nez p2, :cond_2f
+    if-nez p2, :cond_34
 
-    return-object p1
+    return-object v2
 
-    .line 92
-    :cond_2f
-    invoke-direct {p0}, Lcom/cicp/jwxt/CookieWebClient;->insetStyle()Ljava/lang/String;
+    .line 127
+    :cond_34
+    invoke-static {v3}, Lcom/cicp/jwxt/CookieWebClient;->isFrameworkPage(Ljava/lang/String;)Z
 
-    move-result-object p2
+    move-result p2
 
-    .line 94
-    invoke-static {v0}, Lcom/cicp/jwxt/CookieWebClient;->extractQuery(Ljava/lang/String;)Ljava/lang/String;
+    if-eqz p2, :cond_52
 
-    move-result-object v1
-
-    .line 95
-    if-eqz v1, :cond_4e
-
-    new-instance v2, Ljava/lang/StringBuilder;
-
-    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
-
-    invoke-virtual {v2, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object p2
-
-    invoke-static {v1}, Lcom/cicp/jwxt/CookieWebClient;->prefillScript(Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v1
-
-    invoke-virtual {p2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object p2
-
-    invoke-virtual {p2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object p2
-
-    .line 96
-    :cond_4e
-    invoke-direct {p0, v0, p2}, Lcom/cicp/jwxt/CookieWebClient;->fetch(Ljava/lang/String;Ljava/lang/String;)Landroid/webkit/WebResourceResponse;
+    .line 128
+    invoke-direct {p0, p1}, Lcom/cicp/jwxt/CookieWebClient;->loadMobilePage(Landroid/webkit/WebView;)Ljava/lang/String;
 
     move-result-object p1
-    :try_end_52
-    .catchall {:try_start_1 .. :try_end_52} :catchall_54
+    :try_end_3e
+    .catchall {:try_start_5 .. :try_end_3e} :catchall_bb
+
+    .line 129
+    if-eqz p1, :cond_52
+
+    .line 131
+    :try_start_40
+    new-instance p2, Landroid/webkit/WebResourceResponse;
+
+    const-string v4, "text/html"
+
+    new-instance v5, Ljava/io/ByteArrayInputStream;
+
+    .line 132
+    invoke-virtual {p1, v0}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
+
+    move-result-object p1
+
+    invoke-direct {v5, p1}, Ljava/io/ByteArrayInputStream;-><init>([B)V
+
+    invoke-direct {p2, v4, v0, v5}, Landroid/webkit/WebResourceResponse;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/io/InputStream;)V
+    :try_end_50
+    .catchall {:try_start_40 .. :try_end_50} :catchall_51
+
+    .line 131
+    return-object p2
+
+    .line 133
+    :catchall_51
+    move-exception p1
+
+    .line 140
+    :cond_52
+    :try_start_52
+    invoke-virtual {v3, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result p1
+
+    const/4 p2, 0x1
+
+    if-eqz p1, :cond_6c
+
+    .line 141
+    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
+
+    move-result-wide v0
+
+    const-wide/32 v4, 0x1d4c0
+
+    add-long/2addr v0, v4
+
+    iput-wide v0, p0, Lcom/cicp/jwxt/CookieWebClient;->nativeUntil:J
+
+    .line 145
+    invoke-direct {p0}, Lcom/cicp/jwxt/CookieWebClient;->nativeInsetStyle()Ljava/lang/String;
+
+    move-result-object p1
+
+    invoke-direct {p0, v3, p1, p2}, Lcom/cicp/jwxt/CookieWebClient;->fetch(Ljava/lang/String;Ljava/lang/String;Z)Landroid/webkit/WebResourceResponse;
+
+    move-result-object p1
 
     return-object p1
 
-    .line 88
-    :cond_53
-    :goto_53
+    .line 150
+    :cond_6c
+    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
+
+    move-result-wide v4
+
+    iget-wide v6, p0, Lcom/cicp/jwxt/CookieWebClient;->nativeUntil:J
+
+    cmp-long p1, v4, v6
+
+    if-gez p1, :cond_87
+
+    const-string p1, "/jsxsd/framework/"
+
+    invoke-virtual {v3, p1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result p1
+
+    if-eqz p1, :cond_87
+
+    .line 151
+    invoke-direct {p0}, Lcom/cicp/jwxt/CookieWebClient;->nativeInsetStyle()Ljava/lang/String;
+
+    move-result-object p1
+
+    invoke-direct {p0, v3, p1, p2}, Lcom/cicp/jwxt/CookieWebClient;->fetch(Ljava/lang/String;Ljava/lang/String;Z)Landroid/webkit/WebResourceResponse;
+
+    move-result-object p1
+
     return-object p1
 
-    .line 97
-    :catchall_54
-    move-exception p2
+    .line 154
+    :cond_87
+    invoke-virtual {v3, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
 
-    .line 98
+    move-result p1
+
+    .line 155
+    if-eqz p1, :cond_92
+
+    invoke-direct {p0}, Lcom/cicp/jwxt/CookieWebClient;->nativeInsetStyle()Ljava/lang/String;
+
+    move-result-object v0
+
+    goto :goto_96
+
+    :cond_92
+    invoke-direct {p0, v3}, Lcom/cicp/jwxt/CookieWebClient;->insetStyle(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    .line 157
+    :goto_96
+    if-eqz p1, :cond_9a
+
+    move-object p1, v2
+
+    goto :goto_9e
+
+    :cond_9a
+    invoke-static {v3}, Lcom/cicp/jwxt/CookieWebClient;->extractQuery(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object p1
+
+    .line 158
+    :goto_9e
+    if-eqz p1, :cond_b5
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    invoke-static {p1}, Lcom/cicp/jwxt/CookieWebClient;->prefillScript(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object p1
+
+    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    .line 159
+    :cond_b5
+    invoke-direct {p0, v3, v0, p2}, Lcom/cicp/jwxt/CookieWebClient;->fetch(Ljava/lang/String;Ljava/lang/String;Z)Landroid/webkit/WebResourceResponse;
+
+    move-result-object p1
+    :try_end_b9
+    .catchall {:try_start_52 .. :try_end_b9} :catchall_bb
+
     return-object p1
+
+    .line 123
+    :cond_ba
+    :goto_ba
+    return-object v2
+
+    .line 160
+    :catchall_bb
+    move-exception p1
+
+    .line 161
+    return-object v2
 .end method

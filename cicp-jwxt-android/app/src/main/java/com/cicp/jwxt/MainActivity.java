@@ -64,7 +64,25 @@ public class MainActivity extends Activity {
         s.setAllowFileAccessFromFileURLs(false);
         s.setAllowUniversalAccessFromFileURLs(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+                return false;
+            }
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                appendLog("PAGE " + url);
+            }
+        });
+        /* WebView 控制台日志落盘：jwxt_debug.txt（追加），供排查解析/接口异常 */
+        webView.setWebChromeClient(new android.webkit.WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(android.webkit.ConsoleMessage msg) {
+                if (msg != null) appendLog("JS " + msg.messageLevel() + " " + msg.message() + " @" + msg.sourceId() + ":" + msg.lineNumber());
+                return true;
+            }
+        });
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
         webView.loadUrl("file:///android_asset/index.html");
 
@@ -76,6 +94,26 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleGotoSchedule(intent);
+    }
+
+    /** 统一日志：始终写 logcat（tag=JWXT）；仅 debuggable 包额外落盘，限 256KB 轮转 */
+    private void appendLog(String line) {
+        android.util.Log.i("JWXT", line);
+        try {
+            if (0 == (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)) return;
+            java.io.File dir = new java.io.File(getCacheDir(), "logs");
+            if (!dir.exists()) dir.mkdirs();
+            java.io.File f = new java.io.File(dir, "jwxt_debug.txt");
+            if (f.length() > 256 * 1024) {
+                java.io.File old = new java.io.File(dir, "jwxt_debug.txt.1");
+                if (old.exists()) old.delete();
+                f.renameTo(old);
+            }
+            java.io.FileWriter w = new java.io.FileWriter(f, true);
+            w.write(new java.text.SimpleDateFormat("MM-dd HH:mm:ss.SSS", java.util.Locale.US).format(new java.util.Date()) + " " + line + "\n");
+            w.close();
+        } catch (Throwable ignored) {
+        }
     }
 
     private boolean isSystemDarkMode() {
@@ -144,6 +182,16 @@ public class MainActivity extends Activity {
 
     /** JS 桥：前端通过 window.Android.xxx() 调用 */
     private class WebAppInterface {
+
+        /**
+         * 官网：在主 WebView 原位打开（旧管线：会话预热/手机适配/自定义注入/登录兜底）。
+         * 仅当 URL 带 native=1（原站/桌面版）时 InAppOpen.open 才分流到独立 WebActivity。
+         * 返回靠主 WebView 历史 goBack 回到应用页，启动时 restoreReturnState 还原页面与周次。
+         */
+        @JavascriptInterface
+        public void openInApp(String url) {
+            InAppOpen.open(MainActivity.this, url);
+        }
 
         @JavascriptInterface
         public boolean getSystemDarkMode() {

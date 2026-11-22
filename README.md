@@ -239,13 +239,13 @@ cd cicp-jwxt-android
 | 早期 | — | [豆包工作](https://www.doubao.com) | 初版界面与打包链路 |
 | v0.9.8 | 2026-10 | Codex | Claude 暖纸色风格界面 |
 | v145–v189 | 2026-11-10 → 11-12 | Amoo（STEPX Neo 内置助手） | 官网免登录跳转、手机端适配、打包源对齐 |
-| **v190 起** | **2026-11-13 至今** | **豆包搭子工作模式（Doubao Agent）** | 课表「唐韵书声」皮肤、多类型课表、解析重构、深浅主题统一、每轮出包交付 |
+| **v190 起** | **2026-11-13 至今** | **[豆包工作](https://www.doubao.com)** | 课表「唐韵书声」皮肤、多类型课表、解析重构、深浅主题统一、每轮出包交付 |
 
 **v190 之后固定使用的工具链**（后续沿用）：
 
 | 环节 | 工具 |
 |---|---|
-| 任务编排与代码修改 | 豆包搭子工作模式（Doubao Agent，读写工程源码） |
+| 任务编排与代码修改 | [豆包工作](https://www.doubao.com)（读写工程源码、执行命令） |
 | 打包 / 签名 | `apktool`（`.buildtools/apktool.jar`）+ `uber-apk-signer`（zipalign + 自签名） |
 | 包校验 | Android SDK build-tools 的 `aapt dump badging`、`apksigner verify --print-certs` |
 | 视觉回归 | Playwright + 无头 Chromium，注入 mock `window.Android.httpRequest` 喂真实页面样本，深浅两套截图 |

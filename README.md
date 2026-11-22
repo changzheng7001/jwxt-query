@@ -73,10 +73,16 @@
 │           │   └── CookieWebClient.java               # 子资源请求补 Cookie
 │           ├── assets/index.html                       # 前端（主要改这里）
 │           └── res/                                    # 布局/样式/图标
-├── jwxt-webapp/
-│   └── index.html                # 前端源文件（与 assets/ 同步）
+├── jwxt-webapp/                  # 前端源（改这里，再同步到两份 assets）
+│   ├── index.html                # 页面结构 + 主题变量 + 课表页样式
+│   ├── js/                       # 01-foundation / 02-state / 03-parse / 04-query / 05-render / 06-ui
+│   ├── ui/app.css                # 统一外观补充（改前先 grep !important 覆盖）
+│   ├── ui/experience.js          # 系统主题、首页布局、面板与缓存
+│   └── schedule-assets/          # 课表皮肤：山水 bg、表头 head、顶栏 top、古筝动图 bottom
 ├── apk-source/                    # 反编译打包源（smali + java，apktool 构建用）
-└── README.md
+├── tests/                         # node 逻辑回归（17 项）
+├── .buildtools/                   # apktool.jar + uber-apk-signer.jar
+└── README.md / CHANGELOG.md
 ```
 
 ## 维护与代码链说明

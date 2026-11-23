@@ -91,7 +91,7 @@
 │   ├── design/                    # 官网手机端适配预览 v1~v6
 │   └── perf/                      # 闪电优化：基线、实验日志、根因分析
 ├── 课表demo.html                  # 课表皮肤参考稿（schedule-assets 素材来源）
-├── .buildtools/                   # apktool.jar + uber-apk-signer.jar
+├── .buildtools/                   # 打包工具（不入库，从 buildtools Release 下载）
 └── README.md / CHANGELOG.md
 ```
 
@@ -115,6 +115,19 @@
 ## 如何构建
 
 ### 方式一：apktool 快速打包（日常迭代，无需 Android SDK）
+
+仓库不存放二进制，先准备打包工具：
+
+```bash
+mkdir -p .buildtools
+# 从 https://github.com/changzheng7001/jwxt-query/releases/tag/buildtools 下载两个 jar
+curl -L -o .buildtools/apktool.jar \
+  https://github.com/changzheng7001/jwxt-query/releases/download/buildtools/apktool.jar
+curl -L -o .buildtools/uber-apk-signer.jar \
+  https://github.com/changzheng7001/jwxt-query/releases/download/buildtools/uber-apk-signer.jar
+```
+
+然后打包：
 
 ```bash
 java -jar .buildtools/apktool.jar b apk-source -o /tmp/out.apk

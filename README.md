@@ -88,7 +88,8 @@
 │   ├── qc_parse.py                    # 全样本解析质检（空课程名 / 空教师）
 │   └── patrol_v273.py                 # 对比度 / 溢出 / 渲染耗时
 ├── docs/                          # 设计记录与历史设计稿
-│   └── design/                    # 官网手机端适配预览 v1~v6
+│   ├── design/                    # 官网手机端适配预览 v1~v6
+│   └── perf/                      # 闪电优化：基线、实验日志、根因分析
 ├── 课表demo.html                  # 课表皮肤参考稿（schedule-assets 素材来源）
 ├── .buildtools/                   # apktool.jar + uber-apk-signer.jar
 └── README.md / CHANGELOG.md

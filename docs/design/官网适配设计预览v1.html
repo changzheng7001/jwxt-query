@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>官网适配设计预览</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#EDEFF3;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#2A3240;-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;background:#EDEFF3;padding-bottom:40px}
+.top{padding:20px 20px 12px}
+.top h1{font-size:22px;font-weight:600;letter-spacing:.3px}
+.top .sub{font-size:12px;color:#8A92A6;margin-top:4px}
+.nav{display:flex;gap:8px;padding:0 20px 16px}
+.nav button{flex:1;border:0;background:#fff;color:#8A92A6;font-size:13px;padding:9px 0;border-radius:10px}
+.nav button.active{background:#7C93A8;color:#fff}
+.page{display:none}.page.show{display:block}
+.day-tabs{display:flex;gap:6px;padding:0 20px 14px}
+.day-tab{flex:1;border:0;background:transparent;color:#8A92A6;font-size:14px;padding:8px 0;border-radius:9px}
+.day-tab.active{background:#fff;color:#2A3240;font-weight:600;box-shadow:0 1px 4px rgba(20,30,50,.06)}
+.day-page{display:none;padding:0 16px}.day-page.show{display:block}
+.slot{display:flex;gap:12px;margin-bottom:14px}
+.slot-time{width:52px;flex-shrink:0;padding-top:2px;text-align:right}
+.slot-time .p{font-size:12px;font-weight:600;color:#5A6478}
+.slot-time .t{font-size:10px;color:#9AA3B5;margin-top:3px;line-height:1.4}
+.slot-body{flex:1;display:flex;flex-direction:column;gap:8px}
+.course{background:var(--bg);border-left:3px solid var(--fg);border-radius:12px;padding:12px 14px}
+.c-name{font-size:15px;font-weight:600;color:#2A3240}
+.c-cls{font-size:12px;color:#6B7488;margin-top:5px;line-height:1.5}
+.c-meta{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.chip{font-size:11px;background:var(--fg);color:#fff;padding:3px 8px;border-radius:6px}
+.chip.ghost{background:rgba(0,0,0,.05);color:#5A6478}
+.empty{text-align:center;color:#9AA3B5;font-size:13px;padding:50px 0}
+.score-card{background:#fff;border-radius:14px;padding:14px 16px;margin:0 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.sc-name{font-size:15px;font-weight:600}
+.sc-sub{font-size:12px;color:#8A92A6;margin-top:5px}
+.sc-score{font-size:24px;font-weight:600;color:#7C93A8;font-variant-numeric:tabular-nums}
+.form-card{background:#fff;border-radius:16px;margin:0 16px;padding:4px 16px}
+.field{padding:14px 0;border-bottom:1px solid #F0F1F5}
+.field:last-child{border:0}
+.field label{font-size:12px;color:#8A92A6;display:block;margin-bottom:8px}
+.fake-ctl{font-size:15px;display:flex;justify-content:space-between;align-items:center;color:#2A3240}
+.caret{color:#B4BCCB;font-size:18px}
+.submit{margin:20px 16px 0;background:#7C93A8;color:#fff;text-align:center;padding:15px;border-radius:14px;font-size:16px;font-weight:600}
+</style></head><body><div class="wrap">
+<div class="top"><h1>代嘉幸 · 教师课表</h1><div class="sub">2026-秋季 · 设计预览</div></div>
+<div class="nav"><button class="active" data-t="0">课表</button><button data-t="1">成绩</button><button data-t="2">查询</button></div>
+<div class="page show" data-p="0"><div class="day-tabs"><button class="day-tab" data-day="0">一</button><button class="day-tab active" data-day="1">二</button><button class="day-tab" data-day="2">三</button><button class="day-tab" data-day="3">四</button><button class="day-tab" data-day="4">五</button><button class="day-tab" data-day="5">六</button><button class="day-tab" data-day="6">日</button></div><div class="day-page" data-page="0"><div class="slot"><div class="slot-time"><div class="p">0910</div><div class="t">19:00-20:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">13-14周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">11</div><div class="t">20:50-21:30</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">13-14周</span></div></div></div></div></div><div class="day-page show" data-page="1"><div class="slot"><div class="slot-time"><div class="p">0506</div><div class="t">14:00-15:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">1-9,13-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0708</div><div class="t">16:00-17:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">1-9,13-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div></div><div class="day-page" data-page="2"><div class="slot"><div class="slot-time"><div class="p">0506</div><div class="t">14:00-15:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C2(公共教室）</span><span class="chip ghost">1-9,12-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C2(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0708</div><div class="t">16:00-17:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C2(公共教室）</span><span class="chip ghost">1-9,12-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">涉外法治班24,心理矫治班24</div>
+<div class="c-meta"><span class="chip">3C2(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div></div><div class="day-page" data-page="3"><div class="slot"><div class="slot-time"><div class="p">0304</div><div class="t">10:00-11:40</div></div><div class="slot-body"><div class="course" style="--fg:#A38F7E;--bg:#F4F0EB">
+<div class="c-name">教育心理学</div>
+<div class="c-cls">(分组01)</div>
+<div class="c-meta"><span class="chip">代嘉幸 (1-9,12-17周)</span><span class="chip ghost"></span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0708</div><div class="t">16:00-17:40</div></div><div class="slot-body"><div class="course" style="--fg:#968FAC;--bg:#F1EFF5">
+<div class="c-name">社会心理学</div>
+<div class="c-cls">心理矫治班25</div>
+<div class="c-meta"><span class="chip">3-307（25心理矫治班）</span><span class="chip ghost">1-9,12-15周</span></div></div><div class="course" style="--fg:#968FAC;--bg:#F1EFF5">
+<div class="c-name">社会心理学</div>
+<div class="c-cls">心理矫治班25</div>
+<div class="c-meta"><span class="chip">3-307（25心理矫治班）</span><span class="chip ghost">16-17周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0910</div><div class="t">19:00-20:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C6(公共教室）</span><span class="chip ghost">1-9,12-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C6(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">11</div><div class="t">20:50-21:30</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C6(公共教室）</span><span class="chip ghost">1-9,12-15周</span></div></div><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C6(公共教室）</span><span class="chip ghost">16-17周</span></div></div></div></div></div><div class="day-page" data-page="4"><div class="slot"><div class="slot-time"><div class="p">0506</div><div class="t">14:00-15:40</div></div><div class="slot-body"><div class="course" style="--fg:#A38F7E;--bg:#F4F0EB">
+<div class="c-name">教育心理学</div>
+<div class="c-cls">(分组01)</div>
+<div class="c-meta"><span class="chip">代嘉幸 (15-16周)</span><span class="chip ghost"></span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0910</div><div class="t">19:00-20:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">12-14周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">11</div><div class="t">20:50-21:30</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">劳动改造二班23,劳动改造一班23</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">12-14周</span></div></div></div></div></div><div class="day-page" data-page="5"><div class="slot"><div class="slot-time"><div class="p">0102</div><div class="t">08:00-09:40</div></div><div class="slot-body"><div class="course" style="--fg:#968FAC;--bg:#F1EFF5">
+<div class="c-name">社会心理学</div>
+<div class="c-cls">心理矫治班25</div>
+<div class="c-meta"><span class="chip">3-307（25心理矫治班）</span><span class="chip ghost">7-8周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0506</div><div class="t">14:00-15:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">13-14周</span></div></div></div></div><div class="slot"><div class="slot-time"><div class="p">0708</div><div class="t">16:00-17:40</div></div><div class="slot-body"><div class="course" style="--fg:#B09B7E;--bg:#F6F1E9">
+<div class="c-name">罪犯改造心理学</div>
+<div class="c-cls">监狱学二班24,监狱学一班24</div>
+<div class="c-meta"><span class="chip">3C5(公共教室）</span><span class="chip ghost">13-14周</span></div></div></div></div></div><div class="day-page" data-page="6"><div class="empty">这一天没有课</div></div></div>
+<div class="page" data-p="1"><div class="score-card"><div class="sc-main"><div class="sc-name">法律逻辑学</div><div class="sc-sub">2024-秋季 · 3学分 · 考试</div></div><div class="sc-score">82</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">大学英语(一)</div><div class="sc-sub">2024-秋季 · 3学分 · 考试</div></div><div class="sc-score">68</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">大学语文</div><div class="sc-sub">2024-秋季 · 3学分 · 考试</div></div><div class="sc-score">61</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">警察体育基础（一）</div><div class="sc-sub">2024-秋季 · 1学分 · 考查</div></div><div class="sc-score">良</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">军事理论</div><div class="sc-sub">2024-秋季 · 1学分 · 考查</div></div><div class="sc-score">中</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">军事训练</div><div class="sc-sub">2024-秋季 · 2学分 · 考查</div></div><div class="sc-score">中</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">思想道德修养</div><div class="sc-sub">2024-秋季 · 2学分 · 考查</div></div><div class="sc-score">及格</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">中国近现代史纲要</div><div class="sc-sub">2024-秋季 · 3学分 · 考查</div></div><div class="sc-score">良</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">国家安全教育</div><div class="sc-sub">2024-秋季 · 1学分 · 考查</div></div><div class="sc-score">优</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">伦理学</div><div class="sc-sub">2024-秋季 · 2学分 · 考查</div></div><div class="sc-score">中</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">人体解剖学</div><div class="sc-sub">2024-秋季 · 2学分 · 考查</div></div><div class="sc-score">良</div></div><div class="score-card"><div class="sc-main"><div class="sc-name">大学生心理健康教育(限选)</div><div class="sc-sub">2024-秋季 · 1学分 · 考查</div></div><div class="sc-score">及格</div></div></div>
+<div class="page" data-p="2"><div class="form-card"><div class="field"><label>学年学期</label><div class="fake-ctl">2026-秋季<span class="caret">›</span></div></div><div class="field"><label>时间模式</label><div class="fake-ctl">默认节次模式<span class="caret">›</span></div></div><div class="field"><label>教师所属院系</label><div class="fake-ctl">请选择上课院系<span class="caret">›</span></div></div><div class="field"><label>职称</label><div class="fake-ctl">-请选择-<span class="caret">›</span></div></div><div class="field"><label>授课教师</label><div class="fake-ctl">请输入<span class="caret">›</span></div></div><div class="field"><label>周次</label><div class="fake-ctl">-请选择-<span class="caret">›</span></div></div><div class="field"><label>星期</label><div class="fake-ctl">-请选择-<span class="caret">›</span></div></div><div class="field"><label>节次</label><div class="fake-ctl">-请选择-<span class="caret">›</span></div></div></div><div class="submit">查询课表</div></div>
+</div><script>
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+document.querySelectorAll('.page').forEach(p=>p.classList.toggle('show',p.dataset.p===b.dataset.t));});
+document.querySelectorAll('.day-tab').forEach(b=>b.onclick=()=>{
+document.querySelectorAll('.day-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+document.querySelectorAll('.day-page').forEach(p=>p.classList.toggle('show',p.dataset.page===b.dataset.day));});
+</script></body></html>

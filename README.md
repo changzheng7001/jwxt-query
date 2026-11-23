@@ -80,7 +80,16 @@
 │   ├── ui/experience.js          # 系统主题、首页布局、面板与缓存
 │   └── schedule-assets/          # 课表皮肤：山水 bg、表头 head、顶栏 top、古筝动图 bottom
 ├── apk-source/                    # 反编译打包源（smali + java，apktool 构建用）
-├── tests/                         # node 逻辑回归（17 项）
+├── tests/                         # node 逻辑回归（17 项，不依赖真实样本）
+├── tools/                         # 无头浏览器回归与质检脚本（需要本地 tests/fixtures）
+│   ├── shot_dark.py / shot_light.py   # 深浅两套场景截图
+│   ├── shot_kbxx.py                   # 班级 / 教师课表真实页面
+│   ├── shot_return.py                 # 官网返回 A~F 六场景
+│   ├── qc_parse.py                    # 全样本解析质检（空课程名 / 空教师）
+│   └── patrol_v273.py                 # 对比度 / 溢出 / 渲染耗时
+├── docs/                          # 设计记录与历史设计稿
+│   └── design/                    # 官网手机端适配预览 v1~v6
+├── 课表demo.html                  # 课表皮肤参考稿（schedule-assets 素材来源）
 ├── .buildtools/                   # apktool.jar + uber-apk-signer.jar
 └── README.md / CHANGELOG.md
 ```
@@ -140,7 +149,8 @@ cd cicp-jwxt-android
 - 顶栏提供“只看今天 / 周课表”切换、刷新与返回首页；单列模式仅展示当前学期今天的课程，切换时会回到本周。课程格的名称每行最多四个字符。课程详情、复制信息以及四个浮窗继续保留。
 - 默认皮肤图片与动图来自用户提供的 `课表demo.html`，保存在 `jwxt-webapp/schedule-assets/`，随 APK 离线打包；未引入 demo 的演示课程、增删课程功能及完整皮肤商城。
 - 学期周次可在设置中调整；缓存和今日课程提醒会按当前账户、当前学期过滤。
-- 回归检查：`node --test tests/*.test.cjs`（需要 Node.js）。
+- 回归检查：`node --test tests/*.test.cjs`（需要 Node.js，纯逻辑不依赖样本）。
+- 视觉回归：`tools/` 下的脚本用无头 Chromium + mock `window.Android.httpRequest` 喂教务页面样本，样本需自行放在 `tests/fixtures/`（因含真实师生信息，不入库）。脚本里的查询姓名已换成占位名，不影响断言。
 
 ### 外观与面板
 

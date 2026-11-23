@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FF5959">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>课表</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF5959'/%3E%3Cpath d='M8 9h16M8 15h16M8 21h16' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='8' cy='6' r='2.2' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Roboto,sans-serif;color:#333;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  .page{display:none;flex-direction:column;min-height:100vh;position:relative}
+  .page.active{display:flex}
+  #page-home{height:100vh;overflow:hidden}
+  /* ============ 背景（原版分层）：按钮区=imgT(固定层topbg，不随切周/滚动) + 表头横条=imgM + 表格静态=img + 动态gifB置于内容下。底部不再叠 imgM 条 ============ */
+  .topbg{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;overflow:hidden;background-size:100% 100%;background-position:center top;background-repeat:no-repeat}
+  .tb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:none;z-index:0}
+
+  .theme-no1 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OkmRbdThEorALExyQLCcw4chnZb')}
+  .theme-no1 .topbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CM93bWshgoXJu2x0I8qcZiQTnOb')}
+  .theme-no1 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/U2uLbdFTnopVm8xoC7OcdTxEnah')}
+  .theme-no1 .gifT-layer{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/XhdAbXFTSoTKnZxbjZZc4jSSnPd')}
+  .theme-no1 .head{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/O044bUNsUoY0YpxjZyicHGN7nZe')}
+  .theme-no1 .head{border-top:none;border-bottom:none}
+  .theme-no1 .topbg{background-size:100% 100%;background-position:center top}
+  .theme-no1 .pane-bg{background-color:#F0EAE2}
+  .theme-no1 .tb-img-1{display:block}
+
+  .theme-no2 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Sn4Ob61lSoiSylxZ7nxcizTynpc')}
+  .theme-no2 .topbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GdWpb9cKjoSCpKxvz0ucoBXon5c')}
+  .theme-no2 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OgLfbTDMZoQVRFxLyttcd9GNnSe')}
+  .theme-no2 .gifT-layer{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JM2QbPnJdofubixMh4jcUvmIn0c')}
+  .theme-no2 .tb-img-2{display:block}
+
+  .theme-no3 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TZAJbASXwor5JKxSM9KcN8yonCf')}
+  .theme-no3 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/P3YWb5OGDoSujtxSEiScFGqtnEf')}
+  .theme-no3 .pane-bg{background-color:#FFFFFF;background-image:none}
+  .theme-no3 .tb-img-3{display:block}
+
+  .theme-no4 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CzGJbBAL8oG0hqx7lz1cxVY1ntd')}
+  .theme-no4 .topbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZEJWbs1oRo2QMNxluQGcOUbBnwd')}
+  .theme-no4 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/M44nbkrSkoMEbGxi2Bnc3D57nqe')}
+  .theme-no4 .gifT-layer{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZEXEbvducotm2uxrQjAcPL8RnRe')}
+  .theme-no4 .tb-img-4{display:block}
+
+  .theme-no5 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/BPwxbDnhtopkenxIlMacvjS8nSc')}
+  .theme-no5 .pane-headbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/MhXgbf4KTomhrcxfnRNckvTwn5e')}
+  .theme-no5 .pane-headbg{background-position:center bottom}
+  .theme-no5 .topbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TA4MbqvEooXhq5xKnxDc5nTFnOg')}
+  .theme-no5 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/DQiNbqTkkoxAkxx2G5cclIgonie')}
+  .theme-no5 .gifT-layer{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/BANZb1cvloBqWsxBrgDcKXQ9nxc')}
+  .theme-no5 .pane-bg{background-color:#24A8EB}
+  .theme-no5 .tb-img-5{display:block}
+
+  .theme-no6 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JZZdbjNc3oi0XMxLhgKc3XIXnml')}
+  .theme-no6 .pane-headbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HxZubskAyowOCBxx7pkcVMEHnTO')}
+  .theme-no6 .topbg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TZDXbWWYUownaPxZhfUcfYuUnJc')}
+  .theme-no6 .pane-gifB{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HHefbj4evoDgkCxKPRjcD4t6nlg')}
+  .theme-no6 .gifT-layer{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/FoG9bTDeBoUKbYxVB8BcRcGen6c')}
+  .theme-no6 .tb-img-6{display:block}
+
+  .theme-no7 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Dye2bMQrYolVTVxmcv2cEyzvnDd')}
+  .theme-no7 .tb-img-7{display:block}
+
+  .theme-no8 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/PERFbeyxIomvXnxH3DMc1rCEnmZ')}
+  .theme-no8 .tb-img-8{display:block}
+
+  .theme-no9 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/QKhBbMR0Ko7lz1xUxgcc6mH0nZc')}
+  .theme-no9 .tb-img-9{display:block}
+
+  .theme-no10 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/POpXbQCkfoE4cDx0BOdcXoeIn3d')}
+  .theme-no10 .tb-img-10{display:block}
+
+  .theme-no11 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WOkQb0uDto2jy3xAmAEc0vB1nah')}
+  .theme-no11 .tb-img-11{display:block}
+
+  .theme-no12 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/X1kkbzC3ToIX4YxiSaKc1x6wnnb')}
+  .theme-no12 .tb-img-12{display:block}
+
+  .theme-no13 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WQ7bbF7SqoxCsoxYiifcBlNfn2g')}
+  .theme-no13 .tb-img-13{display:block}
+
+  .theme-no14 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GNhQbpzy6oqRY5xOvBBcvheBndg')}
+  .theme-no14 .tb-img-14{display:block}
+
+  .theme-no15 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/I0HFb2Xg4owfkrxeLqRcbL06ndg')}
+  .theme-no15 .tb-img-15{display:block}
+
+  .theme-no16 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SDYcbnmfJo0BOVx2WU8cpdv9nYd')}
+  .theme-no16 .tb-img-16{display:block}
+
+  .theme-no17 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/T6whbMEOionPLdxscvAcCD3unJh')}
+  .theme-no17 .tb-img-17{display:block}
+
+  .theme-no18 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/RKFBb9KVFolsotxphJAcoXOengg')}
+  .theme-no18 .tb-img-18{display:block}
+
+  .theme-no19 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/IZSebr54GoZqONxajNjcIsMWnDc')}
+  .theme-no19 .tb-img-19{display:block}
+
+  .theme-no20 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HNvcbzBEjojthfxoUNccLrg1nmc')}
+  .theme-no20 .tb-img-20{display:block}
+
+  .theme-no21 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JBjzbQHbVoNzTpxNhjFcY4XDn3b')}
+  .theme-no21 .tb-img-21{display:block}
+
+  .theme-no22 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WEE7b1CzNoINvexLe2wcmaCVnjf')}
+  .theme-no22 .tb-img-22{display:block}
+
+  .theme-no23 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WVrlbZPtPoGhHUx8A8dcEFzandc')}
+  .theme-no23 .tb-img-23{display:block}
+
+  .theme-no24 .pane-bg{background-image:url('https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/V5qqbn176oE9LpxYQoPcTTeanMd')}
+  .theme-no24 .tb-img-24{display:block}
+
+  /* 唐韵:表头金线由CSS border承载(清晰);文字浮上 */
+  .head-imgM{position:absolute;inset:0;z-index:5;background-size:100% 100%;background-position:center top;background-repeat:no-repeat}
+  .head>*{position:relative;z-index:6}
+  .pane-bgs{position:absolute;inset:0;z-index:0}
+  .pane-headbg{position:absolute;top:84px;left:0;right:0;height:62px;background-size:100% 100%;background-position:center top;background-repeat:no-repeat;z-index:3} /* 边框/波浪独立层浮于head蒙版之上,不被盖(清晰可见) */
+  .pane-bg{position:absolute;top:84px;left:0;right:0;bottom:0;background-size:100% 100%;background-position:center top;background-repeat:no-repeat} /* 背景从表头(84px)开始,只铺课表区(表头+表格+节次列),不覆盖顶部按钮区 */
+  .pane-gifB{position:absolute;left:0;right:0;bottom:0;height:230px;background-size:100% 100%;background-position:center bottom;background-repeat:no-repeat;pointer-events:none;z-index:1}
+  /* 顶部固定小动图（左上角，70x43dp，原版 marginStart=88 在周次右侧，不随课表滑动） */
+  .gifT-layer{position:absolute;top:6px;left:88px;width:70px;height:43px;background-size:100% 100%;background-position:center;background-repeat:no-repeat;pointer-events:none;display:none;z-index:2}
+  /* 顶部栏（透明浮层，固定在背景之上） */
+  .top{position:absolute;top:0;left:0;right:0;z-index:20;background:transparent;flex:0 0 auto;padding:0 15px}
+  .rl-top{position:relative;height:84px;padding-top:8px}
+  .ll-week{position:absolute;left:0;top:30px;display:flex;align-items:center;gap:6px;cursor:pointer;z-index:8;padding:4px 14px 4px 4px;border-radius:8px}
+  .t-week{font-size:18px;font-weight:700;color:#333;line-height:1}
+  .t-week.red{color:#FF5959}
+  .week-arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid #333;display:block}
+  .week-arrow.red{border-top-color:#FF5959}
+  .t-sem{position:absolute;left:0;top:58px;font-size:13px;color:rgba(255,255,255,.95);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+  .top-acts{position:absolute;right:0;top:31px;display:flex;align-items:center}
+  .t-ic{width:22px;height:22px;display:block;margin-left:10px;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+  .t-ic img{width:100%;height:100%;display:block}
+  /* 周次弹窗（底部弹出 BottomSheet，原版 dialog_select_week） */
+  .week-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:44;display:none}
+  .week-mask.show{display:block}
+  .week-pop{position:fixed;left:0;right:0;bottom:0;z-index:45;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.15);padding:18px 18px 28px;display:none}
+  .week-pop.show{display:block}
+  .wp-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 18px}
+  .wp-title{font-size:20px;font-weight:700;color:#1a1a1a;flex:1;text-align:center}
+  .wp-edit{font-size:17px;color:#333;cursor:pointer;white-space:nowrap}
+  .wp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .wp-cell{aspect-ratio:1.6/1;display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1a1a;background:#f1f5fa;border-radius:12px;cursor:pointer;font-weight:500}
+  .wp-cell:active{background:#e6ecf4}
+  .wp-cell.cur{background:#9aa0a8;color:#fff;font-weight:700}
+  .wp-cell.sel{background:#ff4d4f;color:#fff;font-weight:700}
+  /* ============ ViewPager 主体（占满全屏，含表头+节次+课程整页滑） ============ */
+  .vp{position:absolute;inset:0;overflow:hidden;z-index:4}
+  .vp-track{display:flex;height:100%}
+  .vp-pane{flex:0 0 100%;min-width:100%;display:flex;flex-direction:column;position:relative;padding-top:84px}
+  /* 表头（原版=横条imgM背景，独立不延伸，白字/当天黄字由主题决定） */
+  .head{display:flex;height:62px;border-bottom:none;flex:0 0 auto;position:relative;z-index:2;background-size:100% 100%;background-position:center top;background-repeat:no-repeat}
+  .h-month{width:12.5%;flex:0 0 12.5%;display:flex;align-items:center;justify-content:center;background:transparent;font-size:17px;font-weight:700;color:var(--hd-week,#000)}
+  .h-days{flex:1;display:flex;background:transparent}
+  .h-day{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer}
+  .h-day .week{font-size:16px;font-weight:700;color:var(--hd-week,#000)}
+  .h-day .date{font-size:13px;color:var(--hd-date,#666);margin-top:1px}
+  .h-day.today .week{color:var(--hd-today,#FF5959)}
+  .h-day.today .date{color:var(--hd-today,#FF5959)}
+  .h-day.today::after{content:"";position:absolute;bottom:3px;width:14px;height:3px;border-radius:2px;background:var(--hd-today,#FF5959)}
+  /* 新品主题(isNew)：表头大字号，颜色由主题 color 数组驱动(星期=color[0]/日期=color[1]/当天=color[3]) */
+  .theme-new .h-month{font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .theme-new .h-day .week{font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .theme-new .h-day .date{font-size:12px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .theme-new .h-day.today::after{width:26px;height:3px;bottom:1px}
+  /* 主体：整表（节次列+课程格）一体滚动，表头固定 */
+  .hmain{display:flex;flex:1;overflow:hidden;position:relative;z-index:2}
+  .hb-scroll{flex:1;display:flex;overflow-y:auto;height:100%;-webkit-overflow-scrolling:touch}
+  .lecol{width:12.5%;flex:0 0 12.5%;background:transparent;height:calc(78px * 11)}
+  .le-row{display:flex;flex-direction:column;align-items:center;justify-content:center;height:78px;border-bottom:1px solid rgba(0,0,0,.05)}
+  .le-row .no{font-size:14px;font-weight:600;color:var(--hd-week,#333)}
+  .le-row .tm{font-size:10px;color:var(--hd-date,#999);margin-top:1px;line-height:1.3;text-align:center}
+  .theme-new .le-row{border-bottom-color:rgba(255,255,255,.18)}
+  .theme-new .le-row .no{font-size:18px;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .theme-new .le-row .tm{font-size:11px;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .grid-wrap{flex:1;background:transparent;position:relative}
+  .grid{position:relative;height:calc(78px * 11);touch-action:pan-y;cursor:grab}
+  .grid:active{cursor:grabbing}
+  .dline{position:absolute;left:0;right:0;height:0;border-top:1px dashed rgba(255,255,255,.5);pointer-events:none}
+  .course{position:absolute;border-radius:8px;cursor:pointer;overflow:hidden;transition:transform .08s;padding:6px 7px 5px 7px}
+  .course:active{transform:scale(.98)}
+  .course .cn{position:static;font-size:13px;font-weight:700;line-height:1.22;word-break:break-all;white-space:normal;overflow:visible;text-shadow:0 0 1px rgba(0,0,0,.08)}
+  .course .cs{position:static;font-size:11px;font-weight:500;line-height:1.22;margin-top:3px;word-break:break-all;white-space:normal;overflow:visible}
+  .course .ct{position:static;font-size:10px;margin-top:3px;line-height:1.2;opacity:.7}
+  .back-week{position:fixed;right:14px;bottom:30px;background:#FF5959;color:#fff;font-size:14px;padding:8px 14px;border-radius:99px;box-shadow:0 4px 14px rgba(255,89,89,.35);cursor:pointer;display:none;z-index:30}
+  .back-week.show{display:block}
+  /* ============ 设置页 ============ */
+  .subpage{background:#fff;padding-bottom:30px;z-index:10}
+  .sub-nav{display:flex;align-items:center;height:48px;padding:0 10px;border-bottom:1px solid #F0F0F0;position:sticky;top:0;background:#fff;z-index:5}
+  .sub-nav .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .sub-nav .back svg{width:20px;height:20px}
+  .sub-nav .title{flex:1;text-align:center;font-size:16px;font-weight:700;margin-right:32px}
+  .set-sec{margin-top:8px}
+  .set-title{font-size:14px;color:#999;padding:12px 15px 6px}
+  .set-row{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #F5F5F5;cursor:pointer}
+  .set-row:active{background:#F7F8FA}
+  .set-t{font-size:15px;color:#333}
+  .set-s{font-size:12px;color:#999;margin-top:3px}
+  .set-arrow{flex:0 0 auto}
+  .set-arrow img{width:18px;height:18px;display:block;opacity:.4}
+  /* ============ 主题选择页 ============ */
+  .skin-body{padding:10px 15px}
+  .skin-fixed{display:flex;gap:8px}
+  .skin-fixed-item{flex:1}
+  .def-skin{position:relative;aspect-ratio:100/211;border-radius:8px;overflow:hidden;background-size:cover;background-position:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .def-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(5,1fr);gap:3px;padding:6px;opacity:.85}
+  .def-grid i{background:rgba(255,255,255,.35);border-radius:3px}
+  .def-grid i:nth-child(1){background:#49b583}.def-grid i:nth-child(2){background:#7f86ff}.def-grid i:nth-child(3){background:#e85ec0}
+  .def-grid i:nth-child(4){background:#ffbd69}.def-grid i:nth-child(5){background:#3091ff}
+  .def-cap{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+  .def-skin.custom{background:#F5F6F8;border-style:dashed;border-color:#D5D8DE;display:flex;align-items:center;justify-content:center}
+  .def-plus{width:36px;height:36px;border-radius:50%;background:#E8EBF0;color:#9AA1AB;font-size:24px;display:flex;align-items:center;justify-content:center}
+  .skin-title{font-size:14px;font-weight:700;color:#000;margin:14px 2px 10px}
+  .skin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 8px}
+  .skin-cell{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .skin-thumb{width:100%;aspect-ratio:100/211;border-radius:8px;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);position:relative;background:#EDF0F3}
+  .skin-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .skin-new{position:absolute;top:4px;left:4px;background:#FF5959;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2}
+  .skin-ok{position:absolute;right:4px;bottom:4px;width:16px;height:16px;border-radius:50%;background:#FF5959;display:flex;align-items:center;justify-content:center;z-index:2}
+  .skin-ok svg{width:10px;height:10px;display:block}
+  .skin-cell.active .skin-thumb{border-color:#FF5959}
+  .skin-name{font-size:12px;color:#333;white-space:nowrap}
+  /* ============ 皮肤预览弹窗（居中，含课表预览图 + 使用/取消） ============ */
+  .theme-pop-mask{position:fixed;inset:0;background:rgba(15,18,25,.55);z-index:60;display:none;align-items:center;justify-content:center}
+  .theme-pop-mask.show{display:flex}
+  .theme-pop{width:78vw;max-width:420px;background:#fff;border-radius:16px;padding:16px;animation:pop .22s ease;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+  .theme-pop-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:12px}
+  .theme-pop-img{width:100%;border-radius:10px;display:block;object-fit:cover;max-height:58vh}
+  .theme-pop-btns{display:flex;gap:10px;margin-top:14px}
+  .theme-pop-btns .tb{flex:1;padding:11px 0;border-radius:10px;font-size:15px;font-weight:600;text-align:center;cursor:pointer}
+  .theme-pop-btns .tb-cancel{background:#F2F3F5;color:#555}
+  .theme-pop-btns .tb-use{background:#FF5959;color:#fff}
+  /* ============ 弹层 ============ */
+  .mask{position:fixed;inset:0;background:rgba(15,18,25,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
+  .mask.show{display:flex}
+  .sheet{width:100%;max-width:480px;background:#fff;border-radius:16px 16px 0 0;padding:12px 20px 24px;animation:up .22s ease;max-height:88vh;overflow-y:auto}
+  @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .sheet .grab{width:40px;height:4px;border-radius:99px;background:#E2E5EA;margin:0 auto 12px}
+  .sheet h3{font-size:17px;font-weight:700;margin-bottom:12px;text-align:center}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:13px;color:#666;margin-bottom:5px}
+  .field input,.field select{width:100%;height:40px;border:1px solid #E0E2E6;border-radius:8px;padding:0 10px;font-size:14px;background:#fff;color:#333}
+  .row2{display:flex;gap:10px}
+  .row2 .field{flex:1}
+  .color-row{display:flex;gap:8px;flex-wrap:wrap}
+  .color-swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent}
+  .color-swatch.active{border-color:#333}
+  .btn-row{display:flex;gap:10px;margin-top:6px}
+  .btn{flex:1;height:42px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-primary{background:#FF5959;color:#fff}
+  .btn-ghost{background:#F2F3F5;color:#333}
+  .btn-danger{background:#FEF2F2;color:#DC2626}
+  .tip{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;font-size:12px;padding:8px 14px;border-radius:99px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+  .tip.show{opacity:1}
+  .offline{position:fixed;top:0;left:0;right:0;z-index:70;background:#374151;color:#fff;font-size:12px;text-align:center;padding:5px;display:none}
+  .offline.show{display:block}
+  @media (max-width:420px){
+    .course .cn{font-size:12px}.course .cs{font-size:10px;top:21px}.course .ct{font-size:9px;top:35px}
+  }
+</style>
+</head>
+<body>
+<div class="offline" id="offlineBar">当前处于离线状态 · 课程已本地保存，可正常查看</div>
+
+<!-- ===== 主页 ===== -->
+<div class="page active" id="page-home">
+  <header class="top">
+    <div class="gifT-layer" id="gifTLayer"></div>
+    <div class="topbg" id="topBg"><img class="tb-img tb-img-1" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CM93bWshgoXJu2x0I8qcZiQTnOb" alt=""><img class="tb-img tb-img-2" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GdWpb9cKjoSCpKxvz0ucoBXon5c" alt=""><img class="tb-img tb-img-4" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZEJWbs1oRo2QMNxluQGcOUbBnwd" alt=""><img class="tb-img tb-img-5" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TA4MbqvEooXhq5xKnxDc5nTFnOg" alt=""><img class="tb-img tb-img-6" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TZDXbWWYUownaPxZhfUcfYuUnJc" alt=""></div>
+    <div class="rl-top">
+      <div class="ll-week" id="weekLabel">
+        <span class="t-week" id="weekText">第 42 周</span>
+        <span class="week-arrow" id="weekArrow"></span>
+      </div>
+      <div class="t-sem" id="semLabel">2026-2027 第1学期</div>
+      <div class="top-acts">
+        <div class="t-ic" id="actShowType" title="周视图"><img src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JTtvboxarou5BMxH8HMcDzLonhl" alt=""></div>
+        <div class="t-ic" id="actAdd" title="添加课程"><img src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WOugboZqFoxMlbxgbL3ckckhnAf" alt=""></div>
+        <div class="t-ic" id="actShare" title="分享"><img src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/FGEpbXWpGoXd2Sx28Jico6gantT" alt=""></div>
+        <div class="t-ic" id="actSetting" title="设置"><img src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SBerbCxQPoKYvExhnbAc0jXSngc" alt=""></div>
+        <div class="t-ic" id="actClose" title="关闭"><img src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/K2krbEbAyonUZ3xyMyWciI1Cnke" alt=""></div>
+      </div>
+    </div>
+  </header>
+  <div class="vp" id="vp">
+    <div class="vp-track" id="vpTrack"></div>
+  </div>
+</div>
+
+<!-- ===== 周次弹窗（居中模态） ===== -->
+<div class="week-mask" id="weekMask"></div>
+<div class="week-pop" id="weekPop"></div>
+
+<!-- ===== 设置页 ===== -->
+<div class="page subpage" id="page-setting">
+  <div class="sub-nav">
+    <div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="title">课表设置</div>
+  </div>
+  <div id="settingBody"></div>
+</div>
+
+<!-- ===== 主题选择页 ===== -->
+<div class="page subpage" id="page-skin">
+  <div class="sub-nav">
+    <div class="back" onclick="go('setting')"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="title">个性皮肤</div>
+  </div>
+  <div class="skin-body">
+    <div class="skin-fixed">
+      <div class="skin-fixed-item" id="svDefault"></div>
+      <div class="skin-fixed-item" id="svCustom"></div>
+    </div>
+    <div class="skin-title">推荐主题</div>
+    <div class="skin-grid" id="skinList"></div>
+  </div>
+</div>
+
+<div class="back-week" id="backWeek">返回本周</div>
+
+<div class="theme-pop-mask" id="themePopMask" onclick="closeThemePreview()">
+  <div class="theme-pop" id="themePop" onclick="event.stopPropagation()">
+    <div class="theme-pop-name" id="themePopName"></div>
+    <img class="theme-pop-img" id="themePopImg" alt="皮肤预览">
+    <div class="theme-pop-btns">
+      <div class="tb tb-cancel" onclick="closeThemePreview()">取消</div>
+      <div class="tb tb-use" onclick="useThemePreview()">使用</div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
+<div class="tip" id="tip"></div>
+
+<script>
+var IC_ARROW="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/YOeCbf2rWoRpQMxWXAuc0k79n5c";
+var IC_ADD="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WOugboZqFoxMlbxgbL3ckckhnAf";
+var IC_SETTING="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SBerbCxQPoKYvExhnbAc0jXSngc";
+var IC_SHARE="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/FGEpbXWpGoXd2Sx28Jico6gantT";
+var IC_CLOSE="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/K2krbEbAyonUZ3xyMyWciI1Cnke";
+var IC_SHOWTYPE="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JTtvboxarou5BMxH8HMcDzLonhl";
+var IC_WEEK="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WrqZbSup0ogf74xQv3Oc4QK1nub";
+var THEMES=[{"no":"1","name":"唐韵书声","isNew":true,"color":"#383838,#A6A6A6,#FFFFFF,#C4A468,#FFF7E8,#E0C296,#FFFFFF,#C4A468","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OkmRbdThEorALExyQLCcw4chnZb","imgT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CM93bWshgoXJu2x0I8qcZiQTnOb","imgM":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/O044bUNsUoY0YpxjZyicHGN7nZe","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/N87bbrBMOo5cIOxEeN5c4UeVnlg","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/RF6dboismonhqvxtg7CcN6XQnEc","gifT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/XhdAbXFTSoTKnZxbjZZc4jSSnPd","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/U2uLbdFTnopVm8xoC7OcdTxEnah","course":["#D65642","#67CC29","#D17743","#36D6C3","#D6426A","#705ED6","#7DB51D","#AD7E2D","#25B0CC","#BD31BD"],"headMask":"rgba(244,236,218,.62)","lecolMask":"rgba(250,245,236,.72)"},{"no":"2","name":"豹富课表","isNew":true,"color":"#383838,#063E59,#FFD678,#D33F2F,#D33F2F,#00000000,#995400,#FDCC6E","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Sn4Ob61lSoiSylxZ7nxcizTynpc","imgT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GdWpb9cKjoSCpKxvz0ucoBXon5c","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TCahbwStToLsBmxfNx5cSHOInZe","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/YXYKbYI3FoPzkHxb2kocwLMUnxc","gifT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JM2QbPnJdofubixMh4jcUvmIn0c","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OgLfbTDMZoQVRFxLyttcd9GNnSe","course":["#B86C16","#D40404","#DE7352","#36D6C3","#B84D88","#705ED6","#7DB51D","#AD7E2D","#C95700","#BD31BD"],"headMask":"rgba(249,162,64,.88)","lecolMask":"rgba(244,162,65,.7)"},{"no":"3","name":"钱途无量","isNew":true,"color":"#063E59,#063E59,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TYiIb54EmoDrPox2Bymc515ZnZg","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TZAJbASXwor5JKxSM9KcN8yonCf","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/P3YWb5OGDoSujtxSEiScFGqtnEf","course":["#D65642","#67CC29","#D17743","#36D6C3","#D6426A","#705ED6","#7DB51D","#AD7E2D","#25B0CC","#BD31BD"],"headMask":"rgba(255,255,255,.85)","lecolMask":"rgba(255,255,255,.72)"},{"no":"4","name":"云间喵课","isNew":true,"color":"#004A59,#004A59,#8ACBEA,#FF3B3B,#FF3B3B,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CzGJbBAL8oG0hqx7lz1cxVY1ntd","imgT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZEJWbs1oRo2QMNxluQGcOUbBnwd","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/OEocbHEpqoW5y0xZzRacLnednhf","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Zj41bl5MYoRxBLx3U3zcV5yon1r","gifT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZEXEbvducotm2uxrQjAcPL8RnRe","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/M44nbkrSkoMEbGxi2Bnc3D57nqe","course":["#B84837","#60963C","#B87848","#4A9E96","#F31C52","#E61C8B","#9FAD6F","#C49543","#1F8599","#B54A9A"],"headMask":"rgba(137,202,233,.88)","lecolMask":"rgba(200,236,251,.72)"},{"no":"5","name":"学海逐浪","isNew":true,"color":"#FFFFFF,#FFFFFF,#40B9F8,#EEFF00,#EEFF00,#00000000,#383838,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/BPwxbDnhtopkenxIlMacvjS8nSc","imgT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TA4MbqvEooXhq5xKnxDc5nTFnOg","imgM":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/MhXgbf4KTomhrcxfnRNckvTwn5e","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/E2ZebULDIo7F2TxB6UDc6ob3nwh","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SFAXbcEi3o3z2BxGZgScnMfGnUf","gifT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/BANZb1cvloBqWsxBrgDcKXQ9nxc","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/DQiNbqTkkoxAkxx2G5cclIgonie","course":["#209BBD","#D6426A","#705ED6","#7DB51D","#AD7E2D","#0058F0","#BD31BD","#D65642","#489C14","#D17743"],"headMask":"rgba(36,168,235,.88)","lecolMask":"rgba(49,178,242,.7)"},{"no":"6","name":"乘风破浪","isNew":true,"color":"#FFFFFF,#FFFFFF,#40B9F8,#EEFF00,#EEFF00,#00000000,#383838,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JZZdbjNc3oi0XMxLhgKc3XIXnml","imgT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TZDXbWWYUownaPxZhfUcfYuUnJc","imgM":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HxZubskAyowOCBxx7pkcVMEHnTO","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ISXIbS5Xloi6iFxJ526ck4y2n2g","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/W6AWb4CUcoIGyLxKi8scJcoYnRb","gifT":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/FoG9bTDeBoUKbYxVB8BcRcGen6c","gifB":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HHefbj4evoDgkCxKPRjcD4t6nlg","course":["#209BBD","#D6426A","#705ED6","#7DB51D","#AD7E2D","#0058F0","#BD31BD","#D65642","#489C14","#D17743"],"headMask":"rgba(36,168,237,.88)","lecolMask":"rgba(35,170,238,.72)"},{"no":"7","name":"元气满格","isNew":false,"color":"#063E59,#063E59,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Dye2bMQrYolVTVxmcv2cEyzvnDd","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/KAKMbIA7Ro2pQvxLFApcr2JknQd","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Dye2bMQrYolVTVxmcv2cEyzvnDd","course":["#209BBD","#D6426A","#705ED6","#7DB51D","#AD7E2D","#0058F0","#BD31BD","#D65642","#489C14","#D17743"],"headMask":"rgba(225,232,235,.88)","lecolMask":"rgba(238,241,243,.72)"},{"no":"8","name":"夏日甜兔","isNew":false,"color":"#C32528,#C32528,#FFFFFF,#6ABF08,#6ABF08,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/PERFbeyxIomvXnxH3DMc1rCEnmZ","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GrplbJxbqovP34x9K21cJ3zcnQP","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/PERFbeyxIomvXnxH3DMc1rCEnmZ","course":["#D42651","#376EA6","#008F28","#DB3704","#C79500","#E6007E","#D47783","#B55188","#009682"],"headMask":"rgba(248,229,229,.88)","lecolMask":"rgba(251,240,240,.72)"},{"no":"9","name":"花间自在","isNew":false,"color":"#805C0E,#805C0E,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/QKhBbMR0Ko7lz1xUxgcc6mH0nZc","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CnKbb4x45oU0PyxNOlOc8ODPnwb","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/QKhBbMR0Ko7lz1xUxgcc6mH0nZc","course":["#D42651","#376EA6","#008F28","#DB3704","#C79500","#E6007E","#D47783","#B55188","#009682"],"headMask":"rgba(240,235,226,.88)","lecolMask":"rgba(246,244,238,.72)"},{"no":"10","name":"元气少女","isNew":false,"color":"#476E00,#476E00,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/POpXbQCkfoE4cDx0BOdcXoeIn3d","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/R5lubkcU7ohF74xFuLZc2CNZnBh","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/POpXbQCkfoE4cDx0BOdcXoeIn3d","course":["#528736","#376EA6","#CC630C","#786EBA","#94923B","#418A80","#D47783","#B55188","#418A6D"],"headMask":"rgba(233,238,224,.88)","lecolMask":"rgba(242,245,237,.72)"},{"no":"11","name":"天马行空","isNew":false,"color":"#7A1F00,#7A1F00,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WOkQb0uDto2jy3xAmAEc0vB1nah","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/LuM7b5k9dotsFVxnSeGcgmjjn1b","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WOkQb0uDto2jy3xAmAEc0vB1nah","course":["#528736","#376EA6","#CC630C","#786EBA","#94923B","#418A80","#D47783","#B55188","#418A6D"],"headMask":"rgba(239,228,224,.88)","lecolMask":"rgba(246,239,237,.72)"},{"no":"12","name":"马上自在","isNew":false,"color":"#063E59,#063E59,#FFFFFF,#F3544F,#F3544F,#00000000,#FFFFFF,#F35350","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/X1kkbzC3ToIX4YxiSaKc1x6wnnb","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/CI7kbfJ8eoH0EIxvZNwcfZRsnnd","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/X1kkbzC3ToIX4YxiSaKc1x6wnnb","course":["#528736","#376EA6","#CC630C","#786EBA","#94923B","#418A80","#D47783","#B55188","#418A6D"],"headMask":"rgba(225,232,235,.88)","lecolMask":"rgba(238,241,243,.72)"},{"no":"13","name":"金沙碧浪","isNew":false,"color":"#09423F,#09423F,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WQ7bbF7SqoxCsoxYiifcBlNfn2g","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Tp8Zb9Vmto3EcDxKwFPctXLHnfR","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WQ7bbF7SqoxCsoxYiifcBlNfn2g","headMask":"rgba(255,237,236,.88)","lecolMask":"rgba(255,247,245,.72)"},{"no":"14","name":"清新墨景","isNew":false,"color":"#0B2F4A,#0B2F4A,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GNhQbpzy6oqRY5xOvBBcvheBndg","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/TR0Wb8N8aogfn4xWft0c7rY4nmh","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/GNhQbpzy6oqRY5xOvBBcvheBndg","headMask":"rgba(226,230,233,.88)","lecolMask":"rgba(238,240,242,.72)"},{"no":"15","name":"毕业之光","isNew":false,"color":"#0A3E66,#0A3E66,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/I0HFb2Xg4owfkrxeLqRcbL06ndg","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/XIWZbjDQZoa5mpxsOQ9cpzllnqh","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/I0HFb2Xg4owfkrxeLqRcbL06ndg","headMask":"rgba(226,232,237,.88)","lecolMask":"rgba(238,241,244,.72)"},{"no":"16","name":"田园兔女","isNew":false,"color":"#E88B10,#E88B10,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SDYcbnmfJo0BOVx2WU8cpdv9nYd","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/KSSObjhMDolrNExGNMVcJTmJnDb","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/SDYcbnmfJo0BOVx2WU8cpdv9nYd","headMask":"rgba(252,241,226,.88)","lecolMask":"rgba(253,247,238,.72)"},{"no":"17","name":"清新风景","isNew":false,"color":"#1075E8,#1075E8,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/T6whbMEOionPLdxscvAcCD3unJh","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/MVCfbrXQ0oepq6xSyDYc68ahn2d","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/T6whbMEOionPLdxscvAcCD3unJh","headMask":"rgba(226,238,252,.88)","lecolMask":"rgba(238,245,253,.72)"},{"no":"18","name":"迷雾国竹","isNew":false,"color":"#1075E8,#1075E8,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/RKFBb9KVFolsotxphJAcoXOengg","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/Mrcyb87ysoKRQIxsG9xcQVUOnEc","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/RKFBb9KVFolsotxphJAcoXOengg","headMask":"rgba(226,238,252,.88)","lecolMask":"rgba(238,245,253,.72)"},{"no":"19","name":"柔光花瓣","isNew":false,"color":"#783825,#783825,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/IZSebr54GoZqONxajNjcIsMWnDc","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HD5rb4ZDao7cIZxZsYucU992nQe","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/IZSebr54GoZqONxajNjcIsMWnDc","headMask":"rgba(239,231,229,.88)","lecolMask":"rgba(246,241,240,.72)"},{"no":"20","name":"炫彩花语","isNew":false,"color":"#039E37,#039E37,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HNvcbzBEjojthfxoUNccLrg1nmc","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/BCIbbW3Cmo6eUWxHbmzcUMSunle","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/HNvcbzBEjojthfxoUNccLrg1nmc","headMask":"rgba(225,243,231,.88)","lecolMask":"rgba(237,248,241,.72)"},{"no":"21","name":"蓝天泳池","isNew":false,"color":"#0076B5,#0076B5,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JBjzbQHbVoNzTpxNhjFcY4XDn3b","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/RkyEbfyvmoTNFFxPJ0ncBJJ9nAd","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/JBjzbQHbVoNzTpxNhjFcY4XDn3b","headMask":"rgba(224,239,246,.88)","lecolMask":"rgba(237,245,250,.72)"},{"no":"22","name":"燕归稻田","isNew":false,"color":"#039E37,#039E37,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WEE7b1CzNoINvexLe2wcmaCVnjf","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/ZroHbjwMpog9ZvxGmSqc6bGpnDc","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WEE7b1CzNoINvexLe2wcmaCVnjf","headMask":"rgba(225,243,231,.88)","lecolMask":"rgba(237,248,241,.72)"},{"no":"23","name":"水墨山河","isNew":false,"color":"#181819,#181819,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WVrlbZPtPoGhHUx8A8dcEFzandc","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/IdNGbvt7ioqCTUxHsCTcMdZNn4c","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/WVrlbZPtPoGhHUx8A8dcEFzandc","headMask":"rgba(227,227,227,.88)","lecolMask":"rgba(239,239,239,.72)"},{"no":"24","name":"田园狐狸","isNew":false,"color":"#039E37,#039E37,#FFFFFF","img":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/V5qqbn176oE9LpxYQoPcTTeanMd","pre":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/R3Zhbcv3coKuHMxH4GUcS6xgnPh","bg":"https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/V5qqbn176oE9LpxYQoPcTTeanMd","headMask":"rgba(225,243,231,.88)","lecolMask":"rgba(237,248,241,.72)"}];
+
+/* ================================================================
+   真实配色（APK res/values/colors.xml 原样）
+   ================================================================ */
+/* 原版课程格：不透明浅色实底 + 彩色边框 + 彩色文字（无透明，对照原版截图） */
+var DEFAULT_COLORS=["#FF4949","#49B583","#3091FF","#E8A33D","#E85EC0","#7F86FF","#A6A6A6"];
+var CLASS_TIMES=[
+ {s:"08:00",e:"08:45"},{s:"08:55",e:"09:40"},{s:"10:00",e:"10:45"},{s:"10:55",e:"11:40"},
+ {s:"14:30",e:"15:15"},{s:"15:25",e:"16:10"},{s:"16:20",e:"17:05"},{s:"17:15",e:"18:00"},
+ {s:"19:00",e:"19:45"},{s:"19:55",e:"20:40"},{s:"21:00",e:"21:35"}
+];
+var WEEKDAYS=["一","二","三","四","五","六","日"];
+var SEMESTER="2026-2027 第1学期";
+var SEMESTER_START=new Date(2026,7,31);   /* 第1周周一：2026-08-31（10月12日=第7周） */
+var SEMESTER_WEEKS=18;                     /* 本学期周数（原版周次选择 1-18） */
+
+var COURSE_KEY="yxyx_courses_v1", THEME_KEY="yxyx_theme_v1", WEEK_KEY="yxyx_weekoff_v1";
+var DEFAULT_COURSES=[
+ {id:1,day:1,start:1,end:2,name:"高等数学",sub:"1号楼204（机动教室3）",color:0},
+ {id:2,day:2,start:3,end:3,name:"大学英语",sub:"3号楼305（公共教室）",color:1},
+ {id:3,day:3,start:1,end:1,name:"体育",sub:"操场",color:2},
+ {id:4,day:4,start:4,end:4,name:"思想政治",sub:"2号楼101",color:3},
+ {id:5,day:5,start:2,end:3,name:"线性代数",sub:"1号楼305（机动教室3）",color:4},
+ {id:6,day:1,start:6,end:6,name:"程序设计",sub:"实验楼301",color:1},
+ {id:7,day:3,start:5,end:5,name:"大学物理",sub:"1号楼201（公共教室）",color:0},
+ {id:8,day:5,start:7,end:8,name:"形势与政策",sub:"2号楼203",color:2}
+];
+var STATE={weekOffset:0,today:null,themeNo:"1",curIndex:1};
+function loadJSON(k,d){try{var s=localStorage.getItem(k);if(s)return JSON.parse(s);}catch(e){}return d;}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function loadCourses(){var d=loadJSON(COURSE_KEY,null);if(d&&Array.isArray(d))return d;return DEFAULT_COURSES.slice();}
+function saveCourses(c){saveJSON(COURSE_KEY,c);}
+
+/* ============ 日期工具 ============ */
+function startOfWeek(d){var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());var w=t.getDay();var diff=(w===0?-6:1-w);return new Date(t.getTime()+diff*86400000);}
+function addDays(d,n){return new Date(d.getTime()+n*86400000);}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function weekOfYear(d){var s=startOfWeek(new Date(d.getFullYear(),0,1));return Math.floor((startOfWeek(d).getTime()-s.getTime())/604800000)+1;}
+/* 学期周次（第1周=SEMESTER_START那一周） */
+function weekOfSemester(d){return Math.floor((startOfWeek(d).getTime()-startOfWeek(SEMESTER_START).getTime())/604800000)+1;}
+
+/* ============ 页面路由 ============ */
+function go(page){location.hash="#"+page;}
+function onHash(){
+  var h=location.hash.replace("#","")||"home";
+  ["home","setting","skin"].forEach(function(p){
+    var el=document.getElementById("page-"+p);
+    el.style.display=(p===h)?"flex":"none";
+    if(p===h)el.classList.add("active");else el.classList.remove("active");
+  });
+  if(h==="skin")renderSkinPage();
+  window.scrollTo(0,0);
+}
+
+/* ============ 主题工具 ============ */
+var themeMap={};
+function getTheme(){return themeMap[STATE.themeNo];}
+function curCourseColors(){var t=getTheme();if(t&&t.course&&t.course.length)return t.course;if(t&&t.color){var m=t.color.split(',')[0];if(m&&m.indexOf('#')===0)return [m];}return null;}
+function hexToA(hex,a){var n=parseInt(hex.replace('#',''),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+(a/255)+')';}
+function luminance(hex){var n=parseInt(hex.replace('#',''),16);return (0.299*((n>>16)&255)+0.587*((n>>8)&255)+0.114*(n&255))/255;}
+/* 彩色与白混合，返回不透明浅色（ratio=白占比） */
+function mixWhite(hex,ratio){
+  var n=parseInt(hex.replace('#',''),16);
+  var r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r+(255-r)*ratio);g=Math.round(g+(255-g)*ratio);b=Math.round(b+(255-b)*ratio);
+  return 'rgb('+r+','+g+','+b+')';
+}
+/* 彩色与白混合，返回不透明浅色（ratio=白占比）——原版格子为不透明浅色实底+彩边+彩字，字可清晰读出 */
+function mixWhite(hex,ratio){
+  var n=parseInt(hex.replace('#',''),16);
+  var r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r+(255-r)*ratio);g=Math.round(g+(255-g)*ratio);b=Math.round(b+(255-b)*ratio);
+  return 'rgb('+r+','+g+','+b+')';
+}
+function buildCoursePalette(hexArr,fallback){
+  var arr=(hexArr&&hexArr.length)?hexArr:fallback;
+  return arr.map(function(h){return {border:h,bg:mixWhite(h,0.86),text:h};});
+}
+
+/* ============ 主页渲染 ============ */
+function render(){
+  var today=new Date();
+  STATE.today=today;
+  var ws=addDays(startOfWeek(today),STATE.weekOffset*7);
+  STATE.weekStart=ws;
+  document.getElementById("weekText").textContent="第 "+(weekOfSemester(today)+STATE.weekOffset)+" 周";
+  document.getElementById("weekText").classList.toggle("red",STATE.weekOffset!==0);
+  document.getElementById("weekArrow").classList.toggle("red",STATE.weekOffset!==0);
+  document.getElementById("semLabel").textContent=SEMESTER;
+  /* 学期字色：唐韵(no1)浅米背景=深棕，其余保持白 */
+  var _t0=getTheme();
+  document.getElementById("semLabel").style.color=(_t0&&_t0.no==="1")?"#3A2C1E":"rgba(255,255,255,.95)";
+  document.getElementById("backWeek").classList.toggle("show",STATE.weekOffset!==0);
+  /* 动态新品主题（isNew）：表头/节次透明显示背景；普通主题保留粉底 */
+  var _t=getTheme();
+  var ph=document.getElementById("page-home");
+  ph.classList.toggle("theme-new",!!(_t&&_t.isNew));
+  /* 每主题专属背景 class：CSS 静态背景图（.theme-noN 各层）——发布链路可扫描 */
+  for(var i=1;i<=30;i++)ph.classList.remove("theme-no"+i);
+  if(_t)ph.classList.add("theme-no"+_t.no);
+  applyTopGif();
+  applyTopBg();
+  applyHeadColors();
+  renderWeekPanes();
+}
+/* 顶部左上角小动图（固定，不随课表滑动；背景图由CSS .theme-noN .gifT-layer 控制） */
+function applyTopGif(){
+  var t=getTheme();
+  var gifT=document.getElementById("gifTLayer");
+  if(t&&t.gifT)gifT.style.display="block";
+  else gifT.style.display="none";
+}
+/* 按钮区背景（imgT 固定层；背景图由CSS .theme-noN .topbg 控制） */
+function applyTopBg(){}
+/* 表头文字颜色：从主题 color 数组提取（isNew：星期=color[0]、日期=color[1]、当天=color[3]） */
+function themeHeadColors(t){
+  if(!t||!t.isNew||!t.color)return null;
+  var c=t.color.split(',');
+  return {week:(c[0]||'#000'),date:(c[1]||c[0]||'#666'),today:(c[3]||'#FF5959')};
+}
+function applyHeadColors(){
+  var t=getTheme();
+  var hc=themeHeadColors(t);
+  var root=document.documentElement.style;
+  if(hc){
+    root.setProperty('--hd-week',hc.week);
+    root.setProperty('--hd-date',hc.date);
+    root.setProperty('--hd-today',hc.today);
+  }else{
+    root.setProperty('--hd-week','#000');
+    root.setProperty('--hd-date','#666');
+    root.setProperty('--hd-today','#FF5959');
+  }
+}
+/* ViewPager：三个周面板（上一周/当前/下一周）横向排，整页平移 */
+function renderWeekPanes(){
+  var track=document.getElementById("vpTrack");
+  track.innerHTML="";
+  var offsets=[STATE.weekOffset-1,STATE.weekOffset,STATE.weekOffset+1];
+  offsets.forEach(function(off){
+    var pane=document.createElement("div");
+    pane.className="vp-pane";
+    pane.appendChild(buildPaneBg(off));
+    var _tb=getTheme();
+    if(_tb&&_tb.imgM&&_tb.no!=="1"){var hb=document.createElement("div");hb.className="pane-headbg";pane.appendChild(hb);} /* 表头背景图(imgM:边框/波浪)独立层浮于head蒙版之上(不被盖,清晰可见) */
+    pane.appendChild(buildPaneHead(off));
+    pane.appendChild(buildPaneBody(off));
+    track.appendChild(pane);
+  });
+  STATE.curIndex=1;
+  document.getElementById("vpTrack").style.transform="translateX(-100%)";
+}
+/* 每个面板背景分层（原版）：按钮区背景=imgT(固定层，见render/applyTopBg)，表头区=imgM(横条，独立不延伸)，表格静态背景=img，gifB(动态人物)置于内容之下。底部不再叠 imgM 条。 */
+function buildPaneBg(off){
+  var t=getTheme();
+  var wrap=document.createElement("div");wrap.className="pane-bgs";
+  var bg=document.createElement("div");bg.className="pane-bg"; /* 背景图/底色由CSS .theme-noN .pane-bg 控制(钱途纯白/学海蓝底/唐韵浅米底) */
+  wrap.appendChild(bg);
+  if(t&&t.gifB){
+    var gifB=document.createElement("div");gifB.className="pane-gifB"; /* 背景图由CSS .theme-noN .pane-gifB 控制 */
+    wrap.appendChild(gifB);
+  }
+  return wrap;
+}
+function buildPaneHead(off){
+  var t=getTheme();
+  var ws=addDays(startOfWeek(new Date()),off*7);
+  var head=document.createElement("div");head.className="head";
+  if(t&&t.headMask)head.style.backgroundColor=t.headMask;
+  /* 唐韵:表头金线边框imgM由CSS .theme-no1 .head 背景承载(拉伸铺满,金线清晰对齐head);学海:波浪用CSS白浪条 */
+  var month=document.createElement("div");month.className="h-month";month.textContent=(ws.getMonth()+1)+"月";
+  head.appendChild(month);
+  var days=document.createElement("div");days.className="h-days";
+  var firstW=startOfWeek(ws);
+  for(var i=0;i<7;i++){var day=addDays(firstW,i);var d=document.createElement("div");d.className="h-day"+(sameDay(day,STATE.today)?" today":"");d.innerHTML='<div class="week">'+WEEKDAYS[i]+'</div><div class="date">'+day.getDate()+'</div>';d.addEventListener("click",function(){showTip("点击星期可切换日视图（演示）");});days.appendChild(d);}
+  head.appendChild(days);
+  return head;
+}
+function buildPaneBody(off){
+  var body=document.createElement("div");body.className="hmain";
+  var _tbg=getTheme();
+  var sc=document.createElement("div");sc.className="hb-scroll";
+  var le=document.createElement("div");le.className="lecol";
+  if(_tbg&&_tbg.lecolMask)le.style.backgroundColor=_tbg.lecolMask;
+  for(var i=0;i<CLASS_TIMES.length;i++){var r=document.createElement("div");r.className="le-row";r.innerHTML='<div class="no">'+(i+1)+'</div><div class="tm">'+CLASS_TIMES[i].s+'<br>'+CLASS_TIMES[i].e+'</div>';le.appendChild(r);}
+  sc.appendChild(le);
+  var gw=document.createElement("div");gw.className="grid-wrap";
+  var grid=document.createElement("div");grid.className="grid";
+  for(var k=1;k<CLASS_TIMES.length;k++){var dl=document.createElement("div");dl.className="dline";dl.style.top=(k*78)+"px";grid.appendChild(dl);}
+  gw.appendChild(grid);sc.appendChild(gw);
+  body.appendChild(sc);
+  var palette=buildCoursePalette(curCourseColors(),DEFAULT_COLORS);
+  var courses=loadCourses();
+  var colW=100/7,rowH=78;
+  courses.forEach(function(c){
+    var top=(c.start-1)*rowH,h=(c.end-c.start+1)*rowH,left=(c.day-1)*colW;
+    var cc=palette[c.color%palette.length];
+    var el=document.createElement("div");
+    el.className="course";
+    el.style.top=top+"px";el.style.height=(h-4)+"px";
+    el.style.left="calc("+left+"% + 2px)";el.style.width="calc("+colW+"% - 4px)";
+    el.style.background=cc.bg;el.style.border="2px solid "+cc.border;
+    var text=cc.text;
+    var loc='<div class="cs" style="color:'+text+'">'+esc(c.sub?"@"+c.sub:c.sub||"")+'</div>';
+    el.innerHTML='<div class="cn" style="color:'+text+'">'+esc(c.name)+'</div>'+loc;
+    el.addEventListener("click",function(){openDetail(parseInt(this.dataset.id,10));});
+    el.dataset.id=c.id;
+    grid.appendChild(el);
+  });
+  return body;
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ============ ViewPager 整页拖动（含表头+节次一起滑，相邻周可见） ============ */
+function initSwipe(){
+  var vp=document.getElementById("vp");
+  var track=document.getElementById("vpTrack");
+  var startX=0,startY=0,curX=0,dragging=false,axis=null;
+  function moveTo(dx){
+    var w=vp.offsetWidth||1;
+    var pct=(dx/w*100) - STATE.curIndex*100;
+    track.style.transform="translateX("+pct+"%)";
+  }
+  function settle(toIdx){
+    STATE.weekOffset += (toIdx-STATE.curIndex);
+    saveJSON(WEEK_KEY,STATE.weekOffset);
+    STATE.curIndex=toIdx;
+    track.style.transition="transform .25s ease";
+    track.style.transform="translateX(-"+toIdx*100+"%)";
+    setTimeout(function(){track.style.transition="none";render();},260);
+  }
+  function pickAxis(dx,dy){if(axis===null)axis=(Math.abs(dx)>Math.abs(dy))?"h":"v";return axis;}
+  vp.addEventListener("touchstart",function(e){
+    dragging=true;startX=e.touches[0].clientX;startY=e.touches[0].clientY;curX=startX;axis=null;
+    track.style.transition="none";
+  },{passive:true});
+  vp.addEventListener("touchmove",function(e){
+    if(!dragging)return;
+    var dx=e.touches[0].clientX-startX,dy=e.touches[0].clientY-startY;
+    /* 单轴：第一次判定主轴后锁定。垂直=滚动表格(不切周)；水平=切周(禁滚动) */
+    if(pickAxis(dx,dy)==="v"){return;}
+    curX=e.touches[0].clientX;
+    moveTo(curX-startX);
+    e.preventDefault();
+  },{passive:false});
+  vp.addEventListener("touchend",function(e){
+    if(!dragging)return;dragging=false;
+    if(axis==="v")return; /* 垂直滚动结束，不切周 */
+    var dx=curX-startX;
+    var th=vp.offsetWidth*0.18;
+    if(dx<-th)settle(STATE.curIndex+1);
+    else if(dx>th)settle(STATE.curIndex-1);
+    else{track.style.transition="transform .22s ease";track.style.transform="translateX(-"+STATE.curIndex*100+"%)";}
+  },{passive:true});
+  var mdown=false;
+  vp.addEventListener("mousedown",function(e){mdown=true;dragging=true;startX=e.clientX;startY=e.clientY;curX=startX;axis=null;track.style.transition="none";e.preventDefault();});
+  window.addEventListener("mousemove",function(e){
+    if(!mdown)return;
+    var dx=e.clientX-startX,dy=e.clientY-startY;
+    if(pickAxis(dx,dy)==="v"){return;}
+    curX=e.clientX;moveTo(curX-startX);
+  });
+  window.addEventListener("mouseup",function(e){
+    if(!mdown)return;mdown=false;dragging=false;
+    if(axis==="v")return;
+    var dx=curX-startX;var th=vp.offsetWidth*0.18;
+    if(dx<-th)settle(STATE.curIndex+1);
+    else if(dx>th)settle(STATE.curIndex-1);
+    else{track.style.transition="transform .22s ease";track.style.transform="translateX(-"+STATE.curIndex*100+"%)";}
+  });
+}
+
+/* ============ 主题 ============ */
+function initThemes(){THEMES.forEach(function(t){themeMap[t.no]=t;});var cur=loadJSON(THEME_KEY,"1");STATE.themeNo=themeMap[cur]?cur:"1";render();}
+function applyTheme(no){saveJSON(THEME_KEY,no);STATE.themeNo=no;render();}
+/* 皮肤预览弹窗：选皮肤→弹出含课表预览的画面→点"使用"应用并回主界面（原版流程） */
+var _pendingTheme=null;
+function openThemePreview(no){
+  var t=themeMap[no];if(!t)return;
+  _pendingTheme=no;
+  document.getElementById("themePopImg").src=t.pre||t.img||"";
+  document.getElementById("themePopName").textContent=t.name||"";
+  document.getElementById("themePop").classList.add("show");
+  document.getElementById("themePopMask").classList.add("show");
+}
+function closeThemePreview(){
+  _pendingTheme=null;
+  document.getElementById("themePop").classList.remove("show");
+  document.getElementById("themePopMask").classList.remove("show");
+}
+function useThemePreview(){
+  if(_pendingTheme)applyTheme(_pendingTheme);
+  closeThemePreview();
+  go("home");
+}
+function renderSkinPage(){
+  var cur=loadJSON(THEME_KEY,"1");
+  var def=document.getElementById("svDefault");def.innerHTML=makeDefaultSkinPreview(cur);
+  var cus=document.getElementById("svCustom");cus.innerHTML=makeCustomSkinPreview();
+  var list=document.getElementById("skinList");list.innerHTML="";
+  THEMES.forEach(function(t){
+    var cell=document.createElement("div");
+    cell.className="skin-cell"+(t.no===cur?" active":"");
+    cell.dataset.no=t.no;
+    var newBadge=t.isNew?'<span class="skin-new">NEW</span>':'';
+    cell.innerHTML='<div class="skin-thumb"><img src="'+t.pre+'" alt="'+esc(t.name)+'" loading="lazy">'+newBadge+'<span class="skin-ok">'+(t.no===cur?'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>':'')+'</span></div><div class="skin-name">'+esc(t.name)+'</div>';
+    cell.addEventListener("click",function(){openThemePreview(this.dataset.no);});
+    list.appendChild(cell);
+  });
+}
+function makeDefaultSkinPreview(cur){
+  var t=themeMap[cur]||{};var base=(t&&t.bg)?t.bg:(t&&t.img?t.img:'');
+  return '<div class="def-skin" style="background-image:url(\''+base+'\')"><div class="def-grid"><i></i><i></i><i></i><i></i><i></i></div><div class="def-cap">默认</div></div>';
+}
+function makeCustomSkinPreview(){
+  return '<div class="def-skin custom"><div class="def-plus">+</div><div class="def-cap">自定义</div></div>';
+}
+
+/* ============ 周次弹窗（底部弹出，原版） ============ */
+function toggleWeekPop(force){
+  var pop=document.getElementById("weekPop");
+  var mask=document.getElementById("weekMask");
+  var show=(force===undefined)?!pop.classList.contains("show"):force;
+  if(show)buildWeekPop();   /* 每次打开都重建，确保本周灰/选定红状态实时反映 */
+  pop.classList.toggle("show",show);
+  mask.classList.toggle("show",show);
+}
+function buildWeekPop(){
+  var pop=document.getElementById("weekPop");
+  var thisWeek=weekOfSemester(new Date());
+  var selWeek=thisWeek+STATE.weekOffset;
+  var html='<div class="wp-head"><span class="wp-title">查看周课表</span><span class="wp-edit" id="wpEdit">修改当前周</span></div>';
+  html+='<div class="wp-grid">';
+  for(var i=1;i<=SEMESTER_WEEKS;i++){
+    var cls="wp-cell";
+    var label=i;
+    if(i===selWeek){cls+=" sel";}                 /* 选定周：红色（覆盖一切） */
+    else if(i===thisWeek){cls+=" cur";label="本周";} /* 本周：灰色（仅当选定≠本周） */
+    html+='<div class="'+cls+'" data-w="'+i+'">'+label+'</div>';
+  }
+  html+='</div>';
+  pop.innerHTML=html;
+  pop.querySelectorAll(".wp-cell").forEach(function(el){
+    el.addEventListener("click",function(e){
+      e.stopPropagation();
+      var w=parseInt(this.dataset.w,10);
+      STATE.weekOffset=w-thisWeek;
+      saveJSON(WEEK_KEY,STATE.weekOffset);
+      toggleWeekPop(false);
+      render();
+    });
+  });
+  var we=document.getElementById("wpEdit");
+  if(we)we.addEventListener("click",function(){showTip("修改当前周：用于设定开学日期（演示）");});
+}
+
+/* ============ 设置页 ============ */
+function buildSetting(){
+  var groups=[
+    {title:"基本设置",items:[
+      {k:"kv_manage",t:"课表管理",s:"新增/切换课表，学期开始时间和周数设置等功能"},
+      {k:"kv_timetable",t:"时间表",s:"上课时间设置"},
+      {k:"kv_course_added",t:"已添课程",s:""}
+    ]},
+    {title:"特色功能",items:[
+      {k:"kv_qrcode",t:"分享课表",s:"分享课程表给好友"},
+      {k:"kv_import",t:"导入课程表",s:"快捷导入课程表功能"},
+      {k:"kv_skin",t:"个性皮肤",s:"装扮个性皮肤",skin:true},
+      {k:"kv_shortcut",t:"课表快捷方式",s:"生成课表快捷方式"},
+      {k:"kv_other",t:"其他设置",s:"周六、周日、首页显示，课程提醒，授权分享"}
+    ]}
+  ];
+  var box=document.getElementById("settingBody");box.innerHTML="";
+  groups.forEach(function(g){
+    var sec=document.createElement("div");sec.className="set-sec";
+    sec.innerHTML='<div class="set-title">'+g.title+'</div>';
+    g.items.forEach(function(it){
+      var row=document.createElement("div");
+      row.className="set-row";
+      row.innerHTML='<div class="set-left"><div class="set-t">'+it.t+'</div>'+(it.s?'<div class="set-s">'+it.s+'</div>':'')+'</div><div class="set-arrow"><img src="'+IC_ARROW+'" alt=""></div>';
+      row.addEventListener("click",function(){
+        if(it.k==="kv_skin")go("skin");
+        else if(it.k==="kv_manage")showTip("课表管理：演示用 · 一个课表");
+        else if(it.k==="kv_shortcut")showTip("课表快捷方式：网页已支持添加到主屏直达");
+        else if(it.k==="kv_timetable")showTip("时间表：上课时间设置（演示）");
+        else if(it.k==="kv_course_added"){go("home");showTip("已添课程：点击课程格可编辑");}
+        else showTip(""+it.t+"：演示功能");
+      });
+      sec.appendChild(row);
+    });
+    box.appendChild(sec);
+  });
+}
+
+/* ============ 课程详情/编辑 ============ */
+var editingId=null;
+function openDetail(id){
+  var cs=loadCourses();var c=null;for(var i=0;i<cs.length;i++)if(cs[i].id===id){c=cs[i];break;}
+  if(!c)return;editingId=id;
+  var palette=buildCoursePalette(curCourseColors(),DEFAULT_COLORS);
+  var cc=palette[c.color%palette.length];
+  document.getElementById("sheet").innerHTML=
+    '<div class="grab"></div><h3>课程详情</h3>'+
+    '<div style="display:flex;align-items:center;gap:10px;padding:8px 0 14px"><div style="width:46px;height:46px;border-radius:12px;background:'+cc.border+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700">'+esc(c.name.charAt(0))+'</div><div><div style="font-size:17px;font-weight:700">'+esc(c.name)+'</div><div style="font-size:13px;color:#666;margin-top:3px">'+esc(c.sub||"")+'</div></div></div>'+
+    '<div class="field"><label>上课时间</label><input id="fTime" value="周'+WEEKDAYS[c.day-1]+' 第'+c.start+'-'+c.end+'节" readonly></div>'+
+    '<div class="btn-row" style="margin-top:2px"><button class="btn btn-ghost" onclick="editCourse()">编辑</button><button class="btn btn-danger" onclick="delCourse()">删除</button><button class="btn btn-primary" onclick="closeSheet()">完成</button></div>';
+  showMask(true);
+}
+function editCourse(){
+  var cs=loadCourses();var c=null;for(var i=0;i<cs.length;i++)if(cs[i].id===editingId){c=cs[i];break;}
+  if(!c)return;
+  var palette=buildCoursePalette(curCourseColors(),DEFAULT_COLORS);
+  var dayOpts=[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(d===c.day?" selected":"")+'>周'+WEEKDAYS[d-1]+'</option>';}).join("");
+  var startOpts=CLASS_TIMES.map(function(t,i){return '<option value="'+(i+1)+'"'+(i+1===c.start?" selected":"")+'>第'+(i+1)+'节 '+t.s+'</option>';}).join("");
+  document.getElementById("sheet").innerHTML=
+    '<div class="grab"></div><h3>编辑课程</h3>'+
+    '<div class="field"><label>课程名称</label><input id="fName" value="'+esc(c.name)+'"></div>'+
+    '<div class="field"><label>副标题 / 教室</label><input id="fSub" value="'+esc(c.sub||"")+'"></div>'+
+    '<div class="row2"><div class="field"><label>星期</label><select id="fDay">'+dayOpts+'</select></div><div class="field"><label>节次</label><select id="fStart">'+startOpts+'</select></div></div>'+
+    '<div class="field"><label>颜色</label><div class="color-row" id="fColors"></div></div>'+
+    '<div class="btn-row"><button class="btn btn-primary" onclick="saveEdit()">保存</button><button class="btn btn-ghost" onclick="closeSheet()">取消</button></div>';
+  var cr=document.getElementById("fColors");
+  palette.forEach(function(cc,i){var s=document.createElement("div");s.className="color-swatch"+(i===c.color?" active":"");s.style.background=cc.border;s.dataset.i=i;s.addEventListener("click",function(){document.querySelectorAll(".color-swatch").forEach(function(x){x.classList.remove("active");});s.classList.add("active");});cr.appendChild(s);});
+}
+function saveEdit(){
+  var cs=loadCourses();var c=null;for(var i=0;i<cs.length;i++)if(cs[i].id===editingId){c=cs[i];break;}
+  if(!c)return;
+  c.name=document.getElementById("fName").value||"课程";
+  c.sub=document.getElementById("fSub").value;
+  c.day=parseInt(document.getElementById("fDay").value,10);
+  c.start=parseInt(document.getElementById("fStart").value,10);c.end=c.start;
+  var sel=document.querySelector(".color-swatch.active");if(sel)c.color=parseInt(sel.dataset.i,10);
+  saveCourses(cs);render();closeSheet();
+}
+function delCourse(){var cs=loadCourses();cs=cs.filter(function(x){return x.id!==editingId;});saveCourses(cs);render();closeSheet();}
+function addCourse(){
+  editingId=0;
+  var palette=buildCoursePalette(curCourseColors(),DEFAULT_COLORS);
+  var dayOpts=[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'">周'+WEEKDAYS[d-1]+'</option>';}).join("");
+  var startOpts=CLASS_TIMES.map(function(t,i){return '<option value="'+(i+1)+'">第'+(i+1)+'节 '+t.s+'</option>';}).join("");
+  document.getElementById("sheet").innerHTML=
+    '<div class="grab"></div><h3>添加课程</h3>'+
+    '<div class="field"><label>课程名称</label><input id="fName" placeholder="如 高等数学"></div>'+
+    '<div class="field"><label>副标题 / 教室</label><input id="fSub" placeholder="如 1号楼204 · 王老师"></div>'+
+    '<div class="row2"><div class="field"><label>星期</label><select id="fDay">'+dayOpts+'</select></div><div class="field"><label>节次</label><select id="fStart">'+startOpts+'</select></div></div>'+
+    '<div class="field"><label>颜色</label><div class="color-row" id="fColors"></div></div>'+
+    '<div class="btn-row"><button class="btn btn-primary" onclick="saveAdd()">保存</button><button class="btn btn-ghost" onclick="closeSheet()">取消</button></div>';
+  var cr=document.getElementById("fColors");
+  palette.forEach(function(cc,i){var s=document.createElement("div");s.className="color-swatch"+(i===0?" active":"");s.style.background=cc.border;s.dataset.i=i;s.addEventListener("click",function(){document.querySelectorAll(".color-swatch").forEach(function(x){x.classList.remove("active");});s.classList.add("active");});cr.appendChild(s);});
+  showMask(true);
+}
+function saveAdd(){
+  var cs=loadCourses();var sel=document.querySelector(".color-swatch.active");
+  cs.push({id:Date.now(),day:parseInt(document.getElementById("fDay").value,10),start:parseInt(document.getElementById("fStart").value,10),end:parseInt(document.getElementById("fStart").value,10),name:document.getElementById("fName").value||"新课程",sub:document.getElementById("fSub").value,color:sel?parseInt(sel.dataset.i,10):0});
+  saveCourses(cs);render();closeSheet();
+}
+function closeSheet(){showMask(false);}
+function showMask(on){document.getElementById("mask").classList.toggle("show",on);}
+
+/* ============ 离线检测 ============ */
+function onOffline(){document.getElementById("offlineBar").classList.add("show");showTip("离线模式 · 课程已本地保存");}
+function onOnline(){document.getElementById("offlineBar").classList.remove("show");}
+window.addEventListener("offline",onOffline);
+window.addEventListener("online",onOnline);
+if(!navigator.onLine)onOffline();
+
+/* ============ 提示 ============ */
+var tipTimer=null;
+function showTip(msg){var t=document.getElementById("tip");t.textContent=msg;t.classList.add("show");clearTimeout(tipTimer);tipTimer=setTimeout(function(){t.classList.remove("show");},1800);}
+
+/* ============ 初始化 ============ */
+function init(){
+  THEMES.forEach(function(t){themeMap[t.no]=t;});
+  STATE.themeNo=loadJSON(THEME_KEY,"1");
+  if(!themeMap[STATE.themeNo])STATE.themeNo="1";
+  STATE.weekOffset=loadJSON(WEEK_KEY,0);
+  render();
+  buildSetting();
+  buildWeekPop();
+  initSwipe();
+  document.getElementById("actAdd").addEventListener("click",addCourse);
+  document.getElementById("actSetting").addEventListener("click",function(){go("setting");});
+  document.getElementById("actShare").addEventListener("click",function(){showTip("分享：可将课表截图发给同学");});
+  document.getElementById("actShowType").addEventListener("click",function(){showTip("周视图 · 左右拖动可切换周");});
+  document.getElementById("actClose").addEventListener("click",function(){go("home");});
+  document.getElementById("weekLabel").addEventListener("click",toggleWeekPop);
+  var mask=document.getElementById("weekMask");
+  mask.addEventListener("click",function(e){if(e.target.id==="weekMask")toggleWeekPop(false);});
+  document.getElementById("backWeek").addEventListener("click",function(){STATE.weekOffset=0;saveJSON(WEEK_KEY,0);render();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet();});
+  document.getElementById("mask").addEventListener("click",function(e){if(e.target.id==="mask")closeSheet();});
+  window.addEventListener("hashchange",onHash);
+  document.addEventListener("click",function(e){
+    var pop=document.getElementById("weekPop");
+    var mask2=document.getElementById("weekMask");
+    if(pop.classList.contains("show")&&!pop.contains(e.target)&&!document.getElementById("weekLabel").contains(e.target)){
+      toggleWeekPop(false);
+      if(mask2.classList.contains("show"))mask2.classList.remove("show");
+    }
+  });
+  onHash();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+else init();
+
+</script>
+</body>
+</html>

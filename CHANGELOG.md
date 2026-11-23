@@ -1,5 +1,15 @@
 # 更新记录
 
+## 仓库结构整理 — 2026-11-23
+
+不是功能改动，是把仓库里由来已久的重复清理掉。
+
+- 网页源只保留 `jwxt-webapp/` 一份；`apk-source/assets/` 与 `cicp-jwxt-android/app/src/main/assets/` 改为打包前由脚本生成，已加入 `.gitignore`
+- 移除 30 个内容完全相同的副本：`index.html`、6 个 js、`app.css`、`experience.js`、5 张课表皮肤图各 3 份中的 2 份
+- `jwxt-mobile.html` 原先只存在于两份 assets、没有源，已补进 `jwxt-webapp/` 并纳入同步
+- 同步脚本换成 `scripts/sync-web-assets.sh`，替代过时且漏同步 js 的 PowerShell 版本
+- 打包工具两个 jar 移出仓库，改由 `buildtools` Release 提供，clone 后体积从 36MB 降到 11MB
+
 ## V278（v0.9.96）— 2026-11-22
 
 课表页视觉收口。表头恢复原始素材，深色与浅色共用一套结构、只换变量。

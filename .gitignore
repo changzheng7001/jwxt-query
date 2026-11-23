@@ -31,6 +31,10 @@ Thumbs.db
 # apktool 构建目录
 apk-source/build/
 
+# 打包时由 scripts/sync-web-assets.sh 从 jwxt-webapp/ 生成，不入库
+apk-source/assets/
+cicp-jwxt-android/app/src/main/assets/
+
 # 打包工具二进制（从 buildtools Release 下载，不入库）
 .buildtools/
 

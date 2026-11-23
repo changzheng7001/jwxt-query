@@ -2,7 +2,9 @@
 
 中央司法警官学院教务系统查询工具，WebView 包装的 Android 应用。
 
-> 当前版本 **v0.9.96（构建序号 V278）** · 文档更新 2026-11-22 · [最新 Release](https://github.com/changzheng7001/jwxt-query/releases)
+> 当前版本 **v0.9.96（构建序号 V278）** · 文档更新 2026-11-23 · [最新 Release](https://github.com/changzheng7001/jwxt-query/releases)
+>
+> 仓库只保留一份网页源（`jwxt-webapp/`），打包工程里的 assets 是构建时由脚本生成的副本，不入库。
 
 ## 功能
 
@@ -47,7 +49,7 @@
 └──────────────────────────────────┘
 ```
 
-- **前端**：单文件 HTML + CSS + JS（`cicp-jwxt-android/app/src/main/assets/index.html`，源文件 `jwxt-webapp/index.html`）
+- **前端**：模块化 HTML + CSS + JS，唯一源在 `jwxt-webapp/`；打包前由 `scripts/sync-web-assets.sh` 复制进两处 assets（不入库）
 - **Android 原生层**：`MainActivity.java`（WebView + JS 桥）
 - **接口**：直接调用教务系统 HTTP 接口
 
@@ -61,25 +63,21 @@
 ## 目录结构
 
 ```
-├── cicp-jwxt-android/            # 标准 Android Studio 工程（推荐）
-│   ├── settings.gradle / build.gradle / gradle.properties
-│   └── app/
-│       ├── build.gradle
-│       └── src/main/
-│           ├── AndroidManifest.xml
-│           ├── java/com/cicp/jwxt/                     # 原生层
-│           │   ├── MainActivity.java                  # WebView + JS 桥
-│           │   ├── InAppOpen.java                     # 官网页内打开与会话注入
-│           │   └── CookieWebClient.java               # 子资源请求补 Cookie
-│           ├── assets/index.html                       # 前端（主要改这里）
-│           └── res/                                    # 布局/样式/图标
-├── jwxt-webapp/                  # 前端源（改这里，再同步到两份 assets）
+├── jwxt-webapp/                  # 唯一网页源，改这里就够了
 │   ├── index.html                # 页面结构 + 主题变量 + 课表页样式
+│   ├── jwxt-mobile.html          # 官网手机端适配注入用的样式模板
 │   ├── js/                       # 01-foundation / 02-state / 03-parse / 04-query / 05-render / 06-ui
 │   ├── ui/app.css                # 统一外观补充（改前先 grep !important 覆盖）
 │   ├── ui/experience.js          # 系统主题、首页布局、面板与缓存
 │   └── schedule-assets/          # 课表皮肤：山水 bg、表头 head、顶栏 top、古筝动图 bottom
-├── apk-source/                    # 反编译打包源（smali + java，apktool 构建用）
+├── cicp-jwxt-android/            # 标准 Android Studio 工程
+│   └── app/src/main/
+│       ├── java/com/cicp/jwxt/   # 原生层：MainActivity / InAppOpen / CookieWebClient
+│       ├── res/                  # 布局 / 样式 / 图标
+│       └── assets/               # 生成物，不入库（脚本从 jwxt-webapp 复制）
+├── apk-source/                    # 反编译打包源（smali + java，apktool 用）
+│   └── assets/                    # 生成物，不入库（同上）
+├── scripts/sync-web-assets.sh     # 把网页源复制进两处 assets
 ├── tests/                         # node 逻辑回归（17 项，不依赖真实样本）
 ├── tools/                         # 无头浏览器回归与质检脚本（需要本地 tests/fixtures）
 │   ├── shot_dark.py / shot_light.py   # 深浅两套场景截图
@@ -97,17 +95,14 @@
 
 ## 维护与代码链说明
 
-- **前端唯一源文件**：日常修改 `jwxt-webapp/index.html`、`js/*.js` 和 `schedule-assets/`。`ui/app.css` 维护统一外观，`ui/experience.js` 维护系统主题、首页布局、面板与缓存展示。
-- **同步所有打包目标**：改完 `jwxt-webapp/` 后必须同步到 `apk-source/assets/` 与 `cicp-jwxt-android/app/src/main/assets/` 两份工程，否则打出来的包与网页预览不一致。Linux/macOS 下：
+- **网页源只有一份**：改界面只动 `jwxt-webapp/`（`index.html`、`js/*.js`、`ui/`、`schedule-assets/`、`jwxt-mobile.html`）。
+- **打包前跑一条命令**：
 
   ```bash
-  cp jwxt-webapp/index.html apk-source/assets/index.html
-  cp jwxt-webapp/js/*.js   apk-source/assets/js/
-  cp jwxt-webapp/ui/*.js jwxt-webapp/ui/app.css apk-source/assets/ui/
-  rsync -a --delete jwxt-webapp/schedule-assets/ apk-source/assets/schedule-assets/
-  # cicp-jwxt-android/app/src/main/assets/ 同样复制一份
+  bash scripts/sync-web-assets.sh
   ```
 
+  它会把网页源复制进 `apk-source/assets/` 与 `cicp-jwxt-android/app/src/main/assets/`，并清掉旧文件。这两处是**生成物**，已加入 `.gitignore`，不要手工改、也不要提交。
 - **Android 原生改动**：标准工程改 `cicp-jwxt-android/`；反编译打包改 `apk-source/`，并保持 Java/Smali 行为一致。`apk-source/java/` 不参与打包，改完必须重跑 `javac → d8 → baksmali` 回填 `smali_classes2/`。
 - **版本号约定**：设置页版本标识写 `V序号`，同时改 `index.html` 的 `vX.Y.Z · Vxxx` 与 `apk-source/apktool.yml` 的 `versionName`；`versionCode` 固定 `1000`，保证任意版本可互相覆盖安装、出问题能立刻回退。
 - **视觉改前先 grep `ui/app.css`**：历史上多次「改了 `index.html` 却不生效」都是这里残留的 `!important` 覆盖造成的。
@@ -127,9 +122,10 @@ curl -L -o .buildtools/uber-apk-signer.jar \
   https://github.com/changzheng7001/jwxt-query/releases/download/buildtools/uber-apk-signer.jar
 ```
 
-然后打包：
+然后同步网页并打包：
 
 ```bash
+bash scripts/sync-web-assets.sh                       # 必须：生成两处 assets
 java -jar .buildtools/apktool.jar b apk-source -o /tmp/out.apk
 java -jar .buildtools/uber-apk-signer.jar --apks /tmp/out.apk \
   --ks <你的 keystore>.jks --ksAlias <alias> --ksPass <pass> --ksKeyPass <pass> --out /tmp/signed
@@ -147,11 +143,11 @@ apksigner verify --print-certs /tmp/signed/*-aligned-signed.apk   # 签名证书
 
 ### 方式二：标准 Android Studio 工程
 
-在装有 Android Studio 的机器上打开构建：
+在装有 Android Studio 的机器上先同步再构建（assets 是生成物，不跑同步脚本会缺页面）：
 
 ```bash
-cd cicp-jwxt-android
-./gradlew assembleRelease
+bash scripts/sync-web-assets.sh
+cd cicp-jwxt-android && ./gradlew assembleRelease
 ```
 
 ## 使用
@@ -160,7 +156,7 @@ cd cicp-jwxt-android
 
 - 课表类查询采用参考 demo 的「唐韵书声」样式：分层背景、固定日期表头、节次与课程一体滚动、彩色描边课程块、底部周次选择器及「回到本周」。保留学校现有的 12 节时间表。
 - 左右拖动可预览相邻周的真实缓存；没有缓存时直接切到该周的空课表并提示「暂无缓存」，不会把旧课表当作新周显示。空课表比停在上一周更直观，避免误把旧数据当成新周。查询新周数据仍使用「查询参数」浮窗。
-- 顶栏提供“只看今天 / 周课表”切换、刷新与返回首页；单列模式仅展示当前学期今天的课程，切换时会回到本周。课程格的名称每行最多四个字符。课程详情、复制信息以及四个浮窗继续保留。
+- 顶栏提供“只看今天 / 周课表”切换、刷新与返回首页；单列模式仅展示当前学期今天的课程，切换时会回到本周。课程格名称按格宽自动换行。课程详情、复制信息以及四个浮窗继续保留。
 - 默认皮肤图片与动图来自用户提供的 `课表demo.html`，保存在 `jwxt-webapp/schedule-assets/`，随 APK 离线打包；未引入 demo 的演示课程、增删课程功能及完整皮肤商城。
 - 学期周次可在设置中调整；缓存和今日课程提醒会按当前账户、当前学期过滤。
 - 回归检查：`node --test tests/*.test.cjs`（需要 Node.js，纯逻辑不依赖样本）。
@@ -171,7 +167,7 @@ cd cicp-jwxt-android
 - 设置中的外观分为“自动 / 浅色 / 深色”。自动模式优先读取安卓原生 `uiMode`，系统切换和应用回到前台时同步刷新；网页预览使用 `prefers-color-scheme`。
 - 首页双击面板标题收起到边缘，点击边缘标签展开，双击展开后的标题可还原到首页；页尾也可一键还原全部面板。触屏支持双击标题。
 - 四个浮窗统一按屏幕可用高度排布，较长内容在窗内滚动；返回首页清除结果页坐标，保留用户主动收起的面板。
-- 首页 SVG 书页持续翻动，在结果页、设置页和应用后台暂停；系统开启“减少动态效果”时停止动画。
+- 课表页背景为常驻山水图 + 底部古筝动图；系统开启「减少动态效果」时停用动画。
 - 缓存界面只列出当前账户的个人数据与公共缓存，大小按 localStorage 字符串估算。旧缓存不会因界面升级而删除。
 
 1. 安装 APK
@@ -218,7 +214,7 @@ cd cicp-jwxt-android
 
 ### 7. 打包链路没有自动化（无 CI）
 
-发版靠手动跑脚本：同步 assets → apktool 打包 → uber-apk-signer 签名 → aapt 校验版本 → apksigner 校验证书 → 解包核对 md5。仓库里只有源码和 `.buildtools/` 两个 jar，没有流水线，换台机器要重搭环境。
+发版靠手动跑命令：`sync-web-assets.sh` 同步 → apktool 打包 → uber-apk-signer 签名 → aapt 校验版本 → apksigner 校验证书 → 解包核对 md5。仓库只有源码，两个 jar 要从 `buildtools` Release 下载，没有流水线，换台机器要重搭环境。
 
 ### 8. 回归样本不入库
 
@@ -226,14 +222,14 @@ cd cicp-jwxt-android
 
 ## 时间线
 
-最近一轮迭代集中在「官网免登录跳转」和「手机端适配」，主要节点：
+按时间倒序，最近几轮集中在课表页视觉、解析与出包链路：
 
 | 时间 | 版本 | 内容 |
 |---|---|---|
 | 2026-11-10 | v145–v147 | 清理旧版页面死样式；新增 App 内打开官网并注入会话，前两版因取错 Cookie 来源失败 |
 | 2026-11-11 | v150–v155 | 加诊断输出定位问题：Cookie 正常、登录页是根地址导致；改为按模块真实地址跳转，改用真实地址加载 + 拦截器带会话 |
 | 2026-11-11 | v156–v160 | 打开方式可选「应用内 / 外部浏览器」；实测各模块后缀差异（`.jsp` 走模板、`.htmlx` 走完整框架、无后缀走 Action），最终定为 `.jsp` 内容页 |
-| 2026-11-11 | v161–v166 | 启动直达课表并消除闪屏；版本显示改为 V 序号（内部 versionName 保持 0.9.8）；刷新按钮加转圈反馈；versionCode 固定 1000 便于自由回退 |
+| 2026-11-11 | v161–v166 | 启动直达课表并消除闪屏；版本显示改为 V 序号（当时 versionName 固定 0.9.8，V278 起改为逐版递增）；刷新按钮加转圈反馈；versionCode 固定 1000 便于自由回退 |
 | 2026-11-11 | v167–v173 | 全校课程列表并入「全校列表」并改为一排四列；统一班级/教室/课程列表配色；课程课表「选择」弹窗；按格子顺序重写解析，修掉教师被并进班级 |
 | 2026-11-11 | v174–v180 | 官网跳转对应关系整理成表；教务页上下留白改为注入页面内部生效；移除底部导航栏，设置改为右侧磁贴；设置页改用系统返回 |
 | 2026-11-12 | v181–v185 | 刷新反馈只在手动刷新触发；预留用户自定义 CSS/JS 注入（暂未启用）；手机端适配放弃整页 zoom，改为主文档注入 + 资源透传，修掉页面点不动 |
@@ -279,7 +275,7 @@ cd cicp-jwxt-android
 
 ### 这套流程带来的便利
 
-- **端到端闭环**：改源码 → 同步两份 assets → 打包 → 签名 → aapt/apksigner 校验 → 解包 md5 核对 → 交付，全在对话里完成
+- **端到端闭环**：改源码 → 一条脚本同步 → 打包 → 签名 → aapt/apksigner 校验 → 解包 md5 核对 → 交付，全在对话里完成
 - **真机即测**：交付一张 APK 卡片，用户装完回一张截图就能继续定位，反馈链路很短
 - **不依赖本地环境**：云侧完成打包与签名，无需本机装 Android Studio
 - **能读回执自证**：无法直接看界面时，用无头浏览器截图和像素采样替代猜测；强断言不靠肉眼

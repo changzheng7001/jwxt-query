@@ -31,6 +31,9 @@ Thumbs.db
 # apktool 构建目录
 apk-source/build/
 
+# Android 本机配置（含 SDK 绝对路径）
+local.properties
+
 # 本地凭证（含明文密码，勿提交）
 skills/*/scripts/credentials.json
 *.rooms_cache.html
